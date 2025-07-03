@@ -1,0 +1,286 @@
+/**
+ * @fileoverview Main Injector class for managing dependencies.
+ */
+
+import type {GenericInjectionId, InjectionId} from './types.js';
+import type {Provider, GenericProvider} from './providers.js';
+import {
+  isValueProvider,
+  isClassProvider,
+  isConstructorProvider,
+  isFactoryProvider,
+  isExistingProvider,
+} from './providers.js';
+import {
+  AlreadyProvidedError,
+  NotProvidedError,
+  UnknownProviderError,
+  NeverCachedError,
+} from './errors.js';
+
+/**
+ * Internal provider wrapper that provides a uniform interface for all provider types.
+ */
+interface InjectorProvider {
+  /** The injection identifier (token or constructor). */
+  id: GenericInjectionId;
+  /** Whether the resolved value should be cached. */
+  isSingleton: boolean;
+  /** Function that creates/returns the provider's value. */
+  resolve: () => unknown;
+}
+
+/**
+ * Main dependency injection container that manages providers and resolved values.
+ */
+export class Injector {
+  private providers = new Map<GenericInjectionId, InjectorProvider>();
+  private cache = new Map<GenericInjectionId, unknown>();
+  private boundInject = this.inject.bind(this);
+
+  /**
+   * Creates a new Injector instance.
+   *
+   * @param defaultAllowOverrides Whether to allow provider overrides by default
+   *     when no explicit allowOverrides parameter is provided.
+   */
+  constructor(public defaultAllowOverrides: boolean = false) {}
+
+  /**
+   * Creates a new Injector instance from an existing one, copying all providers.
+   *
+   * @param injector The source injector to copy from.
+   * @param copyCache Whether to copy the cache of resolved dependencies.
+   * @returns A new Injector instance with copied providers and optionally cached values.
+   */
+  static from(injector: Injector, copyCache: boolean = false): Injector {
+    const newInjector = new Injector(injector.defaultAllowOverrides);
+
+    // Copy all providers
+    for (const [id, provider] of injector.providers) {
+      newInjector.providers.set(id, provider);
+    }
+
+    // Copy cache if requested
+    if (copyCache) {
+      for (const [id, value] of injector.cache) {
+        newInjector.cache.set(id, value);
+      }
+    }
+
+    return newInjector;
+  }
+
+  /**
+   * Registers one or more providers with the injector.
+   *
+   * @param providerOrProviders Single provider or array of providers to register.
+   * @param allowOverrides Whether to allow overriding existing providers. If undefined, uses defaultAllowOverrides.
+   * @throws {AlreadyProvidedError} When attempting to register a provider that already exists and allowOverrides is false.
+   * @throws {UnknownProviderError} When provider type is not supported.
+   */
+  register<T>(
+    providerOrProviders: Provider<T> | GenericProvider[],
+    allowOverrides?: boolean
+  ): void {
+    const providerArray = Array.isArray(providerOrProviders)
+      ? providerOrProviders
+      : [providerOrProviders];
+    const shouldThrowOnOverride = !(allowOverrides !== undefined
+      ? allowOverrides
+      : this.defaultAllowOverrides);
+
+    for (const provider of providerArray) {
+      const injectorProvider = this.createInjectorProvider(provider);
+
+      if (shouldThrowOnOverride && this.providers.has(injectorProvider.id)) {
+        throw new AlreadyProvidedError(injectorProvider.id);
+      }
+
+      this.providers.set(injectorProvider.id, injectorProvider);
+    }
+  }
+
+  /**
+   * Resolves a dependency by its injection ID.
+   *
+   * For singleton providers, returns the same instance on subsequent calls.
+   * For transient providers, creates a new instance on each call.
+   * For value providers, returns the registered value.
+   * For existing providers (aliases), delegates to the target provider.
+   *
+   * @param id Token or constructor to resolve.
+   * @param defaultValue Value to return if provider is not found.
+   * @returns The resolved dependency instance.
+   * @throws {NotProvidedError} When no provider is registered for the ID and no default value is provided.
+   */
+  inject<T>(id: InjectionId<T>, defaultValue?: T): T {
+    const provider = this.providers.get(id);
+
+    if (!provider) {
+      if (defaultValue !== undefined) {
+        return defaultValue;
+      }
+      throw new NotProvidedError(id);
+    }
+
+    // Check cache first - if cached, assume it's singleton
+    if (this.cache.has(id)) {
+      return this.cache.get(id) as T;
+    }
+
+    // Resolve the provider
+    const instance = provider.resolve();
+
+    // Cache if singleton
+    if (provider.isSingleton) {
+      this.cache.set(id, instance);
+    }
+
+    return instance as T;
+  }
+
+  /**
+   * Checks if the injector has a provider registered for the given injection ID.
+   *
+   * @param id The injection ID to check for.
+   * @returns True if a provider is registered for the given ID, false otherwise.
+   */
+  hasProviderFor(id: GenericInjectionId): boolean {
+    return this.providers.has(id);
+  }
+
+  /**
+   * Checks if the injector has a cached value for the given injection ID.
+   *
+   * @param id The injection ID to check for cached value.
+   * @returns True if a cached value exists for the given ID, false otherwise.
+   * @throws {NotProvidedError} When no provider is registered for the given ID.
+   * @throws {NeverCachedError} When checking cache status of a transient provider.
+   */
+  hasCachedValue(id: GenericInjectionId): boolean {
+    const provider = this.providers.get(id);
+
+    if (!provider) {
+      throw new NotProvidedError(id);
+    }
+
+    // Throw error if provider is transient (never cached)
+    if (!provider.isSingleton) {
+      throw new NeverCachedError(id);
+    }
+
+    return this.cache.has(id);
+  }
+
+  /**
+   * Clears the cache of resolved dependencies, but keeps the providers registered.
+   *
+   * @param ids Single ID, array of IDs, or undefined to clear all cache.
+   * @throws {NotProvidedError} When any of the provided IDs is not registered.
+   * @throws {NeverCachedError} When trying to invalidate a provider that is never cached.
+   */
+  invalidate(ids?: GenericInjectionId | GenericInjectionId[]): void {
+    if (ids === undefined) {
+      // Clear all cache
+      this.cache.clear();
+      return;
+    }
+
+    const idArray = Array.isArray(ids) ? ids : [ids];
+
+    for (const id of idArray) {
+      const provider = this.providers.get(id);
+
+      if (!provider) {
+        throw new NotProvidedError(id);
+      }
+
+      // Throw error if provider is transient (never cached)
+      if (!provider.isSingleton) {
+        throw new NeverCachedError(id);
+      }
+
+      // Remove from cache if it exists
+      this.cache.delete(id);
+    }
+  }
+
+  /**
+   * Unregisters providers for the given IDs and removes any cached values.
+   *
+   * @param ids Single ID, array of IDs, or undefined to unregister all providers.
+   * @throws {NotProvidedError} When any of the provided IDs is not registered.
+   */
+  unregister(ids?: GenericInjectionId | GenericInjectionId[]): void {
+    if (ids === undefined) {
+      // Reset the injector - remove all providers and cache
+      this.providers.clear();
+      this.cache.clear();
+      return;
+    }
+
+    const idArray = Array.isArray(ids) ? ids : [ids];
+
+    for (const id of idArray) {
+      if (!this.providers.has(id)) {
+        throw new NotProvidedError(id);
+      }
+
+      // Remove provider and any cached value
+      this.providers.delete(id);
+      this.cache.delete(id);
+    }
+  }
+
+  /**
+   * Creates an internal provider wrapper for the given provider configuration.
+   *
+   * @param provider External provider configuration.
+   * @returns Internal provider wrapper.
+   * @throws {UnknownProviderError} When provider type is not supported.
+   */
+  private createInjectorProvider(provider: GenericProvider): InjectorProvider {
+    if (isConstructorProvider(provider)) {
+      return {
+        id: provider,
+        isSingleton: true,
+        resolve: () => new provider(this.boundInject),
+      };
+    }
+
+    if (isValueProvider(provider)) {
+      return {
+        id: provider.provide,
+        isSingleton: false, // Value providers are never cached
+        resolve: () => provider.useValue,
+      };
+    }
+
+    if (isClassProvider(provider)) {
+      return {
+        id: provider.provide,
+        isSingleton: provider.scope === 'singleton',
+        resolve: () => new provider.useClass(this.boundInject),
+      };
+    }
+
+    if (isFactoryProvider(provider)) {
+      return {
+        id: provider.provide,
+        isSingleton: provider.scope === 'singleton',
+        resolve: () => provider.useFactory(this.boundInject),
+      };
+    }
+
+    if (isExistingProvider(provider)) {
+      return {
+        id: provider.provide,
+        isSingleton: false, // Existing providers delegate to the target provider's caching
+        resolve: () => this.inject(provider.useExisting),
+      };
+    }
+
+    throw new UnknownProviderError(provider);
+  }
+}
