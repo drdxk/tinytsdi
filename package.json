@@ -4,7 +4,7 @@
   "description": "Minimalistic TypeScript Dependency Injection library",
   "repository": {
     "type": "git",
-    "url": "git remote add origin https://github.com/drdxk/tinytsdi.git"
+    "url": "git+https://github.com/drdxk/tinytsdi.git"
   },
   "license": "ISC",
   "author": "Dmytro Kossa",
