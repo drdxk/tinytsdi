@@ -18,7 +18,10 @@
     }
   },
   "files": [
-    "src/**/*.ts",
+    "src/*.ts",
+    "!src/*.test.ts",
+    "!src/*.spec.ts",
+    "!src/*.compile-test.ts",
     "README.md",
     "CHANGELOG.md"
   ],
