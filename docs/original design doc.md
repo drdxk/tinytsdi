@@ -86,14 +86,14 @@ describe('SUT', () => {
   let testInjector: Injector;
   beforeAll(() => {
     // Option A: replace the global injector with a clean one.
-    testInjector = newTestInjector(); /* fromCurrent = false, allowOverrides = false */
+    newTestInjector(); /* fromCurrent = false, allowOverrides = false */
     // Option B: replace the global injector, but keep registered providers.
-    testInjector = newTestInjector(
+    newTestInjector(
       /* fromCurrent */ = true,
       /* allowOverrides */ = true
     );
-    // option C: BYOI.
-    testInjector = setTestInjector(myTestInjectorFromElsewhwere);
+    // option C: BYO injector.
+    setTestInjector(myTestInjectorFromElsewhere);
   });
   afterAll(() => {
     // Restores the previous injector, no need to track.

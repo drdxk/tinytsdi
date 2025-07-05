@@ -61,8 +61,7 @@ import {newTestInjector, setTestInjector, removeTestInjector} from 'tinytsdi';
 describe('MyService', () => {
   beforeEach(() => {
     // Create isolated test injector
-    const testInjector = newTestInjector(true, true); // fromCurrent=true, allowOverrides=true
-    setTestInjector(testInjector);
+    newTestInjector(/* fromCurrent= */ true, /* allowOverrides= */ true);
 
     // Override dependencies for testing
     register({provide: CONFIG, useValue: {apiUrl: 'http://test.local'}});

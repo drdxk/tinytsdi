@@ -1,6 +1,6 @@
 {
   "name": "tinytsdi",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Minimalistic TypeScript Dependency Injection library",
   "repository": {
     "type": "git",
@@ -9,19 +9,18 @@
   "license": "ISC",
   "author": "Dmytro Kossa",
   "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     }
   },
   "files": [
-    "src/*.ts",
-    "!src/*.test.ts",
-    "!src/*.spec.ts",
-    "!src/*.compile-test.ts",
+    "dist/**/*",
     "README.md",
     "CHANGELOG.md"
   ],
@@ -37,6 +36,7 @@
     "lint": "eslint && prettier --check src",
     "lint:fix": "eslint --fix",
     "format": "prettier --write src",
+    "build": "rm -rf dist && tsc -p tsconfig.build.types.json && tsc -p tsconfig.build.esm.json && tsc -p tsconfig.build.cjs.json",
     "check": "npm run typecheck && npm run lint && npm run test:run"
   },
   "devDependencies": {

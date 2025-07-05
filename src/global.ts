@@ -171,14 +171,16 @@ export function newTestInjector(
 ): Injector {
   checkTestInjectorAllowed();
 
+  let testInjector: Injector;
   if (fromCurrent && injector) {
     // Always copy from the global injector, not the test injector
-    const testInj = Injector.from(injector, false);
-    testInj.defaultAllowOverrides = allowOverrides;
-    return testInj;
+    testInjector = Injector.from(injector, false);
+    testInjector.defaultAllowOverrides = allowOverrides;
+  } else {
+    testInjector = new Injector(allowOverrides);
   }
-
-  return new Injector(allowOverrides);
+  setTestInjector(testInjector);
+  return testInjector;
 }
 
 /**
