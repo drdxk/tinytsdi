@@ -1,16 +1,17 @@
 /**
- * @fileoverview Tests for provider types
+ * Tests for provider types
  */
 
-import {describe, it, expect} from 'vitest';
-import {Token} from './types.js';
+import {describe, expect, it} from 'vitest';
+
 import type {
-  ValueProvider,
   ClassProvider,
-  FactoryProvider,
   ExistingProvider,
+  FactoryProvider,
   Provider,
+  ValueProvider,
 } from './providers.js';
+import {InjectFn, Token} from './types.js';
 
 describe('Provider types', () => {
   it('creates ValueProvider', () => {
@@ -55,7 +56,11 @@ describe('Provider types', () => {
 
   it('creates FactoryProvider with InjectFn factory', () => {
     const token = new Token<string>('string');
-    const factory = (inject: any) => `result: ${inject}`;
+
+    const factory = (inject: InjectFn) => {
+      void inject;
+      return 'result';
+    };
 
     const provider: FactoryProvider<string> = {
       provide: token,

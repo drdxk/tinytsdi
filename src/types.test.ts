@@ -1,8 +1,9 @@
 /**
- * @fileoverview Tests for basic types
+ * Tests for basic types
  */
 
-import {describe, it, expect} from 'vitest';
+import {describe, expect, it} from 'vitest';
+
 import {Token} from './types.js';
 
 describe('Token', () => {

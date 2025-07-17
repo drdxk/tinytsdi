@@ -1,5 +1,5 @@
 /**
- * @fileoverview TypeScript Dependency Injection library - Main exports
+ * TypeScript Dependency Injection library - Main exports
  */
 
 // Re-export all types
@@ -12,13 +12,13 @@ export {Injector} from './injector.js';
 
 // Re-export global API functions
 export {
-  register,
-  inject,
-  getInjector,
   deleteInjector,
+  getInjector,
   init,
+  inject,
   newTestInjector,
-  setTestInjector,
+  register,
   removeTestInjector,
+  setTestInjector,
 } from './global.js';
 export type {Config} from './global.js';

@@ -1,11 +1,12 @@
 /**
- * @fileoverview Tests for Injector class
+ * Tests for Injector class
  */
 
-import {describe, it, expect} from 'vitest';
+import {describe, expect, it} from 'vitest';
+
+import {AlreadyProvidedError, NotProvidedError, UnknownProviderError} from './errors.js';
 import {Injector} from './injector.js';
 import {InjectFn, Token} from './types.js';
-import {AlreadyProvidedError, NotProvidedError, UnknownProviderError} from './errors.js';
 
 describe('Injector', () => {
   describe('constructor', () => {
@@ -189,6 +190,7 @@ describe('Injector', () => {
       const injector = new Injector();
       const token = new Token<string>('test');
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const invalidProvider = {provide: token, useUnknown: 'invalid'} as any;
 
       expect(() => injector.register(invalidProvider)).toThrow(UnknownProviderError);

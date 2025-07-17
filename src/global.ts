@@ -1,11 +1,11 @@
 /**
- * @fileoverview Global API functions for dependency injection using a module-level singleton injector.
+ * Global API functions for dependency injection using a module-level singleton injector.
  */
 
-import {Injector} from './injector.js';
-import type {InjectionId} from './types.js';
-import type {GenericProvider, Provider} from './providers.js';
 import {AlreadyInitializedError, TestInjectorNotAllowedError} from './errors.js';
+import {Injector} from './injector.js';
+import type {GenericProvider, Provider} from './providers.js';
+import type {InjectionId} from './types.js';
 
 /** Configuration options for TSDI initialization. */
 export interface Config {
@@ -27,8 +27,8 @@ let config: Config | undefined;
  *
  * Can only be called once. Subsequent calls will throw AlreadyInitializedError.
  *
- * @param options Configuration options for TSDI.
- * @throws {AlreadyInitializedError} When init() has already been called.
+ * @param options - Configuration options for TSDI.
+ * @throws {@link AlreadyInitializedError} When init() has already been called.
  */
 export function init(options: Partial<Config> = {}): void {
   if (config !== undefined) {
@@ -90,10 +90,10 @@ export function deleteInjector(): void {
  * - Existing providers: `{provide: token, useExisting: otherToken}` (aliases)
  * - Constructor shorthand: `SomeClass` (equivalent to singleton class provider)
  *
- * @param providerOrProviders Single provider or array of providers to register.
- * @param allowOverrides Whether to allow overriding existing providers. If undefined, uses injector's default (false).
- * @throws {AlreadyProvidedError} When attempting to register a provider that already exists and allowOverrides is false.
- * @throws {UnknownProviderError} When provider type is not supported.
+ * @param providerOrProviders - Single provider or array of providers to register.
+ * @param allowOverrides - Whether to allow overriding existing providers. If undefined, uses injector's default (false).
+ * @throws {@link AlreadyProvidedError} - When attempting to register a provider that already exists and allowOverrides is false.
+ * @throws {@link UnknownProviderError} - When provider type is not supported.
  *
  * @example
  * ```typescript
@@ -125,10 +125,10 @@ export function register<T>(
  * For value providers, returns the registered value.
  * For existing providers (aliases), delegates to the target provider.
  *
- * @param id Token or constructor to resolve
- * @param defaultValue Value to return if provider is not found
+ * @param id - Token or constructor to resolve
+ * @param defaultValue - Value to return if provider is not found
  * @returns The resolved dependency instance
- * @throws {NotProvidedError} When no provider is registered for the ID and no default value is provided
+ * @throws {@link NotProvidedError} - When no provider is registered for the ID and no default value is provided
  *
  * @example
  * ```typescript
@@ -149,7 +149,7 @@ export function inject<T>(id: InjectionId<T>, defaultValue?: T): T {
 /**
  * Checks if test injector functions are disabled.
  *
- * @throws {TestInjectorNotAllowedError} When test injector functions are disabled via noTestInjector config.
+ * @throws {@link TestInjectorNotAllowedError} - When test injector functions are disabled via noTestInjector config.
  */
 function checkTestInjectorAllowed(): void {
   if (config?.noTestInjector) {
@@ -160,10 +160,10 @@ function checkTestInjectorAllowed(): void {
 /**
  * Creates a new test injector, optionally copying from the current global injector.
  *
- * @param fromCurrent Whether to copy providers from the current global injector (not test injector).
- * @param allowOverrides Whether the new test injector should allow provider overrides by default.
+ * @param fromCurrent - Whether to copy providers from the current global injector (not test injector).
+ * @param allowOverrides - Whether the new test injector should allow provider overrides by default.
  * @returns A new injector instance to be used for testing.
- * @throws {TestInjectorNotAllowedError} When test injector functions are disabled.
+ * @throws {@link TestInjectorNotAllowedError} - When test injector functions are disabled.
  */
 export function newTestInjector(
   fromCurrent: boolean = false,
@@ -186,9 +186,9 @@ export function newTestInjector(
 /**
  * Sets a custom test injector to override the global injector.
  *
- * @param injectorInstance The injector instance to use as the test injector.
+ * @param injectorInstance - The injector instance to use as the test injector.
  * @returns The provided injector instance for convenience.
- * @throws {TestInjectorNotAllowedError} When test injector functions are disabled.
+ * @throws {@link TestInjectorNotAllowedError} - When test injector functions are disabled.
  */
 export function setTestInjector(injectorInstance: Injector): Injector {
   checkTestInjectorAllowed();
@@ -199,7 +199,7 @@ export function setTestInjector(injectorInstance: Injector): Injector {
 /**
  * Removes the current test injector, restoring the global injector.
  *
- * @throws {TestInjectorNotAllowedError} When test injector functions are disabled.
+ * @throws {@link TestInjectorNotAllowedError} - When test injector functions are disabled.
  */
 export function removeTestInjector(): void {
   checkTestInjectorAllowed();

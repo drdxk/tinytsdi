@@ -1,18 +1,19 @@
-import {describe, it, expect, beforeEach} from 'vitest';
+import {beforeEach, describe, expect, it} from 'vitest';
+
+import {AlreadyInitializedError, TestInjectorNotAllowedError} from './errors.js';
 import {
-  getInjector,
-  register,
-  inject,
   deleteInjector,
+  getInjector,
   init,
+  inject,
   newTestInjector,
-  setTestInjector,
+  register,
   removeTestInjector,
   resetInitForTestOnly,
+  setTestInjector,
 } from './global.js';
 import {Injector} from './injector.js';
 import {Token} from './types.js';
-import {AlreadyInitializedError, TestInjectorNotAllowedError} from './errors.js';
 
 describe('Global API', () => {
   beforeEach(() => {

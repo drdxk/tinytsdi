@@ -1,25 +1,25 @@
 /**
- * @fileoverview Compile-time type tests for Provider types
+ * Compile-time type tests for Provider types
  *
  * This file contains type assignments that verify TypeScript compilation behavior
  * for provider types. It should be included in typecheck but not in runtime builds.
  *
  * Positive tests: Should compile without errors
- * Negative tests: Should fail compilation (marked with @ts-expect-error)
+ * Negative tests: Should fail compilation (marked with \@ts-expect-error)
  */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/require-await */
 
-import {Token} from './types.js';
-import type {InjectFn} from './types.js';
 import type {
-  ValueProvider,
   ClassProvider,
-  FactoryProvider,
   ExistingProvider,
+  FactoryProvider,
   Provider,
+  ValueProvider,
 } from './providers.js';
+import type {InjectFn} from './types.js';
+import {Token} from './types.js';
 
 // Test classes for provider tests
 class TestServiceNoArgs {

@@ -1,11 +1,11 @@
 /**
- * @fileoverview Compile-time tests for advanced Injector methods
+ * Compile-time tests for advanced Injector methods
  */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import type {InjectFn} from './types.js';
 import {Injector} from './injector.js';
+import type {InjectFn} from './types.js';
 import {Token} from './types.js';
 
 // Test classes for injection

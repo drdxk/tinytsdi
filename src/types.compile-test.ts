@@ -1,25 +1,25 @@
 /**
- * @fileoverview Compile-time type tests for TSDI types
+ * Compile-time type tests for TSDI types
  *
  * This file contains type assignments that verify TypeScript compilation behavior.
  * It should be included in typecheck but not in runtime builds.
  *
  * Positive tests: Should compile without errors
- * Negative tests: Should fail compilation (marked with @ts-expect-error)
+ * Negative tests: Should fail compilation (marked with \@ts-expect-error)
  */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
-import {Token} from './types.js';
 import type {
-  InjectionId,
-  InjectFn,
   Constructor,
+  InjectFn,
   InjectScope,
   InjectableConstructor,
+  InjectionId,
 } from './types.js';
+import {Token} from './types.js';
 
 // Test class for constructor tests
 class TestService {

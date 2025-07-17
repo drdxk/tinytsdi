@@ -1,11 +1,12 @@
 /**
- * @fileoverview Tests for advanced Injector methods
+ * Tests for advanced Injector methods
  */
 
-import {describe, it, expect} from 'vitest';
+import {describe, expect, it} from 'vitest';
+
+import {NeverCachedError, NotProvidedError} from './errors.js';
 import {Injector} from './injector.js';
 import {Token} from './types.js';
-import {NotProvidedError, NeverCachedError} from './errors.js';
 
 describe('Injector Advanced Methods', () => {
   describe('hasProviderFor', () => {

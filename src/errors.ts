@@ -1,8 +1,8 @@
 /**
- * @fileoverview Error classes for TSDI
+ * Error classes for TSDI
  */
 
-import {Token, type GenericInjectionId} from './types.js';
+import {type GenericInjectionId, Token} from './types.js';
 
 /** Error thrown when attempting to register a provider that already exists */
 export class AlreadyProvidedError extends Error {

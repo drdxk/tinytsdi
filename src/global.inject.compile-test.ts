@@ -1,11 +1,11 @@
 /**
- * @fileoverview Compile-time tests for global inject function
+ * Compile-time tests for global inject function
  */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import type {InjectFn} from './types.js';
 import {inject, register} from './global.js';
+import type {InjectFn} from './types.js';
 import {Token} from './types.js';
 
 // Test classes for injection

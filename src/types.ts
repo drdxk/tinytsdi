@@ -1,5 +1,5 @@
 /**
- * @fileoverview Core type definitions for TSDI
+ * Core type definitions for TSDI
  */
 
 /** Constructor type that can be used as InjectionId */

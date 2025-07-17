@@ -1,18 +1,18 @@
 /**
- * @fileoverview Compile-time type tests for Injector class
+ * Compile-time type tests for Injector class
  *
  * This file contains type assignments that verify TypeScript compilation behavior
  * for the Injector class. It should be included in typecheck but not in runtime builds.
  *
  * Positive tests: Should compile without errors
- * Negative tests: Should fail compilation (marked with @ts-expect-error)
+ * Negative tests: Should fail compilation (marked with \@ts-expect-error)
  */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import {Token} from './types.js';
-import type {InjectFn} from './types.js';
 import {Injector} from './injector.js';
+import type {InjectFn} from './types.js';
+import {Token} from './types.js';
 
 // Test classes with unique identities to avoid structural typing issues
 class TestServiceNoArgs {

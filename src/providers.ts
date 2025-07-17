@@ -1,8 +1,8 @@
 /**
- * @fileoverview Provider type definitions for TSDI
+ * Provider type definitions for TSDI
  */
 
-import type {InjectionId, InjectFn, InjectScope, InjectableConstructor} from './types.js';
+import type {InjectFn, InjectScope, InjectableConstructor, InjectionId} from './types.js';
 
 /** Associates a static value with an InjectionId */
 export interface ValueProvider<T> {

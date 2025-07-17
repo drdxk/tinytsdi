@@ -1,10 +1,11 @@
 /**
- * @fileoverview Tests for error classes
+ * Tests for error classes
  */
 
-import {describe, it, expect} from 'vitest';
+import {describe, expect, it} from 'vitest';
+
+import {AlreadyProvidedError, NeverCachedError, NotProvidedError} from './errors.js';
 import {Token} from './types.js';
-import {AlreadyProvidedError, NotProvidedError, NeverCachedError} from './errors.js';
 
 describe('Error classes', () => {
   it('creates AlreadyProvidedError with token', () => {
