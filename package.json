@@ -36,7 +36,7 @@
     "lint": "eslint && prettier --check src",
     "lint:fix": "eslint --fix",
     "format": "prettier --write src",
-    "build": "rm -rf dist && tsc -p tsconfig.build.types.json && tsc -p tsconfig.build.esm.json && tsc -p tsconfig.build.cjs.json",
+    "build": "rm -rf dist && tsc -p tsconfig.build.types.json && tsc -p tsconfig.build.esm.json && tsc-alias -p tsconfig.build.esm.json && tsc -p tsconfig.build.cjs.json && tsc-alias -p tsconfig.build.cjs.json && find dist/cjs -name '*.js' -exec mv {} {}.cjs \\;",
     "check": "npm run typecheck && npm run lint && npm run test:run"
   },
   "devDependencies": {
