@@ -4,6 +4,8 @@
 
 import {describe, expect, it} from 'vitest';
 
+import {InjectFn, Token} from './types.js';
+
 import type {
   ClassProvider,
   ExistingProvider,
@@ -11,7 +13,6 @@ import type {
   Provider,
   ValueProvider,
 } from './providers.js';
-import {InjectFn, Token} from './types.js';
 
 describe('Provider types', () => {
   it('creates ValueProvider', () => {

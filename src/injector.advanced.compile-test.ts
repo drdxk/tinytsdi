@@ -5,8 +5,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import {Injector} from './injector.js';
-import type {InjectFn} from './types.js';
 import {Token} from './types.js';
+
+import type {InjectFn} from './types.js';
 
 // Test classes for injection
 class TestService {

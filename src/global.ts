@@ -4,6 +4,7 @@
 
 import {AlreadyInitializedError, TestInjectorNotAllowedError} from './errors.js';
 import {Injector} from './injector.js';
+
 import type {GenericProvider, Provider} from './providers.js';
 import type {InjectionId} from './types.js';
 

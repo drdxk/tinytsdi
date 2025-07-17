@@ -11,8 +11,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import {Injector} from './injector.js';
-import type {InjectFn} from './types.js';
 import {Token} from './types.js';
+
+import type {InjectFn} from './types.js';
 
 // Test classes with unique identities to avoid structural typing issues
 class TestServiceNoArgs {

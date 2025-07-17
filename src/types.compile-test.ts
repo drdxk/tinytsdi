@@ -12,6 +12,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
+import {Token} from './types.js';
+
 import type {
   Constructor,
   InjectFn,
@@ -19,7 +21,6 @@ import type {
   InjectableConstructor,
   InjectionId,
 } from './types.js';
-import {Token} from './types.js';
 
 // Test class for constructor tests
 class TestService {

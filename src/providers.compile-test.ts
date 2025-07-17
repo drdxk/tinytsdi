@@ -11,6 +11,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/require-await */
 
+import {Token} from './types.js';
+
 import type {
   ClassProvider,
   ExistingProvider,
@@ -19,7 +21,6 @@ import type {
   ValueProvider,
 } from './providers.js';
 import type {InjectFn} from './types.js';
-import {Token} from './types.js';
 
 // Test classes for provider tests
 class TestServiceNoArgs {

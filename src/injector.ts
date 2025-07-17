@@ -8,7 +8,6 @@ import {
   NotProvidedError,
   UnknownProviderError,
 } from './errors.js';
-import type {GenericProvider, Provider} from './providers.js';
 import {
   isClassProvider,
   isConstructorProvider,
@@ -16,6 +15,8 @@ import {
   isFactoryProvider,
   isValueProvider,
 } from './providers.js';
+
+import type {GenericProvider, Provider} from './providers.js';
 import type {GenericInjectionId, InjectionId} from './types.js';
 
 /**

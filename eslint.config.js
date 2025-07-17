@@ -69,6 +69,7 @@ export default [
             'external', // NPM packages
             'internal', // Aliased modules (e.g., '@/components')
             ['parent', 'sibling', 'index'], // Relative imports
+            'type',
           ],
           'newlines-between': 'always',
           alphabetize: {
@@ -81,6 +82,8 @@ export default [
           },
         },
       ],
+
+      'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
 
       'no-restricted-imports': [
         'error',
