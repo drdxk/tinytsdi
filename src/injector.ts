@@ -77,8 +77,8 @@ export class Injector {
    *
    * @param providerOrProviders - Single provider or array of providers to register.
    * @param allowOverrides - Whether to allow overriding existing providers. If undefined, uses defaultAllowOverrides.
-   * @throws \@link AlreadyProvidedError\} - When attempting to register a provider that already exists and allowOverrides is false.
-   * @throws \@link UnknownProviderError\} - When provider type is not supported.
+   * throws {@link AlreadyProvidedError} - When attempting to register a provider that already exists and allowOverrides is false.
+   * throws {@link UnknownProviderError} - When provider type is not supported.
    */
   register<T>(
     providerOrProviders: Provider<T> | GenericProvider[],
@@ -113,7 +113,7 @@ export class Injector {
    * @param id - Token or constructor to resolve.
    * @param defaultValue - Value to return if provider is not found.
    * @returns The resolved dependency instance.
-   * @throws \@link NotProvidedError\} - When no provider is registered for the ID and no default value is provided.
+   * throws {@link NotProvidedError} - When no provider is registered for the ID and no default value is provided.
    */
   inject<T>(id: InjectionId<T>, defaultValue?: T): T {
     const provider = this.providers.get(id);
@@ -156,8 +156,8 @@ export class Injector {
    *
    * @param id - The injection ID to check for cached value.
    * @returns True if a cached value exists for the given ID, false otherwise.
-   * @throws \@link NotProvidedError\} - When no provider is registered for the given ID.
-   * @throws \@link NeverCachedError\} - When checking cache status of a transient provider.
+   * throws {@link NotProvidedError} - When no provider is registered for the given ID.
+   * throws {@link NeverCachedError} - When checking cache status of a transient provider.
    */
   hasCachedValue(id: GenericInjectionId): boolean {
     const provider = this.providers.get(id);
@@ -178,8 +178,8 @@ export class Injector {
    * Clears the cache of resolved dependencies, but keeps the providers registered.
    *
    * @param ids - Single ID, array of IDs, or undefined to clear all cache.
-   * @throws \@link NotProvidedError\} - When any of the provided IDs is not registered.
-   * @throws \@link NeverCachedError\} - When trying to invalidate a provider that is never cached.
+   * throws {@link NotProvidedError} - When any of the provided IDs is not registered.
+   * throws {@link NeverCachedError} - When trying to invalidate a provider that is never cached.
    */
   invalidate(ids?: GenericInjectionId | GenericInjectionId[]): void {
     if (ids === undefined) {
@@ -211,7 +211,7 @@ export class Injector {
    * Unregisters providers for the given IDs and removes any cached values.
    *
    * @param ids - Single ID, array of IDs, or undefined to unregister all providers.
-   * @throws \@link NotProvidedError\} - When any of the provided IDs is not registered.
+   * throws {@link NotProvidedError} - When any of the provided IDs is not registered.
    */
   unregister(ids?: GenericInjectionId | GenericInjectionId[]): void {
     if (ids === undefined) {
@@ -239,7 +239,7 @@ export class Injector {
    *
    * @param provider - External provider configuration.
    * @returns Internal provider wrapper.
-   * @throws \@link UnknownProviderError\} - When provider type is not supported.
+   * throws {@link UnknownProviderError} - When provider type is not supported.
    */
   private createInjectorProvider(provider: GenericProvider): InjectorProvider {
     if (isConstructorProvider(provider)) {
