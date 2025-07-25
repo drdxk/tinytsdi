@@ -11,7 +11,7 @@ export default defineConfig({
     dts({
       outDir: 'dist/types',
       insertTypesEntry: true,
-      tsconfigPath: './tsconfig.vite-dts.json',
+      tsconfigPath: './tsconfig.build.vite-dts.json',
       rollupTypes: true,
     }),
   ],
