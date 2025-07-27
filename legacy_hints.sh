@@ -1,4 +1,4 @@
 #!/bin/sh
 
-echo "export * from './esm/index.js';" > dist/index.mjs
-echo "module.exports = require('./cjs/index.js');" > dist/index.cjs.js
+echo "export * from './dist/esm/index.js';" > index.mjs
+echo "module.exports = require('./dist/cjs/index.js');" > index.cjs.js
