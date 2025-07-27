@@ -46,12 +46,23 @@ const service: TestServiceWithNoArgs = injector.inject(TestServiceWithNoArgs);
 const strWithDefault: string = injector.inject(stringToken, 'default');
 const numWithDefault: number = injector.inject(numberToken, 0);
 
+// Test: inject() allows overriding return type with null
+const strWithNullOverride: string | null = injector.inject(stringToken, null);
+const numWithNullOverride: number | null = injector.inject(numberToken, null);
+const serviceWithNullOverride: TestServiceWithNoArgs | null = injector.inject(
+  TestServiceWithNoArgs,
+  null
+);
+
 // Test: inject() with wrong default type should fail
 // @ts-expect-error - Default value type must match token type
 const strWithWrongDefault = injector.inject(stringToken, 123);
 
 // @ts-expect-error - Default value type must match token type
 const numWithWrongDefault = injector.inject(numberToken, 'wrong');
+
+// @ts-expect-error - Default value type must match token type
+const serviceWithWrongOverride = injector.inject(TestServiceWithNoArgs, {random: 'object'});
 
 // Test: inject() with unregistered token and no default should work (runtime will fail)
 const unregistered: string = injector.inject(new Token<string>('unregistered'));
@@ -175,8 +186,11 @@ const wrongAssignment: ServiceB = injector.inject(ServiceA);
 void str;
 void num;
 void service;
+void serviceWithNullOverride;
 void strWithDefault;
+void strWithNullOverride;
 void numWithDefault;
+void numWithNullOverride;
 void unregistered;
 void tokenResult;
 void classResult;

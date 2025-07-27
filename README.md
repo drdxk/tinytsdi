@@ -1,59 +1,158 @@
 # tinytsdi
 
-Minimalist TypeScript Dependency Injection library focused on testing and type
-safety. No decorators, runtime reflection, or complex hierarchy - just simple,
-type-safe dependency management.
+Minimalistic (yet _useful_ and _elegant_) TypeScript Dependency Injection
+library. No decorators, runtime reflection or complex terminology - just a
+simple, type-safe dependency management with a default global container.
+
+Support for hierarchical injectors, AsyncLocalStorage containers is coming soon!
+Also, documentation!
+
+_Currently, most of the development happens off GitHub, which mostly sees
+squashed release commits. Lmk if you want to contribute!_
+
+## Coming Soon
+
+- Hierarchical injectors
+- `scope` will be renamed and made optional
+- provider controls whether constructor of a class gets injected an `InjectFn`
+- `hijackGlobalContext()` to allow custom containers via library functions
+- Hierarchical containers (`node` (`ALS`), `express`, `fastify`, `react`, in
+  that order of likelihood of being _soon_)
+- More documentation: generated API reference, examples, more text
 
 ## Quick Start
 
 ### Installation
 
-```bash
-npm install tinytsdi
+```shell
+$ npm install tinytsdi
 ```
 
 ### Basic Usage
 
+#### Imports
+
+`Injector` class can be used directly:
+
+```typescript
+import {Injector} from 'tinytsdi';
+
+const injector = new Injector();
+```
+
+Or through a very simple global "container" provided by the library:
+
 ```typescript
 import {register, inject, Token} from 'tinytsdi';
+```
 
-// Define tokens
+#### Injection IDs
+
+Injection ID is a type-bound identifier of a dependency.Define typed Injection
+IDs using `Token` class:
+
+```typescript
 const CONFIG = new Token<Config>('config');
 const LOGGER = new Token<Logger>('logger');
+// The argument is optional, but recommended
+// It is used in error messages
+const PORT = new Token<number>();
+```
 
-// Register dependencies
+Alternatively, constructors can be used as their own injection IDs
+(`class MyService` can be both a service and its injection ID). This is not
+recommended as it complicates testing, specifically providing fake / mock
+implementations in a type safe manner.
+
+#### Providers
+
+_Provider_ associates an injection ID with concrete implementation. In other
+words, it tells injector how to _resolve_ a dependency for the given ID: _"when
+this ID is requested, return ...(this value, an instance of this class, etc.)"_.
+Provider can also give instructions to injector (such as whether to cache the
+resolved value).
+
+Providers need to be registered before injection takes place:
+
+```typescript
 register([
-  // Constructor shorthand (singleton by default)
-  MyService,
-
   // Value provider
+  // "When CONFIG is injected, return this static value"
   {provide: CONFIG, useValue: {apiUrl: 'https://api.example.com'}},
 
   // Factory provider
+  // "When LOGGER is injected, call this function and use the result"
   {
     provide: LOGGER,
     useFactory: (inject) => new ConsoleLogger(inject(CONFIG).logLevel),
-    scope: 'singleton',
+    scope: 'singleton', // "Cache the result and use it for all future injections"
   },
-]);
 
-// Use dependencies
+  // Class provider
+  // "When MY_SERVICE is injected, create an instance of MyService"
+  {
+    provide: MY_SERVICE,
+    useClass: MyService,
+    scope: 'transient', // "Create a new instance every time this ID is injected"
+  },
+
+  // Constructor shorthand
+  // Same as {provide: MyService, useClass: MyService, scope: 'singleton'}
+  MyService,
+]);
+```
+
+#### Injecting Dependencies
+
+Finally, `inject()` function resolves dependencies by their IDs:
+
+```typescript
+const config = inject(CONFIG); // Throws NotProvidedError if not registered
+const optionalValue = inject(PORT, 3000); // Default value if not registered
+const optionalService = inject(LOGGER, null); // Null if not registered
+```
+
+Which can be used anywhere a function call is allowed. Such as in classes:
+
+```typescript
 class MyService {
   private config = inject(CONFIG);
-  private logger = inject(LOGGER);
 
   doWork() {
-    this.logger.info('Working with config:', this.config.apiUrl);
+    const logger = inject(LOGGER);
+    logger.info('Working with config:', this.config.apiUrl);
   }
 }
+```
 
-// Or in functions with default parameters
+Or in function parameters:
+
+_This is a good pattern to use as both creates a good interface and allows for
+easier testing._
+
+```typescript
 function processData(config = inject(CONFIG)) {
   return fetch(config.apiUrl);
 }
 ```
 
+Class instances created by the injector receive `inject()` function as a
+constructor argument:
+
+```typescript
+class MyService {
+  constructor(private inject: InjectFn) {
+    // Now you can use this.inject() to resolve dependencies
+    const config = this.inject(CONFIG);
+    console.log('Service initialized with config:', config.apiUrl);
+  }
+```
+
 ### Testing
+
+One of the benefits of [IOC](https://en.wikipedia.org/wiki/Inversion_of_control)
+is improved testability. The default container comes with a few utilities to
+isolate tests and specify dependencies in test scenarios.
 
 ```typescript
 import {newTestInjector, setTestInjector, removeTestInjector} from 'tinytsdi';
@@ -81,24 +180,29 @@ describe('MyService', () => {
 
 ## API Reference
 
-### Core Functions
+See JSDoc comments in the source code for detailed API documentation! Generated
+doc is coming soon!
 
-- **`register(providers, allowOverrides?)`** - Register providers with global
-  injector
-- **`inject(id, defaultValue?)`** - Resolve dependency from global injector
-- **`getInjector()`** - Get current global injector instance
+### Global Container
 
-### Provider Types
+- **`register(providerOrProvidersArray, allowOverrides?)`** - Register providers
+  with the global injector
+- **`inject(id, defaultValue?)`** - Resolve dependency using the global injector
+- **`getInjector()`** - Get the current global injector instance
 
-#### Constructor Provider (Shorthand)
+#### Testing Utilities
 
 ```typescript
-class MyService {
-  constructor(private inject?: InjectFn) {} // inject parameter is optional
-}
+// Configuration
+init({defaultAllowOverrides: boolean, noTestInjector: boolean});
 
-register(MyService); // Equivalent to {provide: MyService, useClass: MyService, scope: 'singleton'}
+// Test injector management
+newTestInjector(fromCurrent?, allowOverrides?);  // Create a new test injector
+setTestInjector(injector);                       // Set the injector as the test injector
+removeTestInjector();                            // Restore previous non-test global injector
 ```
+
+### Provider Types
 
 #### Value Provider
 
@@ -116,6 +220,16 @@ register({
 });
 ```
 
+#### Constructor Provider (Shorthand)
+
+```typescript
+class MyService {
+  constructor(private inject?: InjectFn) {} // inject parameter is optional
+}
+
+register(MyService); // Equivalent to {provide: MyService, useClass: MyService, scope: 'singleton'}
+```
+
 #### Factory Provider
 
 ```typescript
@@ -127,6 +241,8 @@ register({
 ```
 
 #### Existing Provider (Alias)
+
+_"When `NEW_TOKEN` is injected, resolve `OLD_TOKEN` and return its value."_
 
 ```typescript
 register({provide: NEW_TOKEN, useExisting: OLD_TOKEN});
@@ -144,21 +260,11 @@ injector.inject(id, defaultValue?);
 // Advanced methods (primarily for testing)
 injector.hasProviderFor(id);           // Check if provider exists
 injector.hasCachedValue(id);          // Check if value is cached (throws for transient)
-injector.invalidate(ids?);            // Clear cache for specific IDs or all
-injector.unregister(ids?);            // Remove providers and cache
-Injector.from(source, copyCache?);    // Create copy of injector
-```
+injector.invalidate(ids?);            // Clear cache (for specific IDs)
+injector.unregister(ids?);            // Remove providers and cache (reset the injector)
 
-### Test Utilities
-
-```typescript
-// Configuration
-init({defaultAllowOverrides: boolean, noTestInjector: boolean});
-
-// Test injector management
-newTestInjector(fromCurrent?, allowOverrides?);  // Create test injector
-setTestInjector(injector);                       // Set active test injector
-removeTestInjector();                            // Restore previous injector
+// Static methods
+Injector.from(source, copyCache?);    // Create a copy of the injector
 ```
 
 ### Types
@@ -215,7 +321,7 @@ The library throws specific errors for different scenarios:
 
 - **`AlreadyProvidedError`** - Provider already registered (when overrides
   disabled)
-- **`NotProvidedError`** - No provider found for injection ID
+- **`NotProvidedError`** - No provider found for the given ID
 - **`NeverCachedError`** - Attempting cache operations on transient providers
 - **`UnknownProviderError`** - Unsupported provider type
 - **`AlreadyInitializedError`** - Multiple `init()` calls
@@ -223,17 +329,24 @@ The library throws specific errors for different scenarios:
 
 ## Best Practices
 
-1. **Use tokens for interfaces**:
-   `const SERVICE = new Token<ServiceInterface>('service')`
+1. **Use tokens**: `const SERVICE = new Token<ServiceInterface>('service')`
 2. **Test isolation**: Use `newTestInjector()` for clean test environments
-3. **Parameter injection**: Use default parameters for optional dependencies
+3. **Parameter injection**: Use parameter default values when possible
 4. **Constructor injection**: Keep constructors simple, use `inject()` in
    methods when needed
 
-## Limitations
+## Current Limitations
 
-- No decorator support
-- No runtime reflection
+- No hierarchical injectors **coming soon**
+- No hierarchical containers **coming soon**
+  - Including a default `AsyncLocalStorage` container for Node!
+  - And dedicated `express` and `fastify` containers!
+  - And maybe a `react` container!
 - No circular dependency detection (will hang)
-- No hierarchical injectors
+
+## Permanent Limitations
+
+aka "this is by design" of _minimialistic_ DI
+
+- No decorators, reflection metadata or runtime reflection
 - Synchronous API (async values supported via promises)

@@ -350,6 +350,19 @@ describe('Injector', () => {
       expect(injector.inject(token, 'default')).toBe('default');
     });
 
+    it('supports null default values', () => {
+      const injector = new Injector();
+      const token = new Token<string>('missing');
+      class TestService {
+        readonly marker = 'test';
+      }
+      const testServiceToken = new Token<TestService>('test-service');
+
+      expect(injector.inject(token, null)).toBe(null);
+      expect(injector.inject(TestService, null)).toBe(null);
+      expect(injector.inject(testServiceToken, null)).toBe(null);
+    });
+
     it('throws NotProvidedError when provider not found and no default', () => {
       const injector = new Injector();
       const token = new Token<string>('missing');
