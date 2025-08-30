@@ -254,14 +254,11 @@ register({provide: NEW_TOKEN, useExisting: OLD_TOKEN});
 ### Injector Class
 
 ```typescript
-const injector = new Injector(allowOverrides = false, parent?);
+const injector = new Injector(allowOverrides = false, parent = null);
 
 // Core methods
 injector.register(providers, allowOverrides?);
 injector.inject(id, defaultValue?);
-
-// Hierarchical methods
-injector.fork();                      // Create child injector with curernt injector as parent
 
 // Advanced methods (primarily for testing)
 injector.hasProviderFor(id);           // Check if provider exists
@@ -270,7 +267,8 @@ injector.invalidate(ids?);            // Clear cache (for specific IDs)
 injector.unregister(ids?);            // Remove providers and cache (reset the injector)
 
 // Static methods
-Injector.from(source, copyCache?, copyParent?);  // Create a copy of the injector
+Injector.from(source, copyCache = false, copyParent = true);  // Create a copy of the injector
+injector.fork();                      // Create child injector with current injector as parent
 ```
 
 ### Types
@@ -297,8 +295,6 @@ type InjectScope        // 'singleton' | 'transient'
 - **Value**: Static values (never cached, always O(1) lookup)
 
 ### Hierarchical Injectors
-
-Create parent-child injector relationships where children inherit from parents:
 
 ```typescript
 const parent = new Injector();
