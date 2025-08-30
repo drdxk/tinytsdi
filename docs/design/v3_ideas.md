@@ -1,22 +1,6 @@
 ## v3.0.0 ideas:
 
-### 1. Add basic support for hierarchical injectors:
-
-- `injector.fork()` creates a new injector with the current injector as its
-  parent, using the same `defaultAllowOverrides` setting.
-
-Modified functionality:
-
-- `injector.inject()` would call the parent injector if the provider for the id
-  is not found in the current injector.
-
-Document:
-
-- Behavior: child injector can override providers from the parent injector, they
-  maintain their own providers map and cache.
-- global functionality: not affected, it only knows about the root injector.
-
-(the end of non-breaking changes here :D)
+### 1. ✅ Add basic support for hierarchical injectors
 
 ### 2. Modify `scope` provider setting:
 

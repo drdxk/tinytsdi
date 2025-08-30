@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.1.0] - 2025-08-30
+
+### Added
+
+- Hierarchical injectors with `from()` method to create child injectors.
+
+### Changed
+
+- Migrated to pnpm for package management.
+- Vite is now the default build tool.
+
 ## [2.0.0] - 2025-07-05
 
 ### Breaking Changes

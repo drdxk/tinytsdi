@@ -43,19 +43,40 @@ export class Injector {
    * Creates a new Injector instance.
    *
    * @param defaultAllowOverrides - Whether to allow provider overrides by default
-   *     when no explicit allowOverrides parameter is provided.
+   *    when no explicit allowOverrides parameter is provided.
+   * @param parent - Optional parent injector for hierarchical injection.
    */
-  constructor(public defaultAllowOverrides: boolean = false) {}
+  constructor(
+    public defaultAllowOverrides: boolean = false,
+    private parent: Injector | null = null
+  ) {}
+
+  /**
+   * Creates a child injector with the current injector as its parent.
+   *
+   * @returns A new Injector instance with the current injector as parent, using the same defaultAllowOverrides setting.
+   */
+  fork(): Injector {
+    return new Injector(this.defaultAllowOverrides, this);
+  }
 
   /**
    * Creates a new Injector instance from an existing one, copying all providers.
    *
    * @param injector - The source injector to copy from.
    * @param copyCache - Whether to copy the cache of resolved dependencies.
+   * @param copyParent - Whether to preserve the parent injector relationship.
    * @returns A new Injector instance with copied providers and optionally cached values.
    */
-  static from(injector: Injector, copyCache: boolean = false): Injector {
-    const newInjector = new Injector(injector.defaultAllowOverrides);
+  static from(
+    injector: Injector,
+    copyCache: boolean = false,
+    copyParent: boolean = true
+  ): Injector {
+    const newInjector = new Injector(
+      injector.defaultAllowOverrides,
+      copyParent ? injector.parent : null
+    );
 
     // Copy all providers
     for (const [id, provider] of injector.providers) {
@@ -119,6 +140,11 @@ export class Injector {
     const provider = this.providers.get(id);
 
     if (!provider) {
+      // Check parent injector if provider not found locally
+      if (this.parent) {
+        return this.parent.inject(id, defaultValue);
+      }
+
       if (defaultValue !== undefined) {
         return defaultValue;
       }

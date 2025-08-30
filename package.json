@@ -1,6 +1,6 @@
 {
   "name": "tinytsdi",
-  "version": "2.0.7",
+  "version": "2.1.0",
   "description": "Minimalistic TypeScript Dependency Injection library",
   "repository": {
     "type": "git",
@@ -30,16 +30,15 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "test": "vitest",
-    "test:run": "vitest run",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint && prettier --check src",
-    "format": "prettier --write src && eslint --fix",
-    "build": "rm -rf dist && vite build && ./legacy_hints.sh",
     "build:tsc": "rm -rf dist && tsc -p tsconfig.build.types.json && tsc -p tsconfig.build.esm.json && tsc-alias -p tsconfig.build.esm.json && tsc -p tsconfig.build.cjs.json && tsc-alias -p tsconfig.build.cjs.json && find dist/cjs -name '*.js' -exec mv {} {}.cjs \\;",
-    "check": "pnpm run typecheck && pnpm run lint && pnpm run test:run"
+    "build": "rm -rf dist && vite build && ./legacy_hints.sh",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run test:run",
+    "format": "prettier --write src && eslint --fix",
+    "lint": "eslint && prettier --check src",
+    "test:coverage": "vitest run --coverage",
+    "test:run": "vitest run",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",

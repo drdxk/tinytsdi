@@ -4,15 +4,15 @@ Minimalistic (yet _useful_ and _elegant_) TypeScript Dependency Injection
 library. No decorators, runtime reflection or complex terminology - just a
 simple, type-safe dependency management with a default global container.
 
-Support for hierarchical injectors, AsyncLocalStorage containers is coming soon!
-Also, documentation!
+✅ **NEW in 2.1**: Hierarchical injectors are now supported!
+
+AsyncLocalStorage containers and more documentation coming soon!
 
 _Currently, most of the development happens off GitHub, which mostly sees
 squashed release commits. Lmk if you want to contribute!_
 
 ## Coming Soon
 
-- Hierarchical injectors
 - `scope` will be renamed and made optional
 - provider controls whether constructor of a class gets injected an `InjectFn`
 - `hijackGlobalContext()` to allow custom containers via library functions
@@ -190,6 +190,9 @@ doc is coming soon!
 - **`inject(id, defaultValue?)`** - Resolve dependency using the global injector
 - **`getInjector()`** - Get the current global injector instance
 
+> **IMPORTANT**: global container only allows accessing single root injector. It
+> is not aware of child injectors.
+
 #### Testing Utilities
 
 ```typescript
@@ -251,11 +254,14 @@ register({provide: NEW_TOKEN, useExisting: OLD_TOKEN});
 ### Injector Class
 
 ```typescript
-const injector = new Injector(allowOverrides = false);
+const injector = new Injector(allowOverrides = false, parent?);
 
 // Core methods
 injector.register(providers, allowOverrides?);
 injector.inject(id, defaultValue?);
+
+// Hierarchical methods
+injector.fork();                      // Create child injector with curernt injector as parent
 
 // Advanced methods (primarily for testing)
 injector.hasProviderFor(id);           // Check if provider exists
@@ -264,7 +270,7 @@ injector.invalidate(ids?);            // Clear cache (for specific IDs)
 injector.unregister(ids?);            // Remove providers and cache (reset the injector)
 
 // Static methods
-Injector.from(source, copyCache?);    // Create a copy of the injector
+Injector.from(source, copyCache?, copyParent?);  // Create a copy of the injector
 ```
 
 ### Types
@@ -289,6 +295,27 @@ type InjectScope        // 'singleton' | 'transient'
 - **Singleton**: Cached after first resolution (default for constructors)
 - **Transient**: New instance on every injection (required explicit scope)
 - **Value**: Static values (never cached, always O(1) lookup)
+
+### Hierarchical Injectors
+
+Create parent-child injector relationships where children inherit from parents:
+
+```typescript
+const parent = new Injector();
+parent.register({provide: CONFIG, useValue: {env: 'top'}});
+parent.register({provide: LOGGER, useValue: prodLogger});
+
+const child = parent.fork(); // Child inherits parent's providers
+// can register own providers
+child.register({provide: SERVICE, useClass: ChildService, scope: 'singleton'});
+// and override parent providers
+child.register({provide: CONFIG, useValue: {env: 'child'}});
+
+// Together:
+child.inject(LOGGER); // Returns prodLogger (from parent)
+child.inject(CONFIG); // Returns {env: 'child'} (overridden provider)
+child.inject(SERVICE); // Returns instance of ChildService (own provider)
+```
 
 ### Testing Support
 
@@ -337,7 +364,6 @@ The library throws specific errors for different scenarios:
 
 ## Current Limitations
 
-- No hierarchical injectors **coming soon**
 - No hierarchical containers **coming soon**
   - Including a default `AsyncLocalStorage` container for Node!
   - And dedicated `express` and `fastify` containers!
