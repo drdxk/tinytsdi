@@ -72,7 +72,7 @@ this ID is requested, return ...(this value, an instance of this class, etc.)"_.
 Provider can also give instructions to injector (such as whether to cache the
 resolved value).
 
-Providers need to be registered before injection takes place:
+Providers need to be registered before an injection takes place:
 
 ```typescript
 register([
@@ -127,8 +127,8 @@ class MyService {
 
 Or in function parameters:
 
-_This is a good pattern to use as both creates a good interface and allows for
-easier testing._
+_This is a good pattern to use as itcreates a good interface and allows for
+easier testing (without the requirement of using injection)._
 
 ```typescript
 function processData(config = inject(CONFIG)) {
