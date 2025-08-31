@@ -37,7 +37,7 @@
     "test:run": "vitest run",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
-    "publish": "pnpm build && pnpm publish"
+    "pub": "pnpm build && pnpm publish"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
