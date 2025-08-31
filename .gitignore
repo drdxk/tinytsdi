@@ -1,6 +1,3 @@
 /node_modules
 /coverage
 /dist
-
-index.mjs
-index.cjs.js
