@@ -1,6 +1,4 @@
-/**
- * Tests for Injector class
- */
+/** Tests for Injector class */
 
 import {describe, expect, it} from 'vitest';
 

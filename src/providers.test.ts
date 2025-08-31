@@ -1,6 +1,4 @@
-/**
- * Tests for provider types
- */
+/** Tests for provider types */
 
 import {describe, expect, it} from 'vitest';
 

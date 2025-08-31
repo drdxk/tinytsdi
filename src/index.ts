@@ -1,6 +1,4 @@
-/**
- * TypeScript Dependency Injection library - Main exports
- */
+/** TypeScript Dependency Injection library - Main exports */
 
 // Re-export all types
 export * from './types.js';

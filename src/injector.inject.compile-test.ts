@@ -1,6 +1,4 @@
-/**
- * Compile-time tests for Injector inject method
- */
+/** Compile-time tests for Injector inject method */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 

@@ -1,6 +1,4 @@
-/**
- * Compile-time tests for advanced Injector methods
- */
+/** Compile-time tests for advanced Injector methods */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 

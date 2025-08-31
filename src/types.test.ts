@@ -1,6 +1,4 @@
-/**
- * Tests for basic types
- */
+/** Tests for basic types */
 
 import {describe, expect, it} from 'vitest';
 

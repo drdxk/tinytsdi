@@ -1,6 +1,4 @@
-/**
- * Main Injector class for managing dependencies.
- */
+/** Main Injector class for managing dependencies. */
 
 import {
   AlreadyProvidedError,
@@ -19,9 +17,7 @@ import {
 import type {GenericProvider, Provider} from './providers.js';
 import type {GenericInjectionId, InjectionId} from './types.js';
 
-/**
- * Internal provider wrapper that provides a uniform interface for all provider types.
- */
+/** Internal provider wrapper that provides a uniform interface for all provider types. */
 interface InjectorProvider {
   /** The injection identifier (token or constructor). */
   id: GenericInjectionId;
@@ -31,9 +27,7 @@ interface InjectorProvider {
   resolve: () => unknown;
 }
 
-/**
- * Main dependency injection container that manages providers and resolved values.
- */
+/** Main dependency injection container that manages providers and resolved values. */
 export class Injector {
   private providers = new Map<GenericInjectionId, InjectorProvider>();
   private cache = new Map<GenericInjectionId, unknown>();
@@ -42,8 +36,8 @@ export class Injector {
   /**
    * Creates a new Injector instance.
    *
-   * @param defaultAllowOverrides - Whether to allow provider overrides by default
-   *    when no explicit allowOverrides parameter is provided.
+   * @param defaultAllowOverrides - Whether to allow provider overrides by default when no explicit
+   *   allowOverrides parameter is provided.
    * @param parent - Optional parent injector for hierarchical injection.
    */
   constructor(
@@ -54,7 +48,8 @@ export class Injector {
   /**
    * Creates a child injector with the current injector as its parent.
    *
-   * @returns A new Injector instance with the current injector as parent, using the same defaultAllowOverrides setting.
+   * @returns A new Injector instance with the current injector as parent, using the same
+   *   defaultAllowOverrides setting.
    */
   fork(): Injector {
     return new Injector(this.defaultAllowOverrides, this);
@@ -97,9 +92,11 @@ export class Injector {
    * Registers one or more providers with the injector.
    *
    * @param providerOrProviders - Single provider or array of providers to register.
-   * @param allowOverrides - Whether to allow overriding existing providers. If undefined, uses defaultAllowOverrides.
-   * throws {@link AlreadyProvidedError} - When attempting to register a provider that already exists and allowOverrides is false.
-   * throws {@link UnknownProviderError} - When provider type is not supported.
+   * @param allowOverrides - Whether to allow overriding existing providers. If undefined, uses
+   *   defaultAllowOverrides.
+   * @throws {@link AlreadyProvidedError} - When attempting to register a provider that already
+   *   exists and allowOverrides is false.
+   * @throws {@link UnknownProviderError} - When provider type is not supported.
    */
   register<T>(
     providerOrProviders: Provider<T> | GenericProvider[],
@@ -126,15 +123,15 @@ export class Injector {
   /**
    * Resolves a dependency by its injection ID.
    *
-   * For singleton providers, returns the same instance on subsequent calls.
-   * For transient providers, creates a new instance on each call.
-   * For value providers, returns the registered value.
-   * For existing providers (aliases), delegates to the target provider.
+   * For singleton providers, returns the same instance on subsequent calls. For transient
+   * providers, creates a new instance on each call. For value providers, returns the registered
+   * value. For existing providers (aliases), delegates to the target provider.
    *
    * @param id - Token or constructor to resolve.
    * @param defaultValue - Value to return if provider is not found.
    * @returns The resolved dependency instance.
-   * throws {@link NotProvidedError} - When no provider is registered for the ID and no default value is provided.
+   * @throws {@link NotProvidedError} - When no provider is registered for the ID and no default
+   *   value is provided.
    */
   inject<T>(id: InjectionId<T>, defaultValue?: T): T {
     const provider = this.providers.get(id);
@@ -182,8 +179,8 @@ export class Injector {
    *
    * @param id - The injection ID to check for cached value.
    * @returns True if a cached value exists for the given ID, false otherwise.
-   * throws {@link NotProvidedError} - When no provider is registered for the given ID.
-   * throws {@link NeverCachedError} - When checking cache status of a transient provider.
+   * @throws {@link NotProvidedError} - When no provider is registered for the given ID.
+   * @throws {@link NeverCachedError} - When checking cache status of a transient provider.
    */
   hasCachedValue(id: GenericInjectionId): boolean {
     const provider = this.providers.get(id);
@@ -204,8 +201,8 @@ export class Injector {
    * Clears the cache of resolved dependencies, but keeps the providers registered.
    *
    * @param ids - Single ID, array of IDs, or undefined to clear all cache.
-   * throws {@link NotProvidedError} - When any of the provided IDs is not registered.
-   * throws {@link NeverCachedError} - When trying to invalidate a provider that is never cached.
+   * @throws {@link NotProvidedError} - When any of the provided IDs is not registered.
+   * @throws {@link NeverCachedError} - When trying to invalidate a provider that is never cached.
    */
   invalidate(ids?: GenericInjectionId | GenericInjectionId[]): void {
     if (ids === undefined) {
@@ -237,7 +234,7 @@ export class Injector {
    * Unregisters providers for the given IDs and removes any cached values.
    *
    * @param ids - Single ID, array of IDs, or undefined to unregister all providers.
-   * throws {@link NotProvidedError} - When any of the provided IDs is not registered.
+   * @throws {@link NotProvidedError} - When any of the provided IDs is not registered.
    */
   unregister(ids?: GenericInjectionId | GenericInjectionId[]): void {
     if (ids === undefined) {
@@ -265,7 +262,7 @@ export class Injector {
    *
    * @param provider - External provider configuration.
    * @returns Internal provider wrapper.
-   * throws {@link UnknownProviderError} - When provider type is not supported.
+   * @throws {@link UnknownProviderError} - When provider type is not supported.
    */
   private createInjectorProvider(provider: GenericProvider): InjectorProvider {
     if (isConstructorProvider(provider)) {

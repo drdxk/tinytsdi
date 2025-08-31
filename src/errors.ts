@@ -1,6 +1,4 @@
-/**
- * Error classes for TSDI
- */
+/** Error classes for TSDI */
 
 import {Token} from './types.js';
 

@@ -1,6 +1,4 @@
-/**
- * Core type definitions for TSDI
- */
+/** Core type definitions for TSDI */
 
 /** Constructor type that can be used as InjectionId */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

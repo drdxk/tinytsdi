@@ -1,6 +1,4 @@
-/**
- * Tests for error classes
- */
+/** Tests for error classes */
 
 import {describe, expect, it} from 'vitest';
 

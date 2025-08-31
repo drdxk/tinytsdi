@@ -1,6 +1,4 @@
-/**
- * Tests for hierarchical injector functionality
- */
+/** Tests for hierarchical injector functionality */
 
 import {describe, expect, it} from 'vitest';
 

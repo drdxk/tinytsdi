@@ -1,11 +1,11 @@
 /**
  * Compile-time type tests for TSDI types
  *
- * This file contains type assignments that verify TypeScript compilation behavior.
- * It should be included in typecheck but not in runtime builds.
+ * This file contains type assignments that verify TypeScript compilation behavior. It should be
+ * included in typecheck but not in runtime builds.
  *
- * Positive tests: Should compile without errors
- * Negative tests: Should fail compilation (marked with \@ts-expect-error)
+ * Positive tests: Should compile without errors Negative tests: Should fail compilation (marked
+ * with `@ts-expect-error`)
  */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */

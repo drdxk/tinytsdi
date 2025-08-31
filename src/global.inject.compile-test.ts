@@ -1,6 +1,4 @@
-/**
- * Compile-time tests for global inject function
- */
+/** Compile-time tests for global inject function */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 

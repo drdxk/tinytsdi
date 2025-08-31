@@ -1,6 +1,4 @@
-/**
- * Tests for advanced Injector methods
- */
+/** Tests for advanced Injector methods */
 
 import {describe, expect, it} from 'vitest';
 

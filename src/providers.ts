@@ -1,6 +1,4 @@
-/**
- * Provider type definitions for TSDI
- */
+/** Provider type definitions for TSDI */
 
 import type {InjectFn, InjectScope, InjectableConstructor, InjectionId} from './types.js';
 

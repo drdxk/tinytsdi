@@ -1,18 +1,22 @@
 {
-  "semi": true,
-  "trailingComma": "es5",
-  "singleQuote": true,
-  "printWidth": 100,
-  "tabWidth": 2,
-  "useTabs": false,
-  "bracketSpacing": false,
   "arrowParens": "always",
+  "bracketSpacing": false,
   "endOfLine": "lf",
+  "jsdocPrintWidth": 100,
+  "plugins": ["prettier-plugin-jsdoc"],
+  "printWidth": 100,
+  "quoteProps": "preserve",
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "tsdoc": true,
+  "useTabs": false,
   "overrides": [
     {
       "files": "*.md",
       "options": {
-        "printWidth": 80,
+        "printWidth": 100,
         "proseWrap": "always"
       }
     }
