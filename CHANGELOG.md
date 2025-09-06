@@ -4,15 +4,27 @@
 
 ### Breaking Changes
 
-- **BREAKING**: Replaced `scope` property with optional `noCache` boolean in `ClassProvider<T>` and `FactoryProvider<T>`
+- **BREAKING**: Replaced `scope` property with optional `noCache` boolean in `ClassProvider<T>` and
+  `FactoryProvider<T>`
   - `scope: 'singleton'` → remove property (now the default)
   - `scope: 'transient'` → `noCache: true`
 - **BREAKING**: Removed `InjectScope` type (`'singleton' | 'transient'`)
   - Remove any imports or references to `InjectScope` type
+- **BREAKING**: Class providers no longer automatically pass inject function to constructors by
+  default
+  - Previous behavior: All class constructors received inject function as first parameter
+  - New behavior: Constructors receive inject function only when `injectFn: true` is explicitly set
+  - Migration: Add `injectFn: true` to existing class providers whose constructors expect inject
+    function
 
 ### Added
 
 - Optional `noCache?: boolean` property for explicit control over caching behavior
+- Optional `injectFn?: boolean` property in class providers to control whether constructors receive
+  the inject function
+  - `injectFn: true` - Constructor receives inject function as first parameter (required for
+    constructors that expect it)
+  - `injectFn: false` or omitted - Constructor called with no arguments (default behavior)
 
 ### Changed
 
@@ -33,8 +45,8 @@
 
 ### Breaking Changes
 
-- **BREAKING**: `newTestInjector()` now automatically sets the newly created
-  injector as the current test injector
+- **BREAKING**: `newTestInjector()` now automatically sets the newly created injector as the current
+  test injector
 - **BREAKING**: Proper package exports (CJS, ESM, Types)
 
 ### Added
@@ -60,8 +72,7 @@
 
 ### Added
 
-- Initial release of tinytsdi - Minimalistic TypeScript Dependency Injection
-  library
+- Initial release of tinytsdi - Minimalistic TypeScript Dependency Injection library
 - Core dependency injection functionality with type safety
 - Support for singleton and transient scoping
 - Testing utilities for easy dependency mocking

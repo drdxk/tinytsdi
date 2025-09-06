@@ -52,6 +52,24 @@ class TestServiceWithArgs {
   }
 }
 
+class ServiceWithRequiredArg {
+  constructor(public requiredArg: string) {}
+  getArg() {
+    return this.requiredArg;
+  }
+}
+
+class ServiceAllOptionalParams {
+  constructor(
+    public name?: string,
+    public count?: number,
+    public enabled?: boolean
+  ) {}
+  getName() {
+    return this.name || 'unnamed';
+  }
+}
+
 const testToken = new Token<string>('test');
 const serviceToken = new Token<TestServiceNoArgs>('service');
 // === ValueProvider<T> Type Tests ===
@@ -88,6 +106,7 @@ const validClassProviderWithInject: ClassProvider<TestServiceWithInject> = {
   provide: TestServiceWithInject,
   useClass: TestServiceWithInject,
   noCache: true,
+  injectFn: true,
 };
 
 // Positive: Valid ClassProvider with explicit noCache: false (default behavior)
@@ -104,8 +123,172 @@ const invalidClassProvider: ClassProvider<TestServiceWithArgs> = {
   useClass: TestServiceWithArgs,
 };
 
-// Negative: Invalid scope should fail
-const invalidScopeClassProvider: ClassProvider<TestServiceNoArgs> = {
+// @ts-expect-error - Constructor needs InjectFn but injectFn is false
+const falseInjectFnClassProvider: ClassProvider<TestServiceWithInject> = {
+  provide: TestServiceWithInject,
+  useClass: TestServiceWithInject,
+  injectFn: false,
+};
+
+// @ts-expect-error - Constructor needs InjectFn but injectFn is false
+const undefinedInjectFnClassProvider: ClassProvider<TestServiceWithInject> = {
+  provide: TestServiceWithInject,
+  useClass: TestServiceWithInject,
+};
+
+// === InjectFn Option Compile-Time Type Tests ===
+
+// Test classes for injectFn option tests
+class ServiceRequiringInject {
+  constructor(private inject: InjectFn) {}
+  getData() {
+    return this.inject(testToken, 'default');
+  }
+}
+
+class ServiceNoArgsOnly {
+  readonly data = 'no-args';
+  constructor() {}
+  getData() {
+    return this.data;
+  }
+}
+
+class ServiceWithOptionalParams {
+  constructor(
+    public config?: string,
+    public debug?: boolean
+  ) {}
+  getConfig() {
+    return this.config || 'default';
+  }
+}
+
+class ServiceMixedArgs {
+  constructor(
+    private inject: InjectFn,
+    public config: string
+  ) {}
+  getData() {
+    return this.inject(testToken, 'default') + this.config;
+  }
+}
+
+class ComplexServiceNoArgs {
+  private readonly config = {initialized: true, timestamp: Date.now()};
+  constructor() {
+    // Complex initialization logic but no parameters
+  }
+  getConfig() {
+    return this.config;
+  }
+}
+
+// Positive: No injectFn property (uses default) with no-args constructor
+const validInjectFnDefault: ClassProvider<ServiceNoArgsOnly> = {
+  provide: new Token<ServiceNoArgsOnly>('service-implicit-default'),
+  useClass: ServiceNoArgsOnly,
+};
+
+// Positive: injectFn: true with constructor requiring InjectFn
+const validInjectFnTrue: ClassProvider<ServiceRequiringInject> = {
+  provide: new Token<ServiceRequiringInject>('service-with-inject'),
+  useClass: ServiceRequiringInject,
+  injectFn: true,
+};
+
+// Positive: injectFn: false with no-args constructor
+const validInjectFnFalse: ClassProvider<ServiceNoArgsOnly> = {
+  provide: new Token<ServiceNoArgsOnly>('service-no-args'),
+  useClass: ServiceNoArgsOnly,
+  injectFn: false,
+};
+
+// Positive: injectFn: false explicitly set with various no-args constructors
+const validExplicitFalse: ClassProvider<ServiceNoArgsOnly> = {
+  provide: new Token<ServiceNoArgsOnly>('explicit-false'),
+  useClass: ServiceNoArgsOnly,
+  injectFn: false,
+  noCache: true, // Can still use other options
+};
+
+// Positive: Class with complex initialization but no constructor args needed
+const validComplexNoArgs: ClassProvider<ComplexServiceNoArgs> = {
+  provide: new Token<ComplexServiceNoArgs>('complex-service'),
+  useClass: ComplexServiceNoArgs,
+  injectFn: false,
+};
+
+// Positive: Constructor with optional parameters and injectFn: false
+const validOptionalParams: ClassProvider<ServiceWithOptionalParams> = {
+  provide: new Token<ServiceWithOptionalParams>('service-optional'),
+  useClass: ServiceWithOptionalParams,
+  injectFn: false,
+};
+
+// Positive: Constructor with only optional parameters (can be called with no args)
+const validAllOptionalParams: ClassProvider<ServiceAllOptionalParams> = {
+  provide: new Token<ServiceAllOptionalParams>('all-optional'),
+  useClass: ServiceAllOptionalParams,
+  injectFn: false,
+};
+
+// Positive: Mix of required and optional - should still work with injectFn: false because no required args
+class ServiceOnlyOptional {
+  constructor(public config?: {debug: boolean}) {}
+  isDebug() {
+    return this.config?.debug || false;
+  }
+}
+
+// Positive: Constructor with only optional parameters and injectFn: false
+const validMixedOptional: ClassProvider<ServiceOnlyOptional> = {
+  provide: new Token<ServiceOnlyOptional>('mixed-optional'),
+  useClass: ServiceOnlyOptional,
+  injectFn: false,
+};
+
+// @ts-expect-error - Constructor requires InjectFn but injectFn is false
+const invalidFalseWithInject: ClassProvider<ServiceRequiringInject> = {
+  provide: new Token<ServiceRequiringInject>('invalid-false-inject'),
+  useClass: ServiceRequiringInject,
+  injectFn: false,
+};
+
+// Negative: Constructor with required non-InjectFn arg should fail with injectFn: false
+const invalidRequiredArg: ClassProvider<ServiceWithRequiredArg> = {
+  provide: new Token<ServiceWithRequiredArg>('invalid-required'),
+  // @ts-expect-error - Constructor has required non-InjectFn parameter
+  useClass: ServiceWithRequiredArg,
+  injectFn: false,
+};
+
+// Negative: Constructor with required non-InjectFn arg should fail with injectFn: true
+const invalidRequiredArgTrue: ClassProvider<ServiceWithRequiredArg> = {
+  provide: new Token<ServiceWithRequiredArg>('invalid-required-true'),
+  // @ts-expect-error - Constructor parameter is not InjectFn
+  useClass: ServiceWithRequiredArg,
+  injectFn: true,
+};
+
+// Negative: Mixed args constructor should fail with injectFn: true
+const invalidMixedArgsTrue: ClassProvider<ServiceMixedArgs> = {
+  provide: new Token<ServiceMixedArgs>('invalid-mixed-true'),
+  // @ts-expect-error - Constructor has non-InjectFn required parameters
+  useClass: ServiceMixedArgs,
+  injectFn: true,
+};
+
+// Negative: Mixed args constructor should fail with injectFn: false
+const invalidMixedArgsFalse: ClassProvider<ServiceMixedArgs> = {
+  provide: new Token<ServiceMixedArgs>('invalid-mixed-false'),
+  // @ts-expect-error - Constructor has required parameters
+  useClass: ServiceMixedArgs,
+  injectFn: false,
+};
+
+// Negative: Invalid noCache option should fail
+const invalidNoCacheClassProvider: ClassProvider<TestServiceNoArgs> = {
   provide: serviceToken,
   useClass: TestServiceNoArgs,
   // @ts-expect-error - 'invalid' not a valid value for noCache
@@ -216,28 +399,43 @@ const genericProvider: Provider<Array<string>> = {
 };
 
 // Suppress unused variable warnings
-void validValueProvider;
-void validValueProviderWithClass;
-void validClassProvider;
-void validClassProviderWithInject;
-void validClassProviderCached;
-void validFactoryProvider;
-void validFactoryProviderWithInject;
-void validFactoryProviderCached;
-void explicitNoArgsFactory;
+void asyncProvider;
 void explicitInjectFactory;
+void explicitNoArgsFactory;
+void falseInjectFnClassProvider;
+void genericProvider;
+void invalidClassProvider;
+void invalidExistingProvider;
+void invalidFactoryProvider;
+void invalidFalseWithInject;
+void invalidMixedArgsFalse;
+void invalidMixedArgsTrue;
+void invalidNoCacheClassProvider;
+void invalidRequiredArg;
+void invalidRequiredArgTrue;
+void invalidValueProvider;
+void providerFromClass;
+void providerFromConstructor;
+void providerFromExisting;
+void providerFromFactory;
+void providerFromInjectableConstructor;
+void providerFromValue;
+void undefinedInjectFnClassProvider;
+void validAllOptionalParams;
+void validClassProvider;
+void validClassProviderCached;
+void validClassProviderWithInject;
+void validComplexNoArgs;
 void validExistingProvider;
 void validExistingProviderWithClass;
-void providerFromValue;
-void providerFromClass;
-void providerFromFactory;
-void providerFromExisting;
-void providerFromConstructor;
-void providerFromInjectableConstructor;
-void asyncProvider;
-void genericProvider;
-void invalidValueProvider;
-void invalidClassProvider;
-void invalidScopeClassProvider;
-void invalidFactoryProvider;
-void invalidExistingProvider;
+void validExplicitFalse;
+void validFactoryProvider;
+void validFactoryProviderCached;
+void validFactoryProviderWithInject;
+void validInjectFnDefault;
+void validInjectFnFalse;
+void validInjectFnTrue;
+void validMixedOptional;
+void validOptionalParams;
+void validValueProvider;
+void validValueProviderWithClass;

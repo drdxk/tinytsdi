@@ -76,6 +76,7 @@ register({
   provide: TestServiceWithInject,
   useClass: TestServiceWithInject,
   noCache: true,
+  injectFn: true,
 });
 
 // Negative: Type mismatches in class providers

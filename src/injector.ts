@@ -285,7 +285,14 @@ export class Injector {
       return {
         id: provider.provide,
         cache: !provider.noCache,
-        resolve: () => new provider.useClass(this.boundInject),
+        resolve: () => {
+          // Pass inject function only if injectFn is explicitly true
+          if (provider.injectFn === true) {
+            return new provider.useClass(this.boundInject);
+          } else {
+            return new provider.useClass();
+          }
+        },
       };
     }
 

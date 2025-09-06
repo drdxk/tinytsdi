@@ -114,6 +114,7 @@ const interfaceToken = new Token<ServiceInterface>('interface');
 sourceInjector.register({
   provide: interfaceToken,
   useClass: ConcreteService,
+  injectFn: true,
 });
 
 const interfaceCopy = Injector.from(sourceInjector);
@@ -175,26 +176,26 @@ const invalidateResult: void = sourceInjector.invalidate();
 const unregisterResult: void = sourceInjector.unregister();
 
 // Suppress unused variable warnings
+void aliasResult;
+void classHasCached;
+void classHasProvider;
+void classResult;
+void copiedWithOverrides;
+void factoryResult;
+void hasCached;
+void hasConstructorProvider;
+void hasProvider;
+void inferredString;
+void interfaceResult;
+void invalidateResult;
 void newInjector;
 void newInjectorWithCache;
 void newInjectorWithoutCache;
-void str;
 void num;
-void service;
-void copiedWithOverrides;
-void factoryResult;
-void classResult;
-void aliasResult;
-void inferredString;
 void secondCopy;
+void service;
+void str;
 void thirdCopy;
-void interfaceResult;
-void hasProvider;
-void hasConstructorProvider;
-void hasCached;
-void tokenHasProvider;
-void classHasProvider;
 void tokenHasCached;
-void classHasCached;
-void invalidateResult;
+void tokenHasProvider;
 void unregisterResult;

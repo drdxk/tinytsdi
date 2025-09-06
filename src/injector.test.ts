@@ -382,7 +382,7 @@ describe('Injector', () => {
       }
 
       injector.register({provide: depToken, useValue: 'injected dependency'});
-      injector.register({provide: serviceToken, useClass: TestService});
+      injector.register({provide: serviceToken, useClass: TestService, injectFn: true});
 
       const service = injector.inject(serviceToken);
       expect(service.resolvedValue).toBe('injected dependency');
@@ -428,8 +428,8 @@ describe('Injector', () => {
       }
 
       injector.register({provide: baseToken, useValue: 'base value'});
-      injector.register({provide: serviceAToken, useClass: ServiceA});
-      injector.register({provide: serviceBToken, useClass: ServiceB});
+      injector.register({provide: serviceAToken, useClass: ServiceA, injectFn: true});
+      injector.register({provide: serviceBToken, useClass: ServiceB, injectFn: true});
 
       const serviceB = injector.inject(serviceBToken);
       expect(serviceB.serviceA.baseValue).toBe('base value');
@@ -451,6 +451,7 @@ describe('Injector', () => {
       injector.register({
         provide: serviceToken,
         useClass: TestServiceWithDefault,
+        injectFn: true,
       });
 
       const service = injector.inject(serviceToken);
@@ -476,10 +477,54 @@ describe('Injector', () => {
       injector.register({
         provide: serviceToken,
         useClass: TestServiceUsingAlias,
+        injectFn: true,
       });
 
       const service = injector.inject(serviceToken);
       expect(service.aliasValue).toBe('original value');
+    });
+
+    it('injectFn: false does not pass inject function to constructor', () => {
+      const injector = new Injector();
+      const serviceToken = new Token<TestServiceNoArgs>('service');
+
+      class TestServiceNoArgs {
+        public readonly constructorArgsLength: number;
+
+        constructor() {
+          this.constructorArgsLength = arguments.length;
+        }
+      }
+
+      injector.register({
+        provide: serviceToken,
+        useClass: TestServiceNoArgs,
+        injectFn: false,
+      });
+
+      const service = injector.inject(serviceToken);
+      expect(service.constructorArgsLength).toBe(0);
+    });
+
+    it('omitting injectFn defaults to not passing inject function', () => {
+      const injector = new Injector();
+      const serviceToken = new Token<TestServiceDefault>('service');
+
+      class TestServiceDefault {
+        public readonly constructorArgsLength: number;
+
+        constructor() {
+          this.constructorArgsLength = arguments.length;
+        }
+      }
+
+      injector.register({
+        provide: serviceToken,
+        useClass: TestServiceDefault,
+      });
+
+      const service = injector.inject(serviceToken);
+      expect(service.constructorArgsLength).toBe(0);
     });
   });
 
@@ -643,7 +688,7 @@ describe('Injector', () => {
           provide: factoryToken,
           useFactory: (inject) => `factory: ${inject(valueToken)}`,
         },
-        {provide: classToken, useClass: TestService, noCache: true},
+        {provide: classToken, useClass: TestService, noCache: true, injectFn: true},
         {provide: aliasToken, useExisting: valueToken},
       ]);
 

@@ -4,12 +4,13 @@
 
 ### 2. ✅ Modify `scope` provider setting, rename to `noCache`, defaulting to `false`
 
-### 3. Make passing of `InjectFn` to constructors of class providers (shorthand and full) optional, false by default. -- Maybe?
+### 3. ✅ Make passing of `InjectFn` to constructors of class providers (shorthand and full) optional, false by default.
 
-- Controlled via boolean `injectFn` option in the provider settings.
-- Or by the class itself, via a static [InjectFn] symbol property (symbol provided by the library)?
+### 4. Support hierarcy-aware providers via `atRoot` boolean property:
 
-### 4. Global: add `hijackGlobalContext` API function -- Maybe?
+- If set, `register()` will pass the registration to the parent injector when parent is set.
+
+### 5. Global: add `hijackGlobalContext` API function -- Maybe?
 
 - `hijackGlobalContext(getInjector: () => Injector)` allows to create own "DI container" using
   library methods, since global `inject()` and `register()` simply call `getInjector()[method])()`.
@@ -18,17 +19,15 @@
 - Put non-hijacked functions in error mode (i.e. `if hijacked throw`).
 - `restoreGlobalContext()` to restore the original global context.
 
-### 5. Support hierarcy-aware providers via `atRoot` boolean property:
-
-- If set, `register()` will pass the registration to the parent injector when parent is set.
-
 ## Organizational refactorings:
 
-### 1. Convert to monorepo to support container packages and maybe full-scale e2e tests
-
-### 2. Move tests to subdirectories in `src/`
+### 1. Move tests to subdirectories in `src/`
 
 - one for compile tests, one for unit tests
+- split `src/providers.compile-test.ts` into multiple files per provider type
+- split `src/injector.test.ts` further
+
+### 2. Convert to monorepo to support container packages and maybe full-scale e2e tests
 
 ### 3. e2e test package with subset of functionality
 

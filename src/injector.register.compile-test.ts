@@ -93,6 +93,14 @@ injector.register({
   provide: TestServiceWithInject,
   useClass: TestServiceWithInject,
   noCache: true,
+  injectFn: true,
+});
+
+// Negative: missing injectFn when required
+// @ts-expect-error - Constructor requires InjectFn but no injectFn specified
+injector.register({
+  provide: TestServiceWithInject,
+  useClass: TestServiceWithInject,
 });
 
 // Negative: Type mismatches in class providers
@@ -102,7 +110,7 @@ injector.register({
   useClass: TestServiceNoArgs,
 });
 
-// @ts-expect-error - TestServiceNoArgs does not produce number
+// @ts-expect-error - TestServiceWithInject does not produce string
 injector.register({
   provide: stringToken,
   useClass: TestServiceWithInject,

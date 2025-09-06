@@ -49,15 +49,13 @@ the following core concepts:
 - `Token<T>` - Type-safe unique keys for dependencies
 - `InjectionId<T>` - Union type for tokens or constructors
 - `InjectFn` - Type alias for `typeof inject` used in factory functions
-- `InjectScope` - Either `'singleton'` or `'transient'`
 
 ### Provider Types
 
 - **Constructor Provider** (shorthand) - Classes with no args or single
   `InjectFn` arg
-- **ClassProvider<T>** - Associates constructor with injection ID, requires
-  explicit scope
-- **FactoryProvider<T>** - Uses factory function, requires explicit scope
+- **ClassProvider<T>** - Associates constructor with injection ID, optional `injectFn` and `noCache` properties
+- **FactoryProvider<T>** - Uses factory function, optional `noCache` property
 - **ValueProvider<T>** - Provides static values, never cached
 - **ExistingProvider<T>** - Aliases one injection ID to another
 
@@ -69,14 +67,14 @@ the following core concepts:
 - **Hierarchical Support**: Child injectors can inherit from and override parent
   providers
 - **Async Support**: Providers can return promises for async dependencies
-- **Scoping**: Singleton (cached) vs transient (always new) resolution
+- **Caching Control**: Optional `noCache` property controls singleton (cached) vs transient (always new) resolution
 
 ### Dependency Injection Patterns
 
 - **Parameter Injection**: Functions can accept injected dependencies as default
   parameters
 - **Service Locator**: Classes can call `inject()` directly in their methods
-- **Constructor Injection**: Classes receive `InjectFn` as constructor parameter
+- **Constructor Injection**: Classes can optionally receive `InjectFn` as constructor parameter when `injectFn: true` is set
 
 ### Testing Support
 
@@ -89,7 +87,7 @@ the following core concepts:
 ## Key Files
 
 - `src/index.ts` - Main library implementation
-- `TODO.v2..md` - Complete design document and API specification
+- `docs/design/v3_ideas.md` - v3.0.0 feature ideas and implementation status
 - `tsconfig.json` - Strict TypeScript configuration with ES2022 target
 - `vitest.config.ts` - Test configuration with type checking enabled
 - `eslint.config.js` - ESLint configuration with TypeScript and Prettier

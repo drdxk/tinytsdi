@@ -8,12 +8,24 @@ export interface ValueProvider<T> {
   useValue: T;
 }
 
-/** Associates a constructor with an InjectionId */
-export interface ClassProvider<T> {
+/** ClassProvider for constructors that require InjectFn */
+export interface ClassProviderWithInjectFn<T> {
   provide: InjectionId<T>;
-  useClass: InjectableConstructor<T>;
+  useClass: new (inject: InjectFn) => T;
   noCache?: boolean;
+  injectFn: true;
 }
+
+/** ClassProvider for constructors with no required parameters */
+export interface ClassProviderNoArgs<T> {
+  provide: InjectionId<T>;
+  useClass: new () => T;
+  noCache?: boolean;
+  injectFn?: false;
+}
+
+/** Associates a constructor with an InjectionId */
+export type ClassProvider<T> = ClassProviderWithInjectFn<T> | ClassProviderNoArgs<T>;
 
 /** Associates a factory function with an InjectionId */
 export interface FactoryProvider<T> {
