@@ -20,7 +20,7 @@ export class NotProvidedError extends Error {
   }
 }
 
-/** Error thrown when checking cache status of a transient provider */
+/** Error thrown when checking cache status of a noCache provider */
 export class NeverCachedError extends Error {
   constructor(id: GenericInjectionId) {
     super(`Provider for ${formatInjectionId(id)} is transient and never cached`);

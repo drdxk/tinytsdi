@@ -70,13 +70,12 @@ register({provide: serviceToken, useValue: new TestServiceWithInject(() => 'test
 register({
   provide: serviceToken,
   useClass: TestServiceNoArgs,
-  scope: 'singleton',
 });
 
 register({
   provide: TestServiceWithInject,
   useClass: TestServiceWithInject,
-  scope: 'transient',
+  noCache: true,
 });
 
 // Negative: Type mismatches in class providers
@@ -84,34 +83,25 @@ register({
 register({
   provide: numberToken,
   useClass: TestServiceNoArgs,
-  scope: 'singleton',
 });
 
 // @ts-expect-error - TestServiceWithInject does not produce string
 register({
   provide: stringToken,
   useClass: TestServiceWithInject,
-  scope: 'singleton',
 });
 
 // @ts-expect-error - TestServiceWithArgs has invalid constructor
 register({
   provide: TestServiceWithArgs,
   useClass: TestServiceWithArgs,
-  scope: 'singleton',
 });
 
-// @ts-expect-error - missing scope
+// @ts-expect-error - invalid noCache value
 register({
   provide: serviceToken,
   useClass: TestServiceNoArgs,
-});
-
-// @ts-expect-error - invalid scope value
-register({
-  provide: serviceToken,
-  useClass: TestServiceNoArgs,
-  scope: 'invalid',
+  noCache: 'invalid',
 });
 
 // === FactoryProvider Tests ===
@@ -120,7 +110,6 @@ register({
 register({
   provide: stringToken,
   useFactory: () => 'factory string',
-  scope: 'singleton',
 });
 
 register({
@@ -129,13 +118,12 @@ register({
     const str = inject(stringToken, 'default');
     return str.length;
   },
-  scope: 'transient',
+  noCache: true,
 });
 
 register({
   provide: serviceToken,
   useFactory: () => new TestServiceNoArgs(),
-  scope: 'singleton',
 });
 
 // Negative: Type mismatches in factory providers
@@ -143,20 +131,13 @@ register({
 register({
   provide: stringToken,
   useFactory: () => 42,
-  scope: 'singleton',
 });
 
 // @ts-expect-error - factory must return number, not string
 register({
   provide: numberToken,
   useFactory: () => 'not a number',
-  scope: 'transient',
-});
-
-// @ts-expect-error - missing scope
-register({
-  provide: stringToken,
-  useFactory: () => 'test',
+  noCache: true,
 });
 
 // === ExistingProvider Tests ===
@@ -240,7 +221,6 @@ register([
   {
     provide: new Token<string>('factory'),
     useFactory: () => 'from factory',
-    scope: 'singleton',
   },
 ]);
 

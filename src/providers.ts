@@ -1,6 +1,6 @@
 /** Provider type definitions for TSDI */
 
-import type {InjectFn, InjectScope, InjectableConstructor, InjectionId} from './types.js';
+import type {InjectFn, InjectableConstructor, InjectionId} from './types.js';
 
 /** Associates a static value with an InjectionId */
 export interface ValueProvider<T> {
@@ -12,14 +12,14 @@ export interface ValueProvider<T> {
 export interface ClassProvider<T> {
   provide: InjectionId<T>;
   useClass: InjectableConstructor<T>;
-  scope: InjectScope;
+  noCache?: boolean;
 }
 
 /** Associates a factory function with an InjectionId */
 export interface FactoryProvider<T> {
   provide: InjectionId<T>;
   useFactory: (() => T) | ((inject: InjectFn) => T);
-  scope: InjectScope;
+  noCache?: boolean;
 }
 
 /** Associates one InjectionId with another (aliasing) */

@@ -73,7 +73,6 @@ register({
   useFactory: (inject: InjectFn) => ({
     value: inject(stringToken),
   }),
-  scope: 'singleton',
 });
 
 const factoryResult: {value: string} = inject(factoryToken);
@@ -83,7 +82,6 @@ const factoryResult: {value: string} = inject(factoryToken);
 register({
   provide: new Token<string>('factory-str'),
   useFactory: (): number => 42,
-  scope: 'singleton',
 });
 
 // Test: Class provider type checking
@@ -92,14 +90,12 @@ const classProviderToken = new Token<TestServiceWithNoArgs>('class-provider');
 register({
   provide: classProviderToken,
   useClass: TestServiceWithNoArgs,
-  scope: 'singleton',
 });
 
 // @ts-expect-error - useClass must be compatible with provide type
 register({
   provide: stringToken,
   useClass: TestServiceWithNoArgs,
-  scope: 'singleton',
 });
 
 // Test: Existing provider type checking

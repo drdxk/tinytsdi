@@ -127,8 +127,8 @@ describe('Injector', () => {
 
       expect(() => {
         injector.register({provide: valueToken, useValue: 'test'});
-        injector.register({provide: classToken, useClass: TestService, scope: 'singleton'});
-        injector.register({provide: factoryToken, useFactory: () => 42, scope: 'transient'});
+        injector.register({provide: classToken, useClass: TestService});
+        injector.register({provide: factoryToken, useFactory: () => 42, noCache: true});
         injector.register({provide: aliasToken, useExisting: valueToken});
       }).not.toThrow();
     });
@@ -206,7 +206,7 @@ describe('Injector', () => {
       expect(injector.inject(token)).toBe('test value');
     });
 
-    it('injects class providers with singleton scope', () => {
+    it('caches class providers by default', () => {
       const injector = new Injector();
       const token = new Token<TestServiceA>('service');
 
@@ -214,7 +214,7 @@ describe('Injector', () => {
         readonly id = Math.random();
       }
 
-      injector.register({provide: token, useClass: TestServiceA, scope: 'singleton'});
+      injector.register({provide: token, useClass: TestServiceA});
 
       const instance1 = injector.inject(token);
       const instance2 = injector.inject(token);
@@ -223,7 +223,7 @@ describe('Injector', () => {
       expect(instance1).toBe(instance2); // Same instance (cached)
     });
 
-    it('injects class providers with transient scope', () => {
+    it('creates new instances for noCache class providers', () => {
       const injector = new Injector();
       const token = new Token<TestServiceB>('service');
 
@@ -231,7 +231,7 @@ describe('Injector', () => {
         readonly id = Math.random();
       }
 
-      injector.register({provide: token, useClass: TestServiceB, scope: 'transient'});
+      injector.register({provide: token, useClass: TestServiceB, noCache: true});
 
       const instance1 = injector.inject(token);
       const instance2 = injector.inject(token);
@@ -241,7 +241,7 @@ describe('Injector', () => {
       expect(instance1).not.toBe(instance2); // Different instances
     });
 
-    it('injects factory providers with singleton scope', () => {
+    it('caches factory providers by default', () => {
       const injector = new Injector();
       const token = new Token<string>('factory');
       let callCount = 0;
@@ -249,7 +249,6 @@ describe('Injector', () => {
       injector.register({
         provide: token,
         useFactory: () => `factory-${++callCount}`,
-        scope: 'singleton',
       });
 
       const result1 = injector.inject(token);
@@ -260,7 +259,7 @@ describe('Injector', () => {
       expect(callCount).toBe(1); // Factory called only once
     });
 
-    it('injects factory providers with transient scope', () => {
+    it('creates new instances for noCache factory providers', () => {
       const injector = new Injector();
       const token = new Token<string>('factory');
       let callCount = 0;
@@ -268,7 +267,7 @@ describe('Injector', () => {
       injector.register({
         provide: token,
         useFactory: () => `factory-${++callCount}`,
-        scope: 'transient',
+        noCache: true,
       });
 
       const result1 = injector.inject(token);
@@ -304,7 +303,7 @@ describe('Injector', () => {
 
       expect(instance1).toBeInstanceOf(TestServiceC);
       expect(instance1.marker).toBe('constructor-provider');
-      expect(instance1).toBe(instance2); // Constructor providers are singleton by default
+      expect(instance1).toBe(instance2); // Constructor providers are cached by default
     });
 
     it('passes inject function to constructors', () => {
@@ -335,7 +334,6 @@ describe('Injector', () => {
       injector.register({
         provide: factoryToken,
         useFactory: (inject) => `factory: ${inject(depToken)}`,
-        scope: 'singleton',
       });
 
       expect(injector.inject(factoryToken)).toBe('factory: injected value');
@@ -384,7 +382,7 @@ describe('Injector', () => {
       }
 
       injector.register({provide: depToken, useValue: 'injected dependency'});
-      injector.register({provide: serviceToken, useClass: TestService, scope: 'singleton'});
+      injector.register({provide: serviceToken, useClass: TestService});
 
       const service = injector.inject(serviceToken);
       expect(service.resolvedValue).toBe('injected dependency');
@@ -401,7 +399,6 @@ describe('Injector', () => {
         useFactory: (inject: InjectFn) => ({
           dep: inject(depToken),
         }),
-        scope: 'singleton',
       });
 
       const result = injector.inject(factoryToken);
@@ -431,8 +428,8 @@ describe('Injector', () => {
       }
 
       injector.register({provide: baseToken, useValue: 'base value'});
-      injector.register({provide: serviceAToken, useClass: ServiceA, scope: 'singleton'});
-      injector.register({provide: serviceBToken, useClass: ServiceB, scope: 'singleton'});
+      injector.register({provide: serviceAToken, useClass: ServiceA});
+      injector.register({provide: serviceBToken, useClass: ServiceB});
 
       const serviceB = injector.inject(serviceBToken);
       expect(serviceB.serviceA.baseValue).toBe('base value');
@@ -454,7 +451,6 @@ describe('Injector', () => {
       injector.register({
         provide: serviceToken,
         useClass: TestServiceWithDefault,
-        scope: 'singleton',
       });
 
       const service = injector.inject(serviceToken);
@@ -480,7 +476,6 @@ describe('Injector', () => {
       injector.register({
         provide: serviceToken,
         useClass: TestServiceUsingAlias,
-        scope: 'singleton',
       });
 
       const service = injector.inject(serviceToken);
@@ -522,7 +517,6 @@ describe('Injector', () => {
       sourceInjector.register({
         provide: token,
         useFactory: () => `factory-${++callCount}`,
-        scope: 'singleton',
       });
 
       // Trigger caching in source injector
@@ -545,7 +539,6 @@ describe('Injector', () => {
       sourceInjector.register({
         provide: token,
         useFactory: () => `factory-${++callCount}`,
-        scope: 'singleton',
       });
 
       // Trigger caching in source injector
@@ -568,7 +561,6 @@ describe('Injector', () => {
       sourceInjector.register({
         provide: token,
         useFactory: () => `factory-${++callCount}`,
-        scope: 'singleton',
       });
 
       // Trigger caching in source injector
@@ -650,9 +642,8 @@ describe('Injector', () => {
         {
           provide: factoryToken,
           useFactory: (inject) => `factory: ${inject(valueToken)}`,
-          scope: 'singleton',
         },
-        {provide: classToken, useClass: TestService, scope: 'transient'},
+        {provide: classToken, useClass: TestService, noCache: true},
         {provide: aliasToken, useExisting: valueToken},
       ]);
 

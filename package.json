@@ -1,6 +1,6 @@
 {
   "name": "tinytsdi",
-  "version": "2.1.1",
+  "version": "3.0.0-alpha.1",
   "description": "Minimalistic TypeScript Dependency Injection library",
   "repository": {
     "type": "git",
@@ -31,7 +31,8 @@
     "build:tsc": "rm -rf dist && tsc -p tsconfig.build.types.json && tsc -p tsconfig.build.esm.json && tsc-alias -p tsconfig.build.esm.json && tsc -p tsconfig.build.cjs.json && tsc-alias -p tsconfig.build.cjs.json && find dist/cjs -name '*.js' -exec mv {} {}.cjs \\;",
     "build": "rm -rf dist && vite build",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run test:run",
-    "format": "prettier --write src && eslint --fix",
+    "fix": "prettier --write src && eslint --fix",
+    "fox": "pnpm run fix && pnpm run check",
     "lint": "eslint && prettier --check src",
     "test:coverage": "vitest run --coverage",
     "test:run": "vitest run",

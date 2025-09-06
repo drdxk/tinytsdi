@@ -22,7 +22,7 @@ interface InjectorProvider {
   /** The injection identifier (token or constructor). */
   id: GenericInjectionId;
   /** Whether the resolved value should be cached. */
-  isSingleton: boolean;
+  cache: boolean;
   /** Function that creates/returns the provider's value. */
   resolve: () => unknown;
 }
@@ -123,9 +123,9 @@ export class Injector {
   /**
    * Resolves a dependency by its injection ID.
    *
-   * For singleton providers, returns the same instance on subsequent calls. For transient
-   * providers, creates a new instance on each call. For value providers, returns the registered
-   * value. For existing providers (aliases), delegates to the target provider.
+   * For cached providers, returns the same instance on subsequent calls. For noCache providers,
+   * creates a new instance on each call. For value providers, returns the registered value. For
+   * existing providers (aliases), delegates to the target provider.
    *
    * @param id - Token or constructor to resolve.
    * @param defaultValue - Value to return if provider is not found.
@@ -157,7 +157,7 @@ export class Injector {
     const instance = provider.resolve();
 
     // Cache if singleton
-    if (provider.isSingleton) {
+    if (provider.cache) {
       this.cache.set(id, instance);
     }
 
@@ -180,7 +180,7 @@ export class Injector {
    * @param id - The injection ID to check for cached value.
    * @returns True if a cached value exists for the given ID, false otherwise.
    * @throws {@link NotProvidedError} - When no provider is registered for the given ID.
-   * @throws {@link NeverCachedError} - When checking cache status of a transient provider.
+   * @throws {@link NeverCachedError} - When checking cache status of a noCache provider.
    */
   hasCachedValue(id: GenericInjectionId): boolean {
     const provider = this.providers.get(id);
@@ -189,8 +189,8 @@ export class Injector {
       throw new NotProvidedError(id);
     }
 
-    // Throw error if provider is transient (never cached)
-    if (!provider.isSingleton) {
+    // Throw error if provider is never cached, i.e. noCache: true.
+    if (!provider.cache) {
       throw new NeverCachedError(id);
     }
 
@@ -220,8 +220,8 @@ export class Injector {
         throw new NotProvidedError(id);
       }
 
-      // Throw error if provider is transient (never cached)
-      if (!provider.isSingleton) {
+      // Throw error if provider is never cached.
+      if (!provider.cache) {
         throw new NeverCachedError(id);
       }
 
@@ -268,7 +268,7 @@ export class Injector {
     if (isConstructorProvider(provider)) {
       return {
         id: provider,
-        isSingleton: true,
+        cache: true,
         resolve: () => new provider(this.boundInject),
       };
     }
@@ -276,7 +276,7 @@ export class Injector {
     if (isValueProvider(provider)) {
       return {
         id: provider.provide,
-        isSingleton: false, // Value providers are never cached
+        cache: false, // Value providers are never cached
         resolve: () => provider.useValue,
       };
     }
@@ -284,7 +284,7 @@ export class Injector {
     if (isClassProvider(provider)) {
       return {
         id: provider.provide,
-        isSingleton: provider.scope === 'singleton',
+        cache: !provider.noCache,
         resolve: () => new provider.useClass(this.boundInject),
       };
     }
@@ -292,7 +292,7 @@ export class Injector {
     if (isFactoryProvider(provider)) {
       return {
         id: provider.provide,
-        isSingleton: provider.scope === 'singleton',
+        cache: !provider.noCache,
         resolve: () => provider.useFactory(this.boundInject),
       };
     }
@@ -300,7 +300,7 @@ export class Injector {
     if (isExistingProvider(provider)) {
       return {
         id: provider.provide,
-        isSingleton: false, // Existing providers delegate to the target provider's caching
+        cache: false, // Existing providers delegate to the target provider's caching
         resolve: () => this.inject(provider.useExisting),
       };
     }

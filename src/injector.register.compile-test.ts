@@ -87,13 +87,12 @@ injector.register({provide: serviceToken, useValue: new TestServiceWithInject(()
 injector.register({
   provide: serviceToken,
   useClass: TestServiceNoArgs,
-  scope: 'singleton',
 });
 
 injector.register({
   provide: TestServiceWithInject,
   useClass: TestServiceWithInject,
-  scope: 'transient',
+  noCache: true,
 });
 
 // Negative: Type mismatches in class providers
@@ -101,34 +100,25 @@ injector.register({
 injector.register({
   provide: numberToken,
   useClass: TestServiceNoArgs,
-  scope: 'singleton',
 });
 
 // @ts-expect-error - TestServiceNoArgs does not produce number
 injector.register({
   provide: stringToken,
   useClass: TestServiceWithInject,
-  scope: 'singleton',
 });
 
 // @ts-expect-error - TestServiceNoArgs does not produce number
 injector.register({
   provide: TestServiceWithArgs,
   useClass: TestServiceWithArgs,
-  scope: 'singleton',
 });
 
-// @ts-expect-error - missing scope
+// @ts-expect-error - invalid value for noCache
 injector.register({
   provide: serviceToken,
   useClass: TestServiceNoArgs,
-});
-
-// @ts-expect-error - TestServiceNoArgs does not produce number
-injector.register({
-  provide: serviceToken,
-  useClass: TestServiceNoArgs,
-  scope: 'invalid',
+  noCache: 'invalid',
 });
 
 // === FactoryProvider Tests ===
@@ -137,7 +127,6 @@ injector.register({
 injector.register({
   provide: stringToken,
   useFactory: () => 'factory string',
-  scope: 'singleton',
 });
 
 injector.register({
@@ -146,13 +135,12 @@ injector.register({
     const str = inject(stringToken, 'default');
     return str.length;
   },
-  scope: 'transient',
+  noCache: true,
 });
 
 injector.register({
   provide: serviceToken,
   useFactory: () => new TestServiceNoArgs(),
-  scope: 'singleton',
 });
 
 // Negative: Type mismatches in factory providers
@@ -160,20 +148,13 @@ injector.register({
 injector.register({
   provide: stringToken,
   useFactory: () => 42,
-  scope: 'singleton',
 });
 
 // @ts-expect-error - TestServiceNoArgs does not produce number
 injector.register({
   provide: numberToken,
   useFactory: () => 'not a number',
-  scope: 'transient',
-});
-
-// @ts-expect-error - missing scope
-injector.register({
-  provide: stringToken,
-  useFactory: () => 'test',
+  noCache: true,
 });
 
 // === ExistingProvider Tests ===
@@ -257,7 +238,6 @@ injector.register([
   {
     provide: new Token<string>('factory'),
     useFactory: () => 'from factory',
-    scope: 'singleton',
   },
 ]);
 

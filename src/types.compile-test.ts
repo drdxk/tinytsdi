@@ -14,13 +14,7 @@
 
 import {Token} from './types.js';
 
-import type {
-  Constructor,
-  InjectFn,
-  InjectScope,
-  InjectableConstructor,
-  InjectionId,
-} from './types.js';
+import type {Constructor, InjectFn, InjectableConstructor, InjectionId} from './types.js';
 
 // Test class for constructor tests
 class TestService {
@@ -122,19 +116,6 @@ const incompatibleToken: Token<number> = stringToken1;
 // @ts-expect-error - Token<number> not assignable to Token<string>
 const incompatibleToken2: Token<string> = numberToken;
 
-// === InjectScope Type Tests ===
-
-// Positive: Valid scope values
-const singletonScope: InjectScope = 'singleton';
-const transientScope: InjectScope = 'transient';
-
-// Negative: Invalid scope values should fail
-// @ts-expect-error - 'invalid' not assignable to InjectScope
-const invalidScope: InjectScope = 'invalid';
-
-// @ts-expect-error - number not assignable to InjectScope
-const numericScope: InjectScope = 1;
-
 // === Complex Type Composition Tests ===
 
 // Positive: Complex generic preservation
@@ -171,8 +152,6 @@ void validConstructorWithInject;
 void validInjectableNoArgs;
 void validInjectableWithInject;
 void stringToken2;
-void singletonScope;
-void transientScope;
 void complexInject;
 void unionValue;
 void arrayValue;

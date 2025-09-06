@@ -45,8 +45,8 @@ describe('Injector Advanced Methods', () => {
 
       injector.register([
         {provide: valueToken, useValue: 'test'},
-        {provide: factoryToken, useFactory: () => 42, scope: 'singleton'},
-        {provide: classToken, useClass: TestService, scope: 'transient'},
+        {provide: factoryToken, useFactory: () => 42},
+        {provide: classToken, useClass: TestService, noCache: true},
         {provide: aliasToken, useExisting: valueToken},
       ]);
 
@@ -76,27 +76,25 @@ describe('Injector Advanced Methods', () => {
       expect(() => injector.hasCachedValue(token)).toThrow(NotProvidedError);
     });
 
-    it('returns false when singleton provider is registered but not resolved', () => {
+    it('returns false when cached provider is registered but not resolved', () => {
       const injector = new Injector();
       const token = new Token<string>('test');
 
       injector.register({
         provide: token,
         useFactory: () => 'factory value',
-        scope: 'singleton',
       });
 
       expect(injector.hasCachedValue(token)).toBe(false);
     });
 
-    it('returns true when singleton provider is resolved and cached', () => {
+    it('returns true when cached provider is resolved and cached', () => {
       const injector = new Injector();
       const token = new Token<string>('test');
 
       injector.register({
         provide: token,
         useFactory: () => 'factory value',
-        scope: 'singleton',
       });
 
       // Resolve to trigger caching
@@ -105,13 +103,13 @@ describe('Injector Advanced Methods', () => {
       expect(injector.hasCachedValue(token)).toBe(true);
     });
 
-    it('throws NeverCachedError for transient providers and value providers', () => {
+    it('throws NeverCachedError for noCache providers and value providers', () => {
       const injector = new Injector();
       const transientToken = new Token<string>('transient');
       const valueToken = new Token<string>('value');
 
       injector.register([
-        {provide: transientToken, useFactory: () => 'factory value', scope: 'transient'},
+        {provide: transientToken, useFactory: () => 'factory value', noCache: true},
         {provide: valueToken, useValue: 'test value'},
       ]);
 
@@ -123,7 +121,7 @@ describe('Injector Advanced Methods', () => {
       expect(() => injector.hasCachedValue(valueToken)).toThrow(NeverCachedError);
     });
 
-    it('works with constructor providers (singleton by default)', () => {
+    it('works with constructor providers (cached by default)', () => {
       const injector = new Injector();
 
       class TestService {
@@ -140,7 +138,7 @@ describe('Injector Advanced Methods', () => {
       expect(injector.hasCachedValue(TestService)).toBe(true);
     });
 
-    it('works with class providers based on scope', () => {
+    it('works with class providers based on caching behavior', () => {
       const injector = new Injector();
       const singletonToken = new Token<TestService>('singleton');
       const transientToken = new Token<TestService>('transient');
@@ -148,8 +146,8 @@ describe('Injector Advanced Methods', () => {
       class TestService {}
 
       injector.register([
-        {provide: singletonToken, useClass: TestService, scope: 'singleton'},
-        {provide: transientToken, useClass: TestService, scope: 'transient'},
+        {provide: singletonToken, useClass: TestService},
+        {provide: transientToken, useClass: TestService, noCache: true},
       ]);
 
       // Resolve both
@@ -166,7 +164,7 @@ describe('Injector Advanced Methods', () => {
       const aliasToken = new Token<string>('alias');
 
       injector.register([
-        {provide: originalToken, useFactory: () => 'original value', scope: 'singleton'},
+        {provide: originalToken, useFactory: () => 'original value'},
         {provide: aliasToken, useExisting: originalToken},
       ]);
 
@@ -185,8 +183,8 @@ describe('Injector Advanced Methods', () => {
       const token2 = new Token<string>('test2');
 
       injector.register([
-        {provide: token1, useFactory: () => 'value1', scope: 'singleton'},
-        {provide: token2, useFactory: () => 'value2', scope: 'singleton'},
+        {provide: token1, useFactory: () => 'value1'},
+        {provide: token2, useFactory: () => 'value2'},
       ]);
 
       // Resolve to populate cache
@@ -208,8 +206,8 @@ describe('Injector Advanced Methods', () => {
       const token2 = new Token<string>('test2');
 
       injector.register([
-        {provide: token1, useFactory: () => 'value1', scope: 'singleton'},
-        {provide: token2, useFactory: () => 'value2', scope: 'singleton'},
+        {provide: token1, useFactory: () => 'value1'},
+        {provide: token2, useFactory: () => 'value2'},
       ]);
 
       // Resolve to populate cache
@@ -232,9 +230,9 @@ describe('Injector Advanced Methods', () => {
       const token3 = new Token<string>('test3');
 
       injector.register([
-        {provide: token1, useFactory: () => 'value1', scope: 'singleton'},
-        {provide: token2, useFactory: () => 'value2', scope: 'singleton'},
-        {provide: token3, useFactory: () => 'value3', scope: 'singleton'},
+        {provide: token1, useFactory: () => 'value1'},
+        {provide: token2, useFactory: () => 'value2'},
+        {provide: token3, useFactory: () => 'value3'},
       ]);
 
       // Resolve to populate cache
@@ -256,11 +254,11 @@ describe('Injector Advanced Methods', () => {
       expect(() => injector.invalidate(token)).toThrow(NotProvidedError);
     });
 
-    it('throws NeverCachedError for transient providers', () => {
+    it('throws NeverCachedError for noCache providers', () => {
       const injector = new Injector();
       const token = new Token<string>('test');
 
-      injector.register({provide: token, useFactory: () => 'value', scope: 'transient'});
+      injector.register({provide: token, useFactory: () => 'value', noCache: true});
 
       expect(() => injector.invalidate(token)).toThrow(NeverCachedError);
     });
@@ -300,7 +298,7 @@ describe('Injector Advanced Methods', () => {
       const validToken = new Token<string>('valid');
       const invalidToken = new Token<string>('invalid');
 
-      injector.register({provide: validToken, useFactory: () => 'value', scope: 'singleton'});
+      injector.register({provide: validToken, useFactory: () => 'value'});
 
       expect(() => injector.invalidate([validToken, invalidToken])).toThrow(NotProvidedError);
 
@@ -336,8 +334,8 @@ describe('Injector Advanced Methods', () => {
       const token2 = new Token<string>('test2');
 
       injector.register([
-        {provide: token1, useFactory: () => 'value1', scope: 'singleton'},
-        {provide: token2, useFactory: () => 'value2', scope: 'singleton'},
+        {provide: token1, useFactory: () => 'value1'},
+        {provide: token2, useFactory: () => 'value2'},
       ]);
 
       // Resolve to populate cache
@@ -361,9 +359,9 @@ describe('Injector Advanced Methods', () => {
       const token3 = new Token<string>('test3');
 
       injector.register([
-        {provide: token1, useFactory: () => 'value1', scope: 'singleton'},
-        {provide: token2, useFactory: () => 'value2', scope: 'singleton'},
-        {provide: token3, useFactory: () => 'value3', scope: 'singleton'},
+        {provide: token1, useFactory: () => 'value1'},
+        {provide: token2, useFactory: () => 'value2'},
+        {provide: token3, useFactory: () => 'value3'},
       ]);
 
       // Resolve to populate cache
@@ -409,8 +407,8 @@ describe('Injector Advanced Methods', () => {
 
       injector.register([
         {provide: valueToken, useValue: 'test'},
-        {provide: factoryToken, useFactory: () => 'factory', scope: 'singleton'},
-        {provide: classToken, useClass: TestService, scope: 'transient'},
+        {provide: factoryToken, useFactory: () => 'factory'},
+        {provide: classToken, useClass: TestService, noCache: true},
         {provide: aliasToken, useExisting: valueToken},
       ]);
 

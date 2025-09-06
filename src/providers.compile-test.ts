@@ -81,14 +81,20 @@ const invalidValueProvider: ValueProvider<string> = {
 const validClassProvider: ClassProvider<TestServiceNoArgs> = {
   provide: serviceToken,
   useClass: TestServiceNoArgs,
-  scope: 'singleton',
 };
 
 // Positive: Valid ClassProvider with InjectFn constructor
 const validClassProviderWithInject: ClassProvider<TestServiceWithInject> = {
   provide: TestServiceWithInject,
   useClass: TestServiceWithInject,
-  scope: 'transient',
+  noCache: true,
+};
+
+// Positive: Valid ClassProvider with explicit noCache: false (default behavior)
+const validClassProviderCached: ClassProvider<TestServiceNoArgs> = {
+  provide: serviceToken,
+  useClass: TestServiceNoArgs,
+  noCache: false,
 };
 
 // Negative: Constructor with incompatible args should fail
@@ -96,22 +102,14 @@ const invalidClassProvider: ClassProvider<TestServiceWithArgs> = {
   provide: TestServiceWithArgs,
   // @ts-expect-error - Constructor with non-InjectFn args not allowed
   useClass: TestServiceWithArgs,
-  scope: 'singleton',
-};
-
-// Negative: Missing scope should fail
-// @ts-expect-error - scope is required
-const missingScopeClassProvider: ClassProvider<TestServiceNoArgs> = {
-  provide: serviceToken,
-  useClass: TestServiceNoArgs,
 };
 
 // Negative: Invalid scope should fail
 const invalidScopeClassProvider: ClassProvider<TestServiceNoArgs> = {
   provide: serviceToken,
   useClass: TestServiceNoArgs,
-  // @ts-expect-error - 'invalid' not assignable to InjectScope
-  scope: 'invalid',
+  // @ts-expect-error - 'invalid' not a valid value for noCache
+  noCache: 'invalid',
 };
 
 // === FactoryProvider<T> Type Tests ===
@@ -120,7 +118,6 @@ const invalidScopeClassProvider: ClassProvider<TestServiceNoArgs> = {
 const validFactoryProvider: FactoryProvider<string> = {
   provide: testToken,
   useFactory: () => 'factory result',
-  scope: 'singleton',
 };
 
 // Positive: Valid FactoryProvider with InjectFn factory
@@ -130,14 +127,20 @@ const validFactoryProviderWithInject: FactoryProvider<string> = {
     const value = inject(testToken, 'default');
     return `processed: ${value}`;
   },
-  scope: 'transient',
+  noCache: true,
+};
+
+// Positive: Valid FactoryProvider with explicit noCache: false (default behavior)
+const validFactoryProviderCached: FactoryProvider<string> = {
+  provide: testToken,
+  useFactory: () => 'cached factory result',
+  noCache: false,
 };
 
 // Positive: Factory with explicit typing should work for both signatures
 const explicitNoArgsFactory: FactoryProvider<number> = {
   provide: new Token<number>('num'),
   useFactory: (): number => 42,
-  scope: 'singleton',
 };
 
 const explicitInjectFactory: FactoryProvider<number> = {
@@ -146,7 +149,7 @@ const explicitInjectFactory: FactoryProvider<number> = {
     void inject;
     return 42;
   },
-  scope: 'transient',
+  noCache: true,
 };
 
 // Negative: Factory returning wrong type should fail
@@ -154,14 +157,6 @@ const invalidFactoryProvider: FactoryProvider<string> = {
   provide: testToken,
   // @ts-expect-error - number not assignable to string
   useFactory: () => 42,
-  scope: 'singleton',
-};
-
-// Negative: Missing scope should fail
-// @ts-expect-error - scope is required
-const missingScopeFactoryProvider: FactoryProvider<string> = {
-  provide: testToken,
-  useFactory: () => 'result',
 };
 
 // === ExistingProvider<T> Type Tests ===
@@ -210,7 +205,6 @@ const invalidProviderFromConstructor: Provider<TestServiceWithArgs> = TestServic
 const asyncProvider: Provider<Promise<string>> = {
   provide: new Token<Promise<string>>('async'),
   useFactory: async () => 'async result',
-  scope: 'singleton',
 };
 
 // Positive: Provider with generic types
@@ -218,7 +212,7 @@ const genericToken = new Token<Array<string>>('generic');
 const genericProvider: Provider<Array<string>> = {
   provide: genericToken,
   useFactory: () => ['item1', 'item2'],
-  scope: 'transient',
+  noCache: true,
 };
 
 // Suppress unused variable warnings
@@ -226,8 +220,10 @@ void validValueProvider;
 void validValueProviderWithClass;
 void validClassProvider;
 void validClassProviderWithInject;
+void validClassProviderCached;
 void validFactoryProvider;
 void validFactoryProviderWithInject;
+void validFactoryProviderCached;
 void explicitNoArgsFactory;
 void explicitInjectFactory;
 void validExistingProvider;

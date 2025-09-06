@@ -92,16 +92,18 @@ export function deleteInjector(): void {
  * {provide: stringToken, useValue: 'value'}
  *
  * // Class provider
- * {provide: token, useClass: SomeClass, scope: 'singleton'|'transient'}
+ * {provide: token, useClass: SomeClass} // Default: cached
+ * {provide: token, useClass: SomeClass, noCache: true} // Create new instances on each inject()
  *
  * // Factory provider
- * {provide: token, useFactory: (inject) => value, scope: 'singleton'|'transient'}
+ * {provide: token, useFactory: (inject) => value} // Default: cached
+ * {provide: token, useFactory: (inject) => value, noCache: true} // Create new instances on each inject()
  *
  * // Existing provider (alias provider)
  * {provide: token, useExisting: otherToken}
  *
  * // Constructor shorthand
- * SomeClass // Equivalent to {provide: SomeClass, useClass: SomeClass, scope: 'singleton'}
+ * SomeClass // Equivalent to {provide: SomeClass, useClass: SomeClass} (always cached)
  * ```
  *
  * Usage example:
@@ -137,7 +139,7 @@ export function register<T>(
 /**
  * Resolves a dependency from the global injector.
  *
- * For singleton providers, returns the same instance on subsequent calls. For transient providers,
+ * For cached providers, returns the same instance on subsequent calls. For noCache providers,
  * creates a new instance on each call. For value providers, returns the registered value. For
  * existing providers (aliases), delegates to the target provider.
  *

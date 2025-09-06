@@ -70,12 +70,11 @@ sourceInjector.register([
   {
     provide: factoryToken,
     useFactory: (inject: InjectFn) => ({value: inject(stringToken)}),
-    scope: 'singleton',
   },
   {
     provide: classToken,
     useClass: SimpleService,
-    scope: 'transient',
+    noCache: true,
   },
   {
     provide: aliasToken,
@@ -115,7 +114,6 @@ const interfaceToken = new Token<ServiceInterface>('interface');
 sourceInjector.register({
   provide: interfaceToken,
   useClass: ConcreteService,
-  scope: 'singleton',
 });
 
 const interfaceCopy = Injector.from(sourceInjector);

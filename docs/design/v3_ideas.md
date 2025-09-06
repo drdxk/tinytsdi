@@ -2,22 +2,17 @@
 
 ### 1. ✅ Add basic support for hierarchical injectors
 
-### 2. Modify `scope` provider setting:
-
-- rename to `cache`
-- make it an optional boolean, defaulting to `true`
+### 2. ✅ Modify `scope` provider setting, rename to `noCache`, defaulting to `false`
 
 ### 3. Make passing of `InjectFn` to constructors of class providers (shorthand and full) optional, false by default. -- Maybe?
 
 - Controlled via boolean `injectFn` option in the provider settings.
-- Or by the class itself, via a static [InjectFn] symbol property (symbol
-  provided by the library)?
+- Or by the class itself, via a static [InjectFn] symbol property (symbol provided by the library)?
 
 ### 4. Global: add `hijackGlobalContext` API function -- Maybe?
 
-- `hijackGlobalContext(getInjector: () => Injector)` allows to create own "DI
-  container" using library methods, since global `inject()` and `register()`
-  simply call `getInjector()[method])()`.
+- `hijackGlobalContext(getInjector: () => Injector)` allows to create own "DI container" using
+  library methods, since global `inject()` and `register()` simply call `getInjector()[method])()`.
 - Document the fact that this means that other global functions will not work.
 - maybe add options to hijack `deleteInjector` as the second argument.
 - Put non-hijacked functions in error mode (i.e. `if hijacked throw`).
@@ -25,8 +20,20 @@
 
 ### 5. Support hierarcy-aware providers via `atRoot` boolean property:
 
-- If set, `register()` will pass the registration to the parent injector when
-  parent is set.
+- If set, `register()` will pass the registration to the parent injector when parent is set.
+
+## Organizational refactorings:
+
+### 1. Convert to monorepo to support container packages and maybe full-scale e2e tests
+
+### 2. Move tests to subdirectories in `src/`
+
+- one for compile tests, one for unit tests
+
+### 3. e2e test package with subset of functionality
+
+- maybe both unit and compile tests
+- ESM / CJS
 
 ## v3+ ideas:
 
@@ -131,16 +138,14 @@ Test, add an example.
 
 ### 4. Add a browser example / test
 
-Like within a react app running off vite or something. Maybe create a React
-context provider + a hook that creates and returns a configured context
-provider.
+Like within a react app running off vite or something. Maybe create a React context provider + a
+hook that creates and returns a configured context provider.
 
 ## v-ANY:
 
 ### 1. Add generated documentation
 
-With `tsdoc-markdown` or probably more like `typedoc`+
-`typedoc-plugin-markdown`.
+With `tsdoc-markdown` or probably more like `typedoc`+ `typedoc-plugin-markdown`.
 
 ### 2. Add human written documentation
 

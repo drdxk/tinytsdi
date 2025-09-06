@@ -13,9 +13,6 @@ export type InjectFn = <T>(id: InjectionId<T>, defaultValue?: T) => T;
 /** Valid injection identifiers */
 export type InjectionId<T> = Token<T> | Constructor<T>;
 
-/** Scope for providers */
-export type InjectScope = 'singleton' | 'transient';
-
 /** Generic injection ID for internal use */
 export type GenericInjectionId = InjectionId<unknown>;
 

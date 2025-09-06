@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.0.0] - WIP
+
+### Breaking Changes
+
+- **BREAKING**: Replaced `scope` property with optional `noCache` boolean in `ClassProvider<T>` and `FactoryProvider<T>`
+  - `scope: 'singleton'` → remove property (now the default)
+  - `scope: 'transient'` → `noCache: true`
+- **BREAKING**: Removed `InjectScope` type (`'singleton' | 'transient'`)
+  - Remove any imports or references to `InjectScope` type
+
+### Added
+
+- Optional `noCache?: boolean` property for explicit control over caching behavior
+
+### Changed
+
+- Cached behavior is now the default for class and factory providers
+
 ## [2.1.0] - 2025-08-30
 
 ### Added

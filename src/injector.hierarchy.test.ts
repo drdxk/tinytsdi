@@ -116,7 +116,7 @@ describe('Injector hierarchy', () => {
       }
 
       const token = new Token<TestService>();
-      parent.register({provide: token, useClass: TestService, scope: 'singleton'});
+      parent.register({provide: token, useClass: TestService});
 
       const parentInstance = parent.inject(token);
       const childInstance = child.inject(token);

@@ -30,12 +30,10 @@ describe('Provider types', () => {
     const provider: ClassProvider<TestService> = {
       provide: token,
       useClass: TestService,
-      scope: 'singleton',
     };
 
     expect(provider.provide).toBe(token);
     expect(provider.useClass).toBe(TestService);
-    expect(provider.scope).toBe('singleton');
   });
 
   it('creates FactoryProvider with no-args factory', () => {
@@ -45,12 +43,12 @@ describe('Provider types', () => {
     const provider: FactoryProvider<number> = {
       provide: token,
       useFactory: factory,
-      scope: 'transient',
+      noCache: true,
     };
 
     expect(provider.provide).toBe(token);
     expect(provider.useFactory).toBe(factory);
-    expect(provider.scope).toBe('transient');
+    expect(provider.noCache).toBe(true);
   });
 
   it('creates FactoryProvider with InjectFn factory', () => {
@@ -64,12 +62,10 @@ describe('Provider types', () => {
     const provider: FactoryProvider<string> = {
       provide: token,
       useFactory: factory,
-      scope: 'singleton',
     };
 
     expect(provider.provide).toBe(token);
     expect(provider.useFactory).toBe(factory);
-    expect(provider.scope).toBe('singleton');
   });
 
   it('creates ExistingProvider', () => {
