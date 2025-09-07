@@ -15,11 +15,6 @@ export default defineConfig({
       rollupTypes: true,
     }),
   ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
   build: {
     emptyOutDir: false,
     lib: {

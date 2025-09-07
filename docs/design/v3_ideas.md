@@ -10,7 +10,14 @@
 
 - If set, `register()` will pass the registration to the parent injector when parent is set.
 
-### 5. Global: add `hijackGlobalContext` API function -- Maybe?
+### 5. Use options objects instead of lists of optional args:
+
+- Injector constructor
+- `from()`
+- global `newTestInjector()`
+- add to `fork()` ?
+
+### 6. Global: add `hijackGlobalContext` API function -- Maybe?
 
 - `hijackGlobalContext(getInjector: () => Injector)` allows to create own "DI container" using
   library methods, since global `inject()` and `register()` simply call `getInjector()[method])()`.
@@ -23,9 +30,10 @@
 
 ### 1. Move tests to subdirectories in `src/`
 
-- one for compile tests, one for unit tests
+- one for compile tests
+- ✔️ ~~one for unit tests~~
 - split `src/providers.compile-test.ts` into multiple files per provider type
-- split `src/injector.test.ts` further
+- ✔️ ~~split `src/injector.test.ts` further~~
 
 ### 2. Convert to monorepo to support container packages and maybe full-scale e2e tests
 

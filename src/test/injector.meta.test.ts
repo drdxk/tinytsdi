@@ -1,12 +1,10 @@
-/** Tests for advanced Injector methods */
-
 import {describe, expect, it} from 'vitest';
 
-import {NeverCachedError, NotProvidedError} from './errors.js';
-import {Injector} from './injector.js';
-import {Token} from './types.js';
+import {NeverCachedError, NotProvidedError} from '../errors.js';
+import {Injector} from '../injector.js';
+import {Token} from '../types.js';
 
-describe('Injector Advanced Methods', () => {
+describe('Injector meta methods', () => {
   describe('hasProviderFor', () => {
     it('returns true when provider is registered', () => {
       const injector = new Injector();

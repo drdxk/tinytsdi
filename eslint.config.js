@@ -84,13 +84,6 @@ export default [
       ],
 
       'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
-
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: ['../*'],
-        },
-      ],
     },
     settings: {
       // Add JSDoc settings here for this config object

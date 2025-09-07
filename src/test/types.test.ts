@@ -1,8 +1,6 @@
-/** Tests for basic types */
-
 import {describe, expect, it} from 'vitest';
 
-import {Token} from './types.js';
+import {Token} from '../types.js';
 
 describe('Token', () => {
   it('creates token with name', () => {

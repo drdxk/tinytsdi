@@ -2,9 +2,9 @@
 
 import {describe, expect, it} from 'vitest';
 
-import {NotProvidedError} from './errors.js';
-import {Injector} from './injector.js';
-import {Token} from './types.js';
+import {NotProvidedError} from '../errors.js';
+import {Injector} from '../injector.js';
+import {Token} from '../types.js';
 
 const TOKEN = new Token<string>('test');
 

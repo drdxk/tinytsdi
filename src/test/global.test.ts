@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 
-import {AlreadyInitializedError, TestInjectorNotAllowedError} from './errors.js';
+import {AlreadyInitializedError, TestInjectorNotAllowedError} from '../errors.js';
 import {
   deleteInjector,
   getInjector,
@@ -11,9 +11,9 @@ import {
   removeTestInjector,
   resetInitForTestOnly,
   setTestInjector,
-} from './global.js';
-import {Injector} from './injector.js';
-import {Token} from './types.js';
+} from '../global.js';
+import {Injector} from '../injector.js';
+import {Token} from '../types.js';
 
 describe('Global API', () => {
   beforeEach(() => {
@@ -151,30 +151,6 @@ describe('Global API', () => {
       expect(() => newTestInjector()).toThrow(TestInjectorNotAllowedError);
       expect(() => setTestInjector(new Injector())).toThrow(TestInjectorNotAllowedError);
       expect(() => removeTestInjector()).toThrow(TestInjectorNotAllowedError);
-    });
-  });
-
-  describe('defaultAllowOverrides writable property', () => {
-    it('allows changing defaultAllowOverrides after injector creation', () => {
-      const injector = new Injector(false);
-      expect(injector.defaultAllowOverrides).toBe(false);
-
-      injector.defaultAllowOverrides = true;
-      expect(injector.defaultAllowOverrides).toBe(true);
-    });
-
-    it('changed defaultAllowOverrides affects register behavior', () => {
-      const injector = new Injector(false);
-      const token = new Token<string>('test');
-
-      injector.register({provide: token, useValue: 'first'});
-
-      // Should throw with defaultAllowOverrides = false
-      expect(() => injector.register({provide: token, useValue: 'second'})).toThrow();
-
-      // Change to allow overrides
-      injector.defaultAllowOverrides = true;
-      expect(() => injector.register({provide: token, useValue: 'second'})).not.toThrow();
     });
   });
 

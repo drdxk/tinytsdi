@@ -115,7 +115,7 @@ register([
   },
 
   // Constructor shorthand
-  // Same as {provide: MyService, useClass: MyService} (always cached)
+  // Same as {provide: MyService, useClass: MyService, injectFn: true} (always cached)
   MyService,
 ]);
 ```
@@ -277,7 +277,7 @@ class MyService {
   constructor(private inject?: InjectFn) {} // inject parameter is optional
 }
 
-register(MyService); // Equivalent to {provide: MyService, useClass: MyService} (always cached)
+register(MyService); // Equivalent to {provide: MyService, useClass: MyService, injectFn: true} (always cached)
 ```
 
 #### Factory Provider
