@@ -8,6 +8,7 @@
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
     "src/**/*.compile-test.ts",
+    "src/compile-test/**",
     "node_modules",
     "dist"
   ]

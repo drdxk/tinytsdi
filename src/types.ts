@@ -18,7 +18,11 @@ export type GenericInjectionId = InjectionId<unknown>;
 
 /** Type-safe unique key for dependencies */
 export class Token<T> {
-  constructor(public readonly name?: string) {}
+  private readonly __brand = 'Token' as const;
+
+  constructor(public readonly name?: string) {
+    void this.__brand; // suppress unused property warning
+  }
 
   toString(): string {
     const name = this.name || 'anonymous';
