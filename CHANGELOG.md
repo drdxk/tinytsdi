@@ -16,6 +16,12 @@
   - New behavior: Constructors receive inject function only when `injectFn: true` is explicitly set
   - Migration: Add `injectFn: true` to existing class providers whose constructors expect inject
     function
+- **BREAKING**: `Injector` constructor now uses options object instead of positional arguments
+  - `new Injector(defaultAllowOverrides, parent)` →
+    `new Injector({ defaultAllowOverrides, parent })`
+  - `new Injector(true)` → `new Injector({ defaultAllowOverrides: true })`
+  - `new Injector(false, parent)` → `new Injector({ parent })`
+  - `new Injector()` continues to work unchanged
 
 ### Added
 

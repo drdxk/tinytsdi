@@ -6,31 +6,11 @@
 
 ### 3. ✅ Make passing of `InjectFn` to constructors of class providers (shorthand and full) optional, false by default.
 
-### 4. Support hierarcy-aware providers via `atRoot` boolean property:
+### 4. Use options objects instead of lists of optional args:
 
-- If set, `register()` will pass the registration to the parent injector when parent is set.
-
-Alternatively: tag injectors, and have `at: tag` property on providers. Special tag for `root`
-assigned by default.
-
-- If specified, will check if the injector has the matching tag, and if not, will pass to parent. If
-  there's no parent, will error out.
-
-### 5. Use options objects instead of lists of optional args:
-
-- Injector constructor
-- `from()`
+- ✔️ ~~Injector constructor~~ (done)
 - global `newTestInjector()`
-- add to `fork()` ?
-
-### 6. Global: add `hijackGlobalContext` API function -- Maybe?
-
-- `hijackGlobalContext(getInjector: () => Injector)` allows to create own "DI container" using
-  library methods, since global `inject()` and `register()` simply call `getInjector()[method])()`.
-- Document the fact that this means that other global functions will not work.
-- maybe add options to hijack `deleteInjector` as the second argument.
-- Put non-hijacked functions in error mode (i.e. `if hijacked throw`).
-- `restoreGlobalContext()` to restore the original global context.
+- static `from()` method
 
 ## Organizational refactorings:
 
@@ -44,6 +24,31 @@ assigned by default.
 - ESM / CJS
 
 ## v3+ ideas:
+
+### v3.1. Support hierarchy-aware providers via `atRoot` boolean property:
+
+- If set, `register()` will pass the registration to the parent injector when parent is set.
+
+Alternatively: tag injectors, and have `at: tag` property on providers.
+
+- Special tag for `root` assigned by default.
+- Special tag for `sink` for testing: injector tagged with sink ignores `at` option and register the
+  provider itself.
+
+- If specified, will check if the injector has the matching tag, and if not, will pass to parent. If
+  there's no parent, will error out.
+
+- Add tag to constructor options and `fork`
+- Add tag to `newTestInjector()`
+
+### v3.2. Global: add `hijackGlobalContext` API function -- Maybe?
+
+- `hijackGlobalContext(getInjector: () => Injector)` allows to create own "DI container" using
+  library methods, since global `inject()` and `register()` simply call `getInjector()[method])()`.
+- Document the fact that this means that other global functions will not work.
+- maybe add options to hijack `deleteInjector` as the second argument.
+- Put non-hijacked functions in error mode (i.e. `if hijacked throw`).
+- `restoreGlobalContext()` to restore the original global context.
 
 ### 1. `node-als` either as a submodule or separate script in the built directory
 

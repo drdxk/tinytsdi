@@ -1,23 +1,23 @@
 # tinytsdi
 
-Minimalistic (yet _useful_ and _elegant_) TypeScript Dependency Injection
-library. No decorators, runtime reflection or complex terminology - just a
-simple, type-safe dependency management with a default global container.
+Minimalistic (yet _useful_ and _elegant_) TypeScript Dependency Injection library. No decorators,
+runtime reflection or complex terminology - just a simple, type-safe dependency management with a
+default global container.
 
 ✅ **NEW in 2.1**: Hierarchical injectors are now supported!
 
 AsyncLocalStorage containers and more documentation coming soon!
 
-_Currently, most of the development happens off GitHub, which mostly sees
-squashed release commits. Lmk if you want to contribute!_
+_Currently, most of the development happens off GitHub, which mostly sees squashed release commits.
+Lmk if you want to contribute!_
 
 ## Coming Soon
 
 - `scope` will be renamed and made optional
 - provider controls whether constructor of a class gets injected an `InjectFn`
 - `hijackGlobalContext()` to allow custom containers via library functions
-- Hierarchical containers (`node` (`ALS`), `express`, `fastify`, `react`, in
-  that order of likelihood of being _soon_)
+- Hierarchical containers (`node` (`ALS`), `express`, `fastify`, `react`, in that order of
+  likelihood of being _soon_)
 - More documentation: generated API reference, examples, more text
 
 ## Quick Start
@@ -48,8 +48,8 @@ import {register, inject, Token} from 'tinytsdi';
 
 #### Injection IDs
 
-Injection ID is a type-bound identifier of a dependency.Define typed Injection
-IDs using `Token` class:
+Injection ID is a type-bound identifier of a dependency.Define typed Injection IDs using `Token`
+class:
 
 ```typescript
 const CONFIG = new Token<Config>('config');
@@ -59,18 +59,16 @@ const LOGGER = new Token<Logger>('logger');
 const PORT = new Token<number>();
 ```
 
-Alternatively, constructors can be used as their own injection IDs
-(`class MyService` can be both a service and its injection ID). This is not
-recommended as it complicates testing, specifically providing fake / mock
-implementations in a type safe manner.
+Alternatively, constructors can be used as their own injection IDs (`class MyService` can be both a
+service and its injection ID). This is not recommended as it complicates testing, specifically
+providing fake / mock implementations in a type safe manner.
 
 #### Providers
 
-_Provider_ associates an injection ID with concrete implementation. In other
-words, it tells injector how to _resolve_ a dependency for the given ID: _"when
-this ID is requested, return ...(this value, an instance of this class, etc.)"_.
-Provider can also give instructions to injector (such as whether to cache the
-resolved value).
+_Provider_ associates an injection ID with concrete implementation. In other words, it tells
+injector how to _resolve_ a dependency for the given ID: _"when this ID is requested, return
+...(this value, an instance of this class, etc.)"_. Provider can also give instructions to injector
+(such as whether to cache the resolved value).
 
 Providers need to be registered before an injection takes place:
 
@@ -127,8 +125,8 @@ class MyService {
 
 Or in function parameters:
 
-_This is a good pattern to use as itcreates a good interface and allows for
-easier testing (without the requirement of using injection)._
+_This is a good pattern to use as itcreates a good interface and allows for easier testing (without
+the requirement of using injection)._
 
 ```typescript
 function processData(config = inject(CONFIG)) {
@@ -136,8 +134,7 @@ function processData(config = inject(CONFIG)) {
 }
 ```
 
-Class instances created by the injector receive `inject()` function as a
-constructor argument:
+Class instances created by the injector receive `inject()` function as a constructor argument:
 
 ```typescript
 class MyService {
@@ -150,9 +147,9 @@ class MyService {
 
 ### Testing
 
-One of the benefits of [IOC](https://en.wikipedia.org/wiki/Inversion_of_control)
-is improved testability. The default container comes with a few utilities to
-isolate tests and specify dependencies in test scenarios.
+One of the benefits of [IOC](https://en.wikipedia.org/wiki/Inversion_of_control) is improved
+testability. The default container comes with a few utilities to isolate tests and specify
+dependencies in test scenarios.
 
 ```typescript
 import {newTestInjector, setTestInjector, removeTestInjector} from 'tinytsdi';
@@ -180,18 +177,17 @@ describe('MyService', () => {
 
 ## API Reference
 
-See JSDoc comments in the source code for detailed API documentation! Generated
-doc is coming soon!
+See JSDoc comments in the source code for detailed API documentation! Generated doc is coming soon!
 
 ### Global Container
 
-- **`register(providerOrProvidersArray, allowOverrides?)`** - Register providers
-  with the global injector
+- **`register(providerOrProvidersArray, allowOverrides?)`** - Register providers with the global
+  injector
 - **`inject(id, defaultValue?)`** - Resolve dependency using the global injector
 - **`getInjector()`** - Get the current global injector instance
 
-> **IMPORTANT**: global container only allows accessing single root injector. It
-> is not aware of child injectors.
+> **IMPORTANT**: global container only allows accessing single root injector. It is not aware of
+> child injectors.
 
 #### Testing Utilities
 
@@ -342,8 +338,7 @@ const service = await inject(ASYNC_SERVICE);
 
 The library throws specific errors for different scenarios:
 
-- **`AlreadyProvidedError`** - Provider already registered (when overrides
-  disabled)
+- **`AlreadyProvidedError`** - Provider already registered (when overrides disabled)
 - **`NotProvidedError`** - No provider found for the given ID
 - **`NeverCachedError`** - Attempting cache operations on transient providers
 - **`UnknownProviderError`** - Unsupported provider type
@@ -355,15 +350,10 @@ The library throws specific errors for different scenarios:
 1. **Use tokens**: `const SERVICE = new Token<ServiceInterface>('service')`
 2. **Test isolation**: Use `newTestInjector()` for clean test environments
 3. **Parameter injection**: Use parameter default values when possible
-4. **Constructor injection**: Keep constructors simple, use `inject()` in
-   methods when needed
+4. **Constructor injection**: Keep constructors simple, use `inject()` in methods when needed
 
 ## Current Limitations
 
-- No hierarchical containers **coming soon**
-  - Including a default `AsyncLocalStorage` container for Node!
-  - And dedicated `express` and `fastify` containers!
-  - And maybe a `react` container!
 - No circular dependency detection (will hang)
 
 ## Permanent Limitations

@@ -17,6 +17,17 @@ import {
 import type {GenericProvider, Provider} from './providers.js';
 import type {GenericInjectionId, InjectionId} from './types.js';
 
+/** Configuration options for Injector instance. */
+export interface InjectorOptions {
+  /**
+   * Whether to allow provider overrides by default when no explicit allowOverrides parameter is
+   * provided. Defaults to false.
+   */
+  defaultAllowOverrides?: boolean;
+  /** Parent injector. Defaults to null. */
+  parent?: Injector | null;
+}
+
 /** Internal provider wrapper that provides a uniform interface for all provider types. */
 interface InjectorProvider {
   /** The injection identifier (token or constructor). */
@@ -29,21 +40,23 @@ interface InjectorProvider {
 
 /** Main dependency injection container that manages providers and resolved values. */
 export class Injector {
+  private parent: Injector | null;
   private providers = new Map<GenericInjectionId, InjectorProvider>();
   private cache = new Map<GenericInjectionId, unknown>();
   private boundInject = this.inject.bind(this);
 
+  /** Whether to allow provider overrides by default. */
+  public defaultAllowOverrides: boolean;
+
   /**
    * Creates a new Injector instance.
    *
-   * @param defaultAllowOverrides - Whether to allow provider overrides by default when no explicit
-   *   allowOverrides parameter is provided.
-   * @param parent - Optional parent injector for hierarchical injection.
+   * @param options - Configuration options for the injector.
    */
-  constructor(
-    public defaultAllowOverrides: boolean = false,
-    private parent: Injector | null = null
-  ) {}
+  constructor(options?: InjectorOptions) {
+    this.defaultAllowOverrides = options?.defaultAllowOverrides ?? false;
+    this.parent = options?.parent ?? null;
+  }
 
   /**
    * Creates a child injector with the current injector as its parent.
@@ -52,7 +65,10 @@ export class Injector {
    *   defaultAllowOverrides setting.
    */
   fork(): Injector {
-    return new Injector(this.defaultAllowOverrides, this);
+    return new Injector({
+      defaultAllowOverrides: this.defaultAllowOverrides,
+      parent: this,
+    });
   }
 
   /**
@@ -68,10 +84,10 @@ export class Injector {
     copyCache: boolean = false,
     copyParent: boolean = true
   ): Injector {
-    const newInjector = new Injector(
-      injector.defaultAllowOverrides,
-      copyParent ? injector.parent : null
-    );
+    const newInjector = new Injector({
+      defaultAllowOverrides: injector.defaultAllowOverrides,
+      parent: copyParent ? injector.parent : null,
+    });
 
     // Copy all providers
     for (const [id, provider] of injector.providers) {

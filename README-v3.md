@@ -301,7 +301,14 @@ register({provide: NEW_TOKEN, useExisting: OLD_TOKEN});
 ### Injector Class
 
 ```typescript
-const injector = new Injector(allowOverrides = false, parent = null);
+// Basic usage
+const injector = new Injector();
+
+// With options
+const injector = new Injector({
+  defaultAllowOverrides: false,  // Optional, defaults to false
+  parent: null                   // Optional, defaults to null
+});
 
 // Core methods
 injector.register(providers, allowOverrides?);
@@ -357,6 +364,9 @@ child.register({provide: CONFIG, useValue: {env: 'child'}});
 child.inject(LOGGER); // Returns prodLogger (from parent)
 child.inject(CONFIG); // Returns {env: 'child'} (overridden provider)
 child.inject(SERVICE); // Returns instance of ChildService (own provider)
+
+// Alternatively, parent can be passed to constructor:
+const child = new Injector({parent});
 ```
 
 ### Testing Support
@@ -403,10 +413,6 @@ The library throws specific errors for different scenarios:
 
 ## Current Limitations
 
-- No hierarchical containers **coming soon**
-  - Including a default `AsyncLocalStorage` container for Node!
-  - And dedicated `express` and `fastify` containers!
-  - And maybe a `react` container!
 - No circular dependency detection (will hang)
 
 ## Permanent Limitations
@@ -452,8 +458,39 @@ register({
 });
 ```
 
+### Injector constructor now uses options object
+
+**Old API (v2.x):**
+
+```typescript
+// Positional arguments
+const injector = new Injector(
+  /* defaultAllowOverrides= */ allowOverrides,
+  /* parent= */ parentInjector
+);
+```
+
+**New API (v3.x):**
+
+```typescript
+// Options object (all properties optional)
+const injector = new Injector({defaultAllowOverrides: true, parent: parentInjector});
+const injector = new Injector({defaultAllowOverrides: true});
+const injector = new Injector({parent: parentInjector});
+const injector = new Injector(); // All defaults
+```
+
 ### Migration Guide
+
+#### Provider Changes
 
 - **Remove `scope: 'singleton'`** - This is now the default behavior
 - **Replace `scope: 'transient'`** with **`noCache: true`**
 - **Remove `InjectScope` type imports** - No longer exists
+
+#### Constructor Changes
+
+- **Replace positional arguments** with **options object**:
+  - `new Injector(true)` → `new Injector({ defaultAllowOverrides: true })`
+  - `new Injector(false, parent)` → `new Injector({ parent })`
+  - `new Injector()` → No change needed

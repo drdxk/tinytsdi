@@ -22,11 +22,11 @@ describe('Injector hierarchy', () => {
     });
 
     it('preserves defaultAllowOverrides setting', () => {
-      const parentWithOverrides = new Injector(/* defaultAllowOverrides= */ true);
+      const parentWithOverrides = new Injector({defaultAllowOverrides: true});
       const childWithOverrides = parentWithOverrides.fork();
       expect(childWithOverrides.defaultAllowOverrides).toBe(true);
 
-      const parentWithoutOverrides = new Injector(/* defaultAllowOverrides= */ false);
+      const parentWithoutOverrides = new Injector({defaultAllowOverrides: false});
       const childWithoutOverrides = parentWithoutOverrides.fork();
       expect(childWithoutOverrides.defaultAllowOverrides).toBe(false);
     });
@@ -164,13 +164,13 @@ describe('Injector hierarchy', () => {
     it('accepts parent injector in constructor', () => {
       const parent = new Injector();
       parent.register({provide: TOKEN, useValue: 'parent-value'});
-      const child = new Injector(/* defaultAllowOverrides = */ false, parent);
+      const child = new Injector({defaultAllowOverrides: false, parent});
 
       expect(child.inject(TOKEN)).toBe('parent-value');
     });
 
     it('works with null parent', () => {
-      const injector = new Injector(/* defaultAllowOverrides= */ false, null);
+      const injector = new Injector({defaultAllowOverrides: false, parent: null});
 
       expect(() => injector.inject(TOKEN)).toThrow(NotProvidedError);
     });

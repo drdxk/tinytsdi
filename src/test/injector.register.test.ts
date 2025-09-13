@@ -91,7 +91,7 @@ describe('Injector.register()', () => {
     });
 
     it('respects defaultAllowOverrides setting', () => {
-      const injector = new Injector(/* defaultAllowOverrides= */ true);
+      const injector = new Injector({defaultAllowOverrides: true});
       const token = new Token<string>('test');
       const provider1 = {provide: token, useValue: 'first'};
       const provider2 = {provide: token, useValue: 'second'};
@@ -101,7 +101,7 @@ describe('Injector.register()', () => {
     });
 
     it('explicit allowOverrides=false overrides defaultAllowOverrides=true', () => {
-      const injector = new Injector(/* defaultAllowOverrides= */ true);
+      const injector = new Injector({defaultAllowOverrides: true});
       const token = new Token<string>('test');
       const provider1 = {provide: token, useValue: 'first'};
       const provider2 = {provide: token, useValue: 'second'};

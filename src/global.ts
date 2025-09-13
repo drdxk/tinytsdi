@@ -56,7 +56,7 @@ export function getInjector(): Injector {
 
   if (!injector) {
     const defaultAllowOverrides = config?.defaultAllowOverrides ?? false;
-    injector = new Injector(defaultAllowOverrides);
+    injector = new Injector({defaultAllowOverrides});
   }
   return injector;
 }
@@ -199,7 +199,7 @@ export function newTestInjector(
     testInjector = Injector.from(injector, false);
     testInjector.defaultAllowOverrides = allowOverrides;
   } else {
-    testInjector = new Injector(allowOverrides);
+    testInjector = new Injector({defaultAllowOverrides: allowOverrides});
   }
   setTestInjector(testInjector);
   return testInjector;

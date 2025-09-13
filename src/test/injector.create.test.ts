@@ -13,13 +13,13 @@ describe('Injector creation', () => {
       expect(injector.defaultAllowOverrides).toBe(false);
     });
 
-    it('creates injector with explicit allowOverrides=true', () => {
-      const injector = new Injector(true);
+    it('creates injector with defaultAllowOverrides=true', () => {
+      const injector = new Injector({defaultAllowOverrides: true});
       expect(injector.defaultAllowOverrides).toBe(true);
     });
 
-    it('creates injector with explicit allowOverrides=false', () => {
-      const injector = new Injector(false);
+    it('creates injector with defaultAllowOverrides=false', () => {
+      const injector = new Injector({defaultAllowOverrides: false});
       expect(injector.defaultAllowOverrides).toBe(false);
     });
   });
@@ -37,14 +37,14 @@ describe('Injector creation', () => {
     });
 
     it('creates new injector with defaultAllowOverrides setting copied', () => {
-      const sourceInjector = new Injector(true);
+      const sourceInjector = new Injector({defaultAllowOverrides: true});
       const newInjector = Injector.from(sourceInjector);
 
       expect(newInjector.defaultAllowOverrides).toBe(true);
     });
 
     it('creates new injector with defaultAllowOverrides=false copied', () => {
-      const sourceInjector = new Injector(false);
+      const sourceInjector = new Injector({defaultAllowOverrides: false});
       const newInjector = Injector.from(sourceInjector);
 
       expect(newInjector.defaultAllowOverrides).toBe(false);
