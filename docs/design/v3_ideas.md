@@ -6,14 +6,11 @@
 
 ### 3. ✅ Make passing of `InjectFn` to constructors of class providers (shorthand and full) optional, false by default.
 
-### 4. Use options objects instead of lists of optional args:
+### 4. ✅ Use options objects instead of lists of optional args:
 
-- ✔️ ~~Injector constructor~~ (done)
-- ✔️ ~~global `newTestInjector()`~~ (done)
-- ✔️ ~~static `from()` method~~ (done)
-- rename global `Config` to `ContainerConfig`
+### 5. Rename global `Config` to `ContainerConfig`
 
-# 5. Fix `newTestInjector()` so its not complex as it is now
+### 6. Fix `newTestInjector()` so its not complex as it is now
 
 - remove fromCurrent functionality, use `Injector.from()` + `setTestInjector()` instead
 - newTestInjector() should probably accept `InjectorOptions` only
