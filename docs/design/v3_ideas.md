@@ -10,9 +10,11 @@
 
 ### 5. Rename global `Config` to `ContainerConfig`
 
+### 6. Change `from()` to `clone()` instance method. 
+
 ### 6. Fix `newTestInjector()` so its not complex as it is now
 
-- remove fromCurrent functionality, use `Injector.from()` + `setTestInjector()` instead
+- remove fromCurrent functionality, use `clone()` + `setTestInjector()` instead
 - newTestInjector() should probably accept `InjectorOptions` only
 
 ## Organizational refactorings:
