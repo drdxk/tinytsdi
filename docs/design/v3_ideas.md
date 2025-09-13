@@ -10,6 +10,12 @@
 
 - If set, `register()` will pass the registration to the parent injector when parent is set.
 
+Alternatively: tag injectors, and have `at: tag` property on providers. Special tag for `root`
+assigned by default.
+
+- If specified, will check if the injector has the matching tag, and if not, will pass to parent. If
+  there's no parent, will error out.
+
 ### 5. Use options objects instead of lists of optional args:
 
 - Injector constructor
@@ -28,12 +34,7 @@
 
 ## Organizational refactorings:
 
-### 1. Move tests to subdirectories in `src/`
-
-- one for compile tests
-- ✔️ ~~one for unit tests~~
-- split `src/providers.compile-test.ts` into multiple files per provider type
-- ✔️ ~~split `src/injector.test.ts` further~~
+### 1. ✅ Move tests to subdirectories in `src/`
 
 ### 2. Convert to monorepo to support container packages and maybe full-scale e2e tests
 
