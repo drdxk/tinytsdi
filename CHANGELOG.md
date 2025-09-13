@@ -22,12 +22,25 @@
   - `new Injector(true)` → `new Injector({ defaultAllowOverrides: true })`
   - `new Injector(false, parent)` → `new Injector({ parent })`
   - `new Injector()` continues to work unchanged
+- **BREAKING**: `Injector.from()` static method now uses options object instead of positional
+  arguments
+  - `Injector.from(source, copyCache, copyParent)` →
+    `Injector.from(source, { copyCache, noParent: !copyParent })`
+  - `Injector.from(injector, true)` → `Injector.from(injector, { copyCache: true })`
+  - `Injector.from(injector, false, false)` → `Injector.from(injector, { noParent: true })`
+  - `Injector.from(injector)` continues to work unchanged
 - **BREAKING**: `newTestInjector()` now uses options object instead of positional arguments
   - `newTestInjector(fromCurrent, allowOverrides)` →
     `newTestInjector({ fromCurrent, defaultAllowOverrides })`
   - `newTestInjector(true)` → `newTestInjector({ fromCurrent: true })`
   - `newTestInjector(false, true)` → `newTestInjector({ defaultAllowOverrides: true })`
-  - `newTestInjector(true, true)` → `newTestInjector({ fromCurrent: true, defaultAllowOverrides: true })`
+  - `newTestInjector(true, true)` →
+    `newTestInjector({ fromCurrent: { defaultAllowOverrides: true } })`
+  - `newTestInjector()` continues to work unchanged
+  - **Type:**
+    `TestInjectorOptions = { fromCurrent: FromOptions | true } | { fromCurrent?: false, defaultAllowOverrides?: boolean }`
+    - Passing `true` is equivalent to `{ fromCurrent: true }` (copy providers from global injector)
+    - Passing `false` is equivalent to `{}` (create new injector with defaults)
   - `newTestInjector()` continues to work unchanged
 
 ### Added
@@ -41,9 +54,15 @@
 - `InjectorOptions` interface for configuring injector creation
   - `defaultAllowOverrides?: boolean` - Allow provider overrides by default
   - `parent?: Injector` - Parent injector for hierarchical injection
+- `FromOptions` interface for configuring injector copying with `Injector.from()`
+  - `copyCache?: boolean` - Copy cached values from source injector (default: false)
+  - `noParent?: boolean` - Exclude parent injector relationship (default: false)
+  - `defaultAllowOverrides?: boolean` - Override setting for new injector
 - `TestInjectorOptions` interface for configuring test injector creation
-  - `fromCurrent?: boolean` - Copy providers from current global injector
-  - `defaultAllowOverrides?: boolean` - Allow provider overrides by default
+  - `{ fromCurrent: FromOptions | true }` - Copy providers from current global injector (optionally
+    with options)
+  - `{ fromCurrent?: false, defaultAllowOverrides?: boolean }` - Create new injector, optionally
+    allowing provider overrides
 
 ### Changed
 

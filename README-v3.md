@@ -253,10 +253,10 @@ removeTestInjector();                            // Restore previous non-test gl
 
 // TestInjectorOptions interface
 interface TestInjectorOptions {
-  fromCurrent?: boolean;            // Copy providers from current global injector
+  fromCurrent?: boolean | FromOptions;  // Copy providers from current global injector with optional FromOptions
+  defaultAllowOverrides?: boolean;      // Allow provider overrides by default (only when fromCurrent is false/omitted)
 }
 ```
-  defaultAllowOverrides?: boolean;  // Allow provider overrides by default
 
 #### Test Injector Examples
 
@@ -270,8 +270,10 @@ newTestInjector({ defaultAllowOverrides: true });
 // Copy providers from current global injector
 newTestInjector({ fromCurrent: true });
 
-// Copy providers from current global injector and allow overrides
-newTestInjector({ fromCurrent: true, defaultAllowOverrides: true });
+// Copy providers from current global injector with custom FromOptions
+newTestInjector({ fromCurrent: { copyCache: true } });
+newTestInjector({ fromCurrent: { defaultAllowOverrides: true } });
+newTestInjector({ fromCurrent: { copyCache: true, defaultAllowOverrides: true } });
 ```
 
 ### Provider Types
@@ -337,14 +339,19 @@ injector.register(providers, allowOverrides?);
 injector.inject(id, defaultValue?);
 
 // Advanced methods (primarily for testing)
-injector.hasProviderFor(id);           // Check if provider exists
-injector.hasCachedValue(id);          // Check if value is cached (throws for noCache providers)
-injector.invalidate(ids?);            // Clear cache (for specific IDs)
-injector.unregister(ids?);            // Remove providers and cache (reset the injector)
+injector.hasProviderFor(id);    // Check if provider exists
+injector.hasCachedValue(id);    // Check if value is cached (throws for noCache providers)
+injector.invalidate(ids?);      // Clear cache (for specific IDs)
+injector.unregister(ids?);      // Remove providers and cache (reset the injector)
 
 // Static methods
-Injector.from(source, copyCache = false, copyParent = true);  // Create a copy of the injector
-injector.fork();                      // Create child injector with current injector as parent
+Injector.from(source, options?);  // Copy injector with optional FromOptions
+Injector.from(source, {
+  copyCache: false,               // Copy cached values from source (default: false)
+  noParent: false,                // Exclude parent injector relationship (default: false)
+  defaultAllowOverrides: false,    // Override setting for new injector (default: source's setting)
+});
+injector.fork();                  // Create child injector with current injector as parent
 ```
 
 ### Types
@@ -517,11 +524,34 @@ newTestInjector(true);
 **New API (v3.x):**
 
 ```typescript
-// Options object (all properties optional)
-newTestInjector({ fromCurrent: true, defaultAllowOverrides: true });
-newTestInjector({ defaultAllowOverrides: true });
-newTestInjector({ fromCurrent: true });
+// Options object
+newTestInjector({ defaultAllowOverrides: true });                    // Create empty test injector with overrides allowed
+newTestInjector({ fromCurrent: { defaultAllowOverrides: true } });   // Copy from current with overrides allowed
+newTestInjector({ fromCurrent: true });                              // Copy from current with default FromOptions
+newTestInjector({ fromCurrent: { copyCache: true } });               // Copy from current with custom FromOptions
 newTestInjector(); // All defaults - no change needed
+```
+
+### Injector.from() now uses options object
+
+**Old API (v2.x):**
+
+```typescript
+// Positional arguments
+Injector.from(source, copyCache, copyParent);
+Injector.from(injector, true, true);
+Injector.from(injector, false, false);
+Injector.from(injector, true);
+```
+
+**New API (v3.x):**
+
+```typescript
+// Options object (all properties optional)
+Injector.from(source, { copyCache: true });
+Injector.from(injector, { noParent: true });
+Injector.from(injector, { copyCache: true });
+Injector.from(injector); // All defaults - no change needed
 ```
 
 ### Migration Guide
@@ -542,8 +572,17 @@ newTestInjector(); // All defaults - no change needed
 #### Test Injector Changes
 
 - **Replace positional arguments** with **options object**:
-  - `newTestInjector(true, true)` → `newTestInjector({ fromCurrent: true, defaultAllowOverrides: true })`
+  - `newTestInjector(true, true)` → `newTestInjector({ fromCurrent: { defaultAllowOverrides: true } })`
   - `newTestInjector(false, true)` → `newTestInjector({ defaultAllowOverrides: true })`
   - `newTestInjector(true)` → `newTestInjector({ fromCurrent: true })`
   - `newTestInjector()` → No change needed
-- **Note**: Second parameter renamed from `allowOverrides` to `defaultAllowOverrides`
+- **Note**: When copying from current injector, override settings and other FromOptions must be specified within the `fromCurrent` object
+
+#### Injector.from() Changes
+
+- **Replace positional arguments** with **options object**:
+  - `Injector.from(source, true, true)` → `Injector.from(source, { copyCache: true })`
+  - `Injector.from(source, false, false)` → `Injector.from(source, { noParent: true })`
+  - `Injector.from(source, true)` → `Injector.from(source, { copyCache: true })`
+  - `Injector.from(source)` → No change needed
+- **Note**: Third parameter `copyParent` is now `noParent` with inverted logic (`copyParent: false` → `noParent: true`)

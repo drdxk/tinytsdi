@@ -12,48 +12,80 @@ describe('Injector meta methods', () => {
 
     it('rejects invalid Injector as the first argument', () => {
       // @ts-expect-error - First parameter must be Injector
-      const invalidSource = Injector.from({});
+      Injector.from({});
       // @ts-expect-error - First parameter must be Injector
-      const invalidSource2 = Injector.from(null);
+      Injector.from(null);
       // @ts-expect-error - First parameter must be Injector
-      const invalidSource3 = Injector.from(new Date());
-      void invalidSource;
-      void invalidSource2;
-      void invalidSource3;
+      Injector.from(new Date());
     });
 
-    it('accepts valid values for copyCache paramater', () => {
-      const newInjectorWithCache: Injector = Injector.from(injector, true);
-      const newInjectorWithoutCache: Injector = Injector.from(injector, false);
+    it('accepts valid values for copyCache option', () => {
+      const newInjectorWithCache: Injector = Injector.from(injector, {copyCache: true});
+      const newInjectorWithoutCache: Injector = Injector.from(injector, {copyCache: false});
       void newInjectorWithCache;
       void newInjectorWithoutCache;
     });
 
-    it('rejects invalid values for copyCache paramater', () => {
-      // @ts-expect-error - copyCache must be boolean
-      const invalidCopyCache = Injector.from(injector, 'invalid');
-      // @ts-expect-error - copyCache must be boolean
-      const invalidCopyCache2 = Injector.from(injector, 123);
-      void invalidCopyCache;
-      void invalidCopyCache2;
+    it('rejects invalid values for copyCache option', () => {
+      Injector.from(
+        injector,
+        // @ts-expect-error - copyCache must be boolean
+        {copyCache: 'true'}
+      );
+      Injector.from(
+        injector,
+        // @ts-expect-error - copyCache must be boolean
+        {copyCache: 123}
+      );
     });
 
-    it('accepts valid values for copyParent paramater', () => {
-      const sourceInjector = new Injector();
-      const newInjectorWithParent: Injector = Injector.from(sourceInjector, false, true);
-      const newInjectorWithoutParent: Injector = Injector.from(sourceInjector, false, false);
-      void newInjectorWithParent;
-      void newInjectorWithoutParent;
+    it('accepts valid values for noParent option', () => {
+      const withParent: Injector = Injector.from(injector, {noParent: true});
+      const withoutParent: Injector = Injector.from(injector, {noParent: false});
+      void withParent;
+      void withoutParent;
     });
 
-    it('rejects invalid values for copyParent paramater', () => {
-      const sourceInjector = new Injector();
-      // @ts-expect-error - copyParent must be boolean
-      const invalidCopyParent = Injector.from(sourceInjector, false, 'invalid');
-      // @ts-expect-error - copyParent must be boolean
-      const invalidCopyParent2 = Injector.from(sourceInjector, false, 123);
-      void invalidCopyParent;
-      void invalidCopyParent2;
+    it('rejects invalid values for copyParent option', () => {
+      Injector.from(
+        injector,
+        // @ts-expect-error - copyParent must be boolean
+        {noParent: 'true'}
+      );
+      Injector.from(
+        injector,
+        // @ts-expect-error - copyParent must be boolean
+        {noParent: 123}
+      );
+    });
+
+    it('accepts valid values for defaultAllowOverrides option', () => {
+      const allowOverrides: Injector = Injector.from(injector, {defaultAllowOverrides: true});
+      const disallowOverrides: Injector = Injector.from(injector, {defaultAllowOverrides: false});
+      void allowOverrides;
+      void disallowOverrides;
+    });
+
+    it('rejects invalid values for defaultAllowOverrides option', () => {
+      Injector.from(
+        injector,
+        // @ts-expect-error - defaultAllowOverrides must be boolean
+        {defaultAllowOverrides: 'true'}
+      );
+      Injector.from(
+        injector,
+        // @ts-expect-error - defaultAllowOverrides must be boolean
+        {defaultAllowOverrides: 123}
+      );
+    });
+
+    it('accepts all options together', () => {
+      const newInjector: Injector = Injector.from(injector, {
+        copyCache: true,
+        noParent: true,
+        defaultAllowOverrides: true,
+      });
+      void newInjector;
     });
   });
 

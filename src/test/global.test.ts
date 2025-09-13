@@ -137,13 +137,26 @@ describe('Global API', () => {
     it('affects global injector defaultAllowOverrides setting', () => {
       init({defaultAllowOverrides: true});
       const injector = getInjector();
-      expect(injector.defaultAllowOverrides).toBe(true);
+      const token = new Token<string>('override-test');
+      injector.register({provide: token, useValue: 'first'});
+
+      expect(() => {
+        injector.register({provide: token, useValue: 'second'});
+      }).not.toThrow();
+      expect(injector.inject(token)).toBe('second');
     });
 
     it('uses default false for defaultAllowOverrides when not specified', () => {
       init();
       const injector = getInjector();
-      expect(injector.defaultAllowOverrides).toBe(false);
+
+      const token = new Token<string>('override-test-false');
+      injector.register({provide: token, useValue: 'first'});
+      // Should throw on override
+      expect(() => {
+        injector.register({provide: token, useValue: 'second'});
+      }).toThrow();
+      expect(injector.inject(token)).toBe('first');
     });
 
     it('disables test injector functions when noTestInjector is true', () => {
@@ -159,12 +172,28 @@ describe('Global API', () => {
       it('creates a new empty test injector', () => {
         const testInjector = newTestInjector();
         expect(testInjector).toBeInstanceOf(Injector);
-        expect(testInjector.defaultAllowOverrides).toBe(false);
       });
 
-      it('creates test injector with allowOverrides=true', () => {
+      it('does not allow overrides by default', () => {
+        const testInjector = newTestInjector();
+        const token = new Token<string>('override-test-false');
+        testInjector.register({provide: token, useValue: 'first'});
+
+        expect(() => {
+          testInjector.register({provide: token, useValue: 'second'});
+        }).toThrow();
+        expect(testInjector.inject(token)).toBe('first');
+      });
+
+      it('allows overrides when defaultAllowOverrides is true', () => {
         const testInjector = newTestInjector({defaultAllowOverrides: true});
-        expect(testInjector.defaultAllowOverrides).toBe(true);
+        const token = new Token<string>('override-test');
+        testInjector.register({provide: token, useValue: 'first'});
+
+        expect(() => {
+          testInjector.register({provide: token, useValue: 'second'});
+        }).not.toThrow();
+        expect(testInjector.inject(token)).toBe('second');
       });
 
       it('creates test injector from current global injector', () => {
@@ -180,8 +209,7 @@ describe('Global API', () => {
         const token = new Token<string>('test');
         register({provide: token, useValue: 'global'});
 
-        const testInjector = newTestInjector({fromCurrent: true, defaultAllowOverrides: true});
-        expect(testInjector.defaultAllowOverrides).toBe(true);
+        const testInjector = newTestInjector({fromCurrent: {defaultAllowOverrides: true}});
         expect(getInjector()).toBe(testInjector);
 
         // Should allow override due to allowOverrides=true
@@ -282,7 +310,7 @@ describe('Global API', () => {
       expect(inject(token)).toBe('production');
 
       // Create test injector from current
-      newTestInjector({fromCurrent: true, defaultAllowOverrides: true});
+      newTestInjector({fromCurrent: {defaultAllowOverrides: true}});
 
       expect(inject(token)).toBe('production'); // Copied from global
 

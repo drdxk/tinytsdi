@@ -10,8 +10,13 @@
 
 - ✔️ ~~Injector constructor~~ (done)
 - ✔️ ~~global `newTestInjector()`~~ (done)
-- static `from()` method
+- ✔️ ~~static `from()` method~~ (done)
 - rename global `Config` to `ContainerConfig`
+
+# 5. Fix `newTestInjector()` so its not complex as it is now
+
+- remove fromCurrent functionality, use `Injector.from()` + `setTestInjector()` instead
+- newTestInjector() should probably accept `InjectorOptions` only
 
 ## Organizational refactorings:
 
@@ -50,6 +55,10 @@ Alternatively: tag injectors, and have `at: tag` property on providers.
 - maybe add options to hijack `deleteInjector` as the second argument.
 - Put non-hijacked functions in error mode (i.e. `if hijacked throw`).
 - `restoreGlobalContext()` to restore the original global context.
+
+### 0. Implement testing mode as a hijacked global context, i.e. create a test container, think how to map existing flows onto this
+
+- mark test global functions as deprecated from then on
 
 ### 1. `node-als` either as a submodule or separate script in the built directory
 

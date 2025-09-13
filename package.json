@@ -1,6 +1,6 @@
 {
   "name": "tinytsdi",
-  "version": "3.0.0-alpha.4",
+  "version": "3.0.0-alpha.5",
   "description": "Minimalistic TypeScript Dependency Injection library",
   "repository": {
     "type": "git",

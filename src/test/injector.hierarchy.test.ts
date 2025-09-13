@@ -21,14 +21,28 @@ describe('Injector hierarchy', () => {
       expect(child1).not.toBe(child2);
     });
 
-    it('preserves defaultAllowOverrides setting', () => {
+    it('preserves defaultAllowOverrides setting when true', () => {
       const parentWithOverrides = new Injector({defaultAllowOverrides: true});
       const childWithOverrides = parentWithOverrides.fork();
-      expect(childWithOverrides.defaultAllowOverrides).toBe(true);
+      const token = new Token<string>('override-hierarchy-true');
+      childWithOverrides.register({provide: token, useValue: 'first'});
 
+      expect(() => {
+        childWithOverrides.register({provide: token, useValue: 'second'});
+      }).not.toThrow();
+      expect(childWithOverrides.inject(token)).toBe('second');
+    });
+
+    it('preserves defaultAllowOverrides setting when false', () => {
       const parentWithoutOverrides = new Injector({defaultAllowOverrides: false});
       const childWithoutOverrides = parentWithoutOverrides.fork();
-      expect(childWithoutOverrides.defaultAllowOverrides).toBe(false);
+      const token2 = new Token<string>('override-hierarchy-false');
+      childWithoutOverrides.register({provide: token2, useValue: 'first'});
+
+      expect(() => {
+        childWithoutOverrides.register({provide: token2, useValue: 'second'});
+      }).toThrow();
+      expect(childWithoutOverrides.inject(token2)).toBe('first');
     });
   });
 
@@ -198,7 +212,7 @@ describe('Injector hierarchy', () => {
 
       parent.register({provide: TOKEN, useValue: 'parent-value'});
 
-      const copiedChild = Injector.from(child, /* copyCache= */ false, /* copyParent= */ false);
+      const copiedChild = Injector.from(child, {noParent: true});
 
       // Should not access parent since copyParent=false
       expect(() => copiedChild.inject(TOKEN)).toThrow(NotProvidedError);
@@ -218,7 +232,7 @@ describe('Injector hierarchy', () => {
       // Warm up the cache
       const originalInstance = child.inject(ChildService);
 
-      const copiedChild = Injector.from(child, /* copyCache= */ true, /* copyParent= */ true);
+      const copiedChild = Injector.from(child, {copyCache: true});
 
       // Should get the cached instance
       expect(copiedChild.inject(ChildService)).toBe(originalInstance);

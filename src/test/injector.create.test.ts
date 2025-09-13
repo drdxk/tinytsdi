@@ -10,17 +10,35 @@ describe('Injector creation', () => {
   describe('constructor', () => {
     it('creates injector with default allowOverrides=false', () => {
       const injector = new Injector();
-      expect(injector.defaultAllowOverrides).toBe(false);
+      const token = new Token<string>('override-test-default-false');
+      injector.register({provide: token, useValue: 'first'});
+
+      expect(() => {
+        injector.register({provide: token, useValue: 'second'});
+      }).toThrow();
+      expect(injector.inject(token)).toBe('first');
     });
 
     it('creates injector with defaultAllowOverrides=true', () => {
       const injector = new Injector({defaultAllowOverrides: true});
-      expect(injector.defaultAllowOverrides).toBe(true);
+      const token = new Token<string>('override-test-true');
+      injector.register({provide: token, useValue: 'first'});
+
+      expect(() => {
+        injector.register({provide: token, useValue: 'second'});
+      }).not.toThrow();
+      expect(injector.inject(token)).toBe('second');
     });
 
     it('creates injector with defaultAllowOverrides=false', () => {
       const injector = new Injector({defaultAllowOverrides: false});
-      expect(injector.defaultAllowOverrides).toBe(false);
+      const token = new Token<string>('override-test-false');
+      injector.register({provide: token, useValue: 'first'});
+
+      expect(() => {
+        injector.register({provide: token, useValue: 'second'});
+      }).toThrow();
+      expect(injector.inject(token)).toBe('first');
     });
   });
 
@@ -40,14 +58,26 @@ describe('Injector creation', () => {
       const sourceInjector = new Injector({defaultAllowOverrides: true});
       const newInjector = Injector.from(sourceInjector);
 
-      expect(newInjector.defaultAllowOverrides).toBe(true);
+      const token = new Token<string>('override-test-copied-true');
+      newInjector.register({provide: token, useValue: 'first'});
+
+      expect(() => {
+        newInjector.register({provide: token, useValue: 'second'});
+      }).not.toThrow();
+      expect(newInjector.inject(token)).toBe('second');
     });
 
     it('creates new injector with defaultAllowOverrides=false copied', () => {
       const sourceInjector = new Injector({defaultAllowOverrides: false});
       const newInjector = Injector.from(sourceInjector);
 
-      expect(newInjector.defaultAllowOverrides).toBe(false);
+      const token = new Token<string>('override-test-copied-false');
+      newInjector.register({provide: token, useValue: 'first'});
+
+      expect(() => {
+        newInjector.register({provide: token, useValue: 'second'});
+      }).toThrow();
+      expect(newInjector.inject(token)).toBe('first');
     });
 
     it('creates new injector without copying cache by default', () => {
@@ -86,7 +116,7 @@ describe('Injector creation', () => {
       const firstResult = sourceInjector.inject(token);
       expect(firstResult).toBe('factory-1');
 
-      const newInjector = Injector.from(sourceInjector, true);
+      const newInjector = Injector.from(sourceInjector, {copyCache: true});
 
       // New injector should have cache, so factory should not be called again
       const secondResult = newInjector.inject(token);
@@ -108,7 +138,7 @@ describe('Injector creation', () => {
       const firstResult = sourceInjector.inject(token);
       expect(firstResult).toBe('factory-1');
 
-      const newInjector = Injector.from(sourceInjector, false);
+      const newInjector = Injector.from(sourceInjector, {copyCache: false});
 
       // New injector should not have cache, so factory should be called again
       const secondResult = newInjector.inject(token);
