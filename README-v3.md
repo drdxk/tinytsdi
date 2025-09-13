@@ -208,7 +208,7 @@ import {newTestInjector, setTestInjector, removeTestInjector} from 'tinytsdi';
 describe('MyService', () => {
   beforeEach(() => {
     // Create isolated test injector
-    newTestInjector(/* fromCurrent= */ true, /* allowOverrides= */ true);
+    newTestInjector({ fromCurrent: true, defaultAllowOverrides: true });
 
     // Override dependencies for testing
     register({provide: CONFIG, useValue: {apiUrl: 'http://test.local'}});
@@ -247,9 +247,31 @@ See JSDoc comments in the source code for detailed API documentation! Generated 
 init({defaultAllowOverrides: boolean, noTestInjector: boolean});
 
 // Test injector management
-newTestInjector(fromCurrent?, allowOverrides?);  // Create a new test injector
+newTestInjector(options?: TestInjectorOptions);  // Create a new test injector
 setTestInjector(injector);                       // Set the injector as the test injector
 removeTestInjector();                            // Restore previous non-test global injector
+
+// TestInjectorOptions interface
+interface TestInjectorOptions {
+  fromCurrent?: boolean;            // Copy providers from current global injector
+}
+```
+  defaultAllowOverrides?: boolean;  // Allow provider overrides by default
+
+#### Test Injector Examples
+
+```typescript
+// Create empty test injector
+newTestInjector();
+
+// Create test injector that allows overrides of registered providers
+newTestInjector({ defaultAllowOverrides: true });
+
+// Copy providers from current global injector
+newTestInjector({ fromCurrent: true });
+
+// Copy providers from current global injector and allow overrides
+newTestInjector({ fromCurrent: true, defaultAllowOverrides: true });
 ```
 
 ### Provider Types
@@ -480,6 +502,28 @@ const injector = new Injector({parent: parentInjector});
 const injector = new Injector(); // All defaults
 ```
 
+### newTestInjector() now uses options object
+
+**Old API (v2.x):**
+
+```typescript
+// Positional arguments
+newTestInjector(fromCurrent, allowOverrides);
+newTestInjector(true, true);
+newTestInjector(false, true);
+newTestInjector(true);
+```
+
+**New API (v3.x):**
+
+```typescript
+// Options object (all properties optional)
+newTestInjector({ fromCurrent: true, defaultAllowOverrides: true });
+newTestInjector({ defaultAllowOverrides: true });
+newTestInjector({ fromCurrent: true });
+newTestInjector(); // All defaults - no change needed
+```
+
 ### Migration Guide
 
 #### Provider Changes
@@ -494,3 +538,12 @@ const injector = new Injector(); // All defaults
   - `new Injector(true)` → `new Injector({ defaultAllowOverrides: true })`
   - `new Injector(false, parent)` → `new Injector({ parent })`
   - `new Injector()` → No change needed
+
+#### Test Injector Changes
+
+- **Replace positional arguments** with **options object**:
+  - `newTestInjector(true, true)` → `newTestInjector({ fromCurrent: true, defaultAllowOverrides: true })`
+  - `newTestInjector(false, true)` → `newTestInjector({ defaultAllowOverrides: true })`
+  - `newTestInjector(true)` → `newTestInjector({ fromCurrent: true })`
+  - `newTestInjector()` → No change needed
+- **Note**: Second parameter renamed from `allowOverrides` to `defaultAllowOverrides`

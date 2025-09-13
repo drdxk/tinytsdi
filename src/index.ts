@@ -7,6 +7,7 @@ export * from './providers.js';
 
 // Re-export Injector class
 export {Injector} from './injector.js';
+export type {InjectorOptions} from './injector.js';
 
 // Re-export global API functions
 export {
@@ -19,4 +20,4 @@ export {
   removeTestInjector,
   setTestInjector,
 } from './global.js';
-export type {Config} from './global.js';
+export type {Config, TestInjectorOptions} from './global.js';

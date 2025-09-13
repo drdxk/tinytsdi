@@ -22,6 +22,13 @@
   - `new Injector(true)` → `new Injector({ defaultAllowOverrides: true })`
   - `new Injector(false, parent)` → `new Injector({ parent })`
   - `new Injector()` continues to work unchanged
+- **BREAKING**: `newTestInjector()` now uses options object instead of positional arguments
+  - `newTestInjector(fromCurrent, allowOverrides)` →
+    `newTestInjector({ fromCurrent, defaultAllowOverrides })`
+  - `newTestInjector(true)` → `newTestInjector({ fromCurrent: true })`
+  - `newTestInjector(false, true)` → `newTestInjector({ defaultAllowOverrides: true })`
+  - `newTestInjector(true, true)` → `newTestInjector({ fromCurrent: true, defaultAllowOverrides: true })`
+  - `newTestInjector()` continues to work unchanged
 
 ### Added
 
@@ -31,6 +38,12 @@
   - `injectFn: true` - Constructor receives inject function as first parameter (required for
     constructors that expect it)
   - `injectFn: false` or omitted - Constructor called with no arguments (default behavior)
+- `InjectorOptions` interface for configuring injector creation
+  - `defaultAllowOverrides?: boolean` - Allow provider overrides by default
+  - `parent?: Injector` - Parent injector for hierarchical injection
+- `TestInjectorOptions` interface for configuring test injector creation
+  - `fromCurrent?: boolean` - Copy providers from current global injector
+  - `defaultAllowOverrides?: boolean` - Allow provider overrides by default
 
 ### Changed
 

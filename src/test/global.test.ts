@@ -163,7 +163,7 @@ describe('Global API', () => {
       });
 
       it('creates test injector with allowOverrides=true', () => {
-        const testInjector = newTestInjector(false, true);
+        const testInjector = newTestInjector({defaultAllowOverrides: true});
         expect(testInjector.defaultAllowOverrides).toBe(true);
       });
 
@@ -171,7 +171,7 @@ describe('Global API', () => {
         const token = new Token<string>('test');
         register({provide: token, useValue: 'global'});
 
-        const testInjector = newTestInjector(true);
+        const testInjector = newTestInjector({fromCurrent: true});
         expect(testInjector.inject(token)).toBe('global');
         expect(getInjector()).toBe(testInjector);
       });
@@ -180,7 +180,7 @@ describe('Global API', () => {
         const token = new Token<string>('test');
         register({provide: token, useValue: 'global'});
 
-        const testInjector = newTestInjector(true, true);
+        const testInjector = newTestInjector({fromCurrent: true, defaultAllowOverrides: true});
         expect(testInjector.defaultAllowOverrides).toBe(true);
         expect(getInjector()).toBe(testInjector);
 
@@ -202,7 +202,7 @@ describe('Global API', () => {
         setTestInjector(firstTestInjector);
 
         // Create new test injector from current - should copy from global, not test
-        const secondTestInjector = newTestInjector(true);
+        const secondTestInjector = newTestInjector({fromCurrent: true});
         expect(secondTestInjector.inject(globalToken)).toBe('global');
         expect(() => secondTestInjector.inject(testToken)).toThrow(); // Should not have test token
         expect(getInjector()).toBe(secondTestInjector);
@@ -282,7 +282,7 @@ describe('Global API', () => {
       expect(inject(token)).toBe('production');
 
       // Create test injector from current
-      newTestInjector(true, true);
+      newTestInjector({fromCurrent: true, defaultAllowOverrides: true});
 
       expect(inject(token)).toBe('production'); // Copied from global
 

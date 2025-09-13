@@ -9,8 +9,9 @@
 ### 4. Use options objects instead of lists of optional args:
 
 - ✔️ ~~Injector constructor~~ (done)
-- global `newTestInjector()`
+- ✔️ ~~global `newTestInjector()`~~ (done)
 - static `from()` method
+- rename global `Config` to `ContainerConfig`
 
 ## Organizational refactorings:
 

@@ -14,6 +14,14 @@ export interface Config {
   noTestInjector?: boolean;
 }
 
+/** Options for creating a test injector. */
+export interface TestInjectorOptions {
+  /** Whether to copy providers from the current global injector. */
+  fromCurrent?: boolean;
+  /** Whether the new test injector should allow provider overrides by default. */
+  defaultAllowOverrides?: boolean;
+}
+
 /** Module-level injector instance, created lazily on first access. */
 let injector: Injector | undefined;
 /** Test injector instance, when set overrides the global injector. */
@@ -181,25 +189,22 @@ function checkTestInjectorAllowed(): void {
 /**
  * Creates a new test injector, optionally copying from the current global injector.
  *
- * @param fromCurrent - Whether to copy providers from the current global injector (not test
- *   injector).
- * @param allowOverrides - Whether the new test injector should allow provider overrides by default.
+ * @param options - Options for creating the test injector.
  * @returns A new injector instance to be used for testing.
  * @throws {@link TestInjectorNotAllowedError} - When test injector functions are disabled.
  */
-export function newTestInjector(
-  fromCurrent: boolean = false,
-  allowOverrides: boolean = false
-): Injector {
+export function newTestInjector(options?: TestInjectorOptions): Injector {
   checkTestInjectorAllowed();
 
   let testInjector: Injector;
-  if (fromCurrent && injector) {
+  const defaultAllowOverrides = options?.defaultAllowOverrides ?? false;
+  if (options?.fromCurrent && injector) {
     // Always copy from the global injector, not the test injector
     testInjector = Injector.from(injector, false);
-    testInjector.defaultAllowOverrides = allowOverrides;
+    // TODO: make this part of Injector.from() options.
+    testInjector.defaultAllowOverrides = defaultAllowOverrides;
   } else {
-    testInjector = new Injector({defaultAllowOverrides: allowOverrides});
+    testInjector = new Injector({defaultAllowOverrides});
   }
   setTestInjector(testInjector);
   return testInjector;
