@@ -89,6 +89,80 @@ describe('Injector meta methods', () => {
     });
   });
 
+  describe('copy()', () => {
+    it('returns Injector type', () => {
+      const newInjector: Injector = injector.copy();
+      void newInjector;
+    });
+
+    it('accepts valid values for copyCache option', () => {
+      const newInjectorWithCache: Injector = injector.copy({copyCache: true});
+      const newInjectorWithoutCache: Injector = injector.copy({copyCache: false});
+      void newInjectorWithCache;
+      void newInjectorWithoutCache;
+    });
+
+    it('rejects invalid values for copyCache option', () => {
+      injector.copy(
+        // @ts-expect-error - copyCache must be boolean
+        {copyCache: 'true'}
+      );
+      injector.copy(
+        // @ts-expect-error - copyCache must be boolean
+        {copyCache: 123}
+      );
+    });
+
+    it('accepts valid values for parent option', () => {
+      const withParent: Injector = injector.copy({parent: new Injector()});
+      const withoutParent: Injector = injector.copy({parent: null});
+      void withParent;
+      void withoutParent;
+    });
+
+    it('rejects invalid values for parent option', () => {
+      injector.copy(
+        // @ts-expect-error - parent must be Injector or null
+        {parent: 'true'}
+      );
+      injector.copy(
+        // @ts-expect-error - parent must be Injector or null
+        {parent: 123}
+      );
+      injector.copy(
+        // @ts-expect-error - parent must be Injector or null
+        {parent: {}}
+      );
+    });
+
+    it('accepts valid values for defaultAllowOverrides option', () => {
+      const allowOverrides: Injector = injector.copy({defaultAllowOverrides: true});
+      const disallowOverrides: Injector = injector.copy({defaultAllowOverrides: false});
+      void allowOverrides;
+      void disallowOverrides;
+    });
+
+    it('rejects invalid values for defaultAllowOverrides option', () => {
+      injector.copy(
+        // @ts-expect-error - defaultAllowOverrides must be boolean
+        {defaultAllowOverrides: 'true'}
+      );
+      injector.copy(
+        // @ts-expect-error - defaultAllowOverrides must be boolean
+        {defaultAllowOverrides: 123}
+      );
+    });
+
+    it('accepts all options together', () => {
+      const newInjector: Injector = injector.copy({
+        copyCache: true,
+        parent: null,
+        defaultAllowOverrides: true,
+      });
+      void newInjector;
+    });
+  });
+
   describe('hasProviderFor()', () => {
     it('accepts valid injection IDs', () => {
       injector.hasProviderFor(STRING);

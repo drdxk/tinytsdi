@@ -8,14 +8,20 @@
 
 ### 4. ✅ Use options objects instead of lists of optional args:
 
-### 5. Rename global `Config` to `ContainerConfig`
-
-### 6. Change `from()` to `clone()` instance method. 
+### 5. ✅ Change static `from()` to `copy()` instance method.
 
 ### 6. Fix `newTestInjector()` so its not complex as it is now
 
-- remove fromCurrent functionality, use `clone()` + `setTestInjector()` instead
+- remove fromCurrent functionality, recomment `clone()` + `setTestInjector()` instead
 - newTestInjector() should probably accept `InjectorOptions` only
+
+1. Modify `newTestInjector()` to accept `InjectorOptions` only.
+1. Update usages of `newTestInjector()` in tests to use the new signature.
+1. Update documentation in `README.md` and `CHANGELOG.md`.
+1. Update usages of `from()` outside of the tests to use copy.
+1. Delete `from()` method and related tests.
+
+### 7. Rename global `Config` to `ContainerConfig`
 
 ## Organizational refactorings:
 

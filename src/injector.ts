@@ -41,6 +41,26 @@ export interface FromOptions {
   defaultAllowOverrides?: boolean;
 }
 
+/** Configuration options for copying an injector with Injector.copy(). */
+export interface CopyOptions {
+  /** Whether to copy the cache of resolved dependencies. Defaults to false. */
+  copyCache?: boolean;
+  /**
+   * Whether to allow provider overrides by default in the new injector.
+   *
+   * - If not set (undefined), uses the current instance's defaultAllowOverrides setting.
+   * - If explicitly set (true/false), uses the provided value.
+   */
+  defaultAllowOverrides?: boolean;
+  /**
+   * Parent injector for the new injector.
+   *
+   * - If not set (undefined), uses the current instance's parent.
+   * - If explicitly set (including null), uses the provided value.
+   */
+  parent?: Injector | null;
+}
+
 /** Internal provider wrapper that provides a uniform interface for all provider types. */
 interface InjectorProvider {
   /** The injection identifier (token or constructor). */
@@ -88,6 +108,8 @@ export class Injector {
   /**
    * Creates a new Injector instance from an existing one, copying all providers.
    *
+   * @deprecated Use `injector.copy()` instead. To migrate: `Injector.from(injector, options)`
+   *   becomes `injector.copy(options)` with updated option names.
    * @param injector - The source injector to copy from.
    * @param options - Configuration options for copying the injector.
    * @returns A new Injector instance with copied providers and optionally cached values.
@@ -110,6 +132,40 @@ export class Injector {
     // Copy cache if requested
     if (copyCache) {
       for (const [id, value] of injector.cache) {
+        newInjector.cache.set(id, value);
+      }
+    }
+
+    return newInjector;
+  }
+
+  /**
+   * Creates a new Injector instance from the current one, copying all providers.
+   *
+   * @param options - Configuration options for copying the injector.
+   * @returns A new Injector instance.
+   */
+  copy(options?: CopyOptions): Injector {
+    const copyCache = options?.copyCache ?? false;
+    const parent = options?.parent !== undefined ? options.parent : this.parent;
+    const defaultAllowOverrides =
+      options?.defaultAllowOverrides !== undefined
+        ? options.defaultAllowOverrides
+        : this.defaultAllowOverrides;
+
+    const newInjector = new Injector({
+      defaultAllowOverrides,
+      parent,
+    });
+
+    // Copy all providers
+    for (const [id, provider] of this.providers) {
+      newInjector.providers.set(id, provider);
+    }
+
+    // Copy cache if requested
+    if (copyCache) {
+      for (const [id, value] of this.cache) {
         newInjector.cache.set(id, value);
       }
     }

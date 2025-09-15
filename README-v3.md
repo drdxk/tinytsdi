@@ -344,12 +344,12 @@ injector.hasCachedValue(id);    // Check if value is cached (throws for noCache 
 injector.invalidate(ids?);      // Clear cache (for specific IDs)
 injector.unregister(ids?);      // Remove providers and cache (reset the injector)
 
-// Static methods
-Injector.from(source, options?);  // Copy injector with optional FromOptions
-Injector.from(source, {
-  copyCache: false,               // Copy cached values from source (default: false)
-  noParent: false,                // Exclude parent injector relationship (default: false)
-  defaultAllowOverrides: false,    // Override setting for new injector (default: source's setting)
+// Instance methods
+injector.copy(options?);          // Copy injector with optional CopyOptions
+injector.copy({
+  copyCache: true,                // Copy cached values from source (default: false)
+  parent: anotherParent,          // Parent injector for copy (default: current instance's parent)
+  defaultAllowOverrides: false,   // Override setting for new injector (default: current instance's setting)
 });
 injector.fork();                  // Create child injector with current injector as parent
 ```
@@ -532,12 +532,12 @@ newTestInjector({ fromCurrent: { copyCache: true } });               // Copy fro
 newTestInjector(); // All defaults - no change needed
 ```
 
-### Injector.from() now uses options object
+### Injector.from() replaced with injector.copy()
 
 **Old API (v2.x):**
 
 ```typescript
-// Positional arguments
+// Positional arguments on the static `from()` method
 Injector.from(source, copyCache, copyParent);
 Injector.from(injector, true, true);
 Injector.from(injector, false, false);
@@ -547,11 +547,11 @@ Injector.from(injector, true);
 **New API (v3.x):**
 
 ```typescript
-// Options object (all properties optional)
-Injector.from(source, { copyCache: true });
-Injector.from(injector, { noParent: true });
-Injector.from(injector, { copyCache: true });
-Injector.from(injector); // All defaults - no change needed
+// Instance method with CopyOptions
+injector.copy({ copyCache: true });       // parent defaults to the current parent
+injector.copy({ parent: null });          // copyParent false → parent null
+injector.copy({ copyCache: true });       // copyCache is an option
+injector.copy();
 ```
 
 ### Migration Guide
@@ -578,11 +578,12 @@ Injector.from(injector); // All defaults - no change needed
   - `newTestInjector()` → No change needed
 - **Note**: When copying from current injector, override settings and other FromOptions must be specified within the `fromCurrent` object
 
-#### Injector.from() Changes
+#### Injector.from() → injector.copy() Changes
 
-- **Replace positional arguments** with **options object**:
-  - `Injector.from(source, true, true)` → `Injector.from(source, { copyCache: true })`
-  - `Injector.from(source, false, false)` → `Injector.from(source, { noParent: true })`
-  - `Injector.from(source, true)` → `Injector.from(source, { copyCache: true })`
-  - `Injector.from(source)` → No change needed
-- **Note**: Third parameter `copyParent` is now `noParent` with inverted logic (`copyParent: false` → `noParent: true`)
+- **Replace static method with positional arguments** with **instance method with options object**:
+  - `Injector.from(source, true, true)` → `source.copy({ copyCache: true })`
+  - `Injector.from(source, false, false)` → `source.copy({ parent: null })`
+  - `Injector.from(source, true, false)` → `source.copy({ copyCache: true, parent: null })`
+  - `Injector.from(source, true)` → `source.copy({ copyCache: true })`
+  - `Injector.from(source)` → `source.copy()`
+- **Note**: Third parameter `copyParent: false` is now `parent: null`

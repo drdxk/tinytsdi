@@ -22,13 +22,12 @@
   - `new Injector(true)` → `new Injector({ defaultAllowOverrides: true })`
   - `new Injector(false, parent)` → `new Injector({ parent })`
   - `new Injector()` continues to work unchanged
-- **BREAKING**: `Injector.from()` static method now uses options object instead of positional
-  arguments
-  - `Injector.from(source, copyCache, copyParent)` →
-    `Injector.from(source, { copyCache, noParent: !copyParent })`
-  - `Injector.from(injector, true)` → `Injector.from(injector, { copyCache: true })`
-  - `Injector.from(injector, false, false)` → `Injector.from(injector, { noParent: true })`
-  - `Injector.from(injector)` continues to work unchanged
+- **BREAKING**: `Injector.from()` static method replaced by `injector.copy()` instance method
+  - `Injector.from(source, copyCache, copyParent)` → `source.copy({ copyCache, parent: copyParent ? undefined : null })`
+  - `Injector.from(injector, true)` → `injector.copy({ copyCache: true })`
+  - `Injector.from(injector, false, false)` → `injector.copy({ parent: null })`
+  - `Injector.from(injector)` → `injector.copy()`
+  - **Note**: `FromOptions` interface deprecated in favor of `CopyOptions`
 - **BREAKING**: `newTestInjector()` now uses options object instead of positional arguments
   - `newTestInjector(fromCurrent, allowOverrides)` →
     `newTestInjector({ fromCurrent, defaultAllowOverrides })`
@@ -54,7 +53,11 @@
 - `InjectorOptions` interface for configuring injector creation
   - `defaultAllowOverrides?: boolean` - Allow provider overrides by default
   - `parent?: Injector` - Parent injector for hierarchical injection
-- `FromOptions` interface for configuring injector copying with `Injector.from()`
+- `CopyOptions` interface for configuring injector copying with `injector.copy()`
+  - `copyCache?: boolean` - Copy cached values from source injector (default: false)
+  - `parent?: Injector | null` - Parent injector for copy (default: current instance's parent)
+  - `defaultAllowOverrides?: boolean` - Override setting for new injector (default: current instance's setting)
+- `FromOptions` interface for configuring injector copying with `Injector.from()` (**deprecated**)
   - `copyCache?: boolean` - Copy cached values from source injector (default: false)
   - `noParent?: boolean` - Exclude parent injector relationship (default: false)
   - `defaultAllowOverrides?: boolean` - Override setting for new injector
