@@ -10,18 +10,14 @@
 
 ### 5. ✅ Change static `from()` to `copy()` instance method.
 
-### 6. Fix `newTestInjector()` so its not complex as it is now
+### 6. ✅ Fix `newTestInjector()` so its not complex as it is now
 
-- remove fromCurrent functionality, recomment `clone()` + `setTestInjector()` instead
-- newTestInjector() should probably accept `InjectorOptions` only
+### 7. Remove static `from()` method and associated interface.
 
-1. Modify `newTestInjector()` to accept `InjectorOptions` only.
-1. Update usages of `newTestInjector()` in tests to use the new signature.
-1. Update documentation in `README.md` and `CHANGELOG.md`.
-1. Update usages of `from()` outside of the tests to use copy.
 1. Delete `from()` method and related tests.
+1. Update documentation in `README.md` and `CHANGELOG.md`.
 
-### 7. Rename global `Config` to `ContainerConfig`
+### 8. Rename global `Config` to `ContainerConfig`
 
 ## Organizational refactorings:
 

@@ -208,7 +208,7 @@ import {newTestInjector, setTestInjector, removeTestInjector} from 'tinytsdi';
 describe('MyService', () => {
   beforeEach(() => {
     // Create isolated test injector
-    newTestInjector({ fromCurrent: true, defaultAllowOverrides: true });
+    newTestInjector({defaultAllowOverrides: true});
 
     // Override dependencies for testing
     register({provide: CONFIG, useValue: {apiUrl: 'http://test.local'}});
@@ -247,15 +247,9 @@ See JSDoc comments in the source code for detailed API documentation! Generated 
 init({defaultAllowOverrides: boolean, noTestInjector: boolean});
 
 // Test injector management
-newTestInjector(options?: TestInjectorOptions);  // Create a new test injector
-setTestInjector(injector);                       // Set the injector as the test injector
-removeTestInjector();                            // Restore previous non-test global injector
-
-// TestInjectorOptions interface
-interface TestInjectorOptions {
-  fromCurrent?: boolean | FromOptions;  // Copy providers from current global injector with optional FromOptions
-  defaultAllowOverrides?: boolean;      // Allow provider overrides by default (only when fromCurrent is false/omitted)
-}
+newTestInjector(options?: InjectorOptions);  // Create a new test injector
+setTestInjector(injector);                   // Set a custom injector as the test injector
+removeTestInjector();                        // Restore previous non-test global injector
 ```
 
 #### Test Injector Examples
@@ -265,15 +259,14 @@ interface TestInjectorOptions {
 newTestInjector();
 
 // Create test injector that allows overrides of registered providers
-newTestInjector({ defaultAllowOverrides: true });
+newTestInjector({defaultAllowOverrides: true});
 
-// Copy providers from current global injector
-newTestInjector({ fromCurrent: true });
+// Copy providers from current global injector:
+setTestInjector(getInjector().copy());
 
-// Copy providers from current global injector with custom FromOptions
-newTestInjector({ fromCurrent: { copyCache: true } });
-newTestInjector({ fromCurrent: { defaultAllowOverrides: true } });
-newTestInjector({ fromCurrent: { copyCache: true, defaultAllowOverrides: true } });
+// Copy with custom options:
+const testInjector = getInjector().copy({copyCache: true, defaultAllowOverrides: true});
+setTestInjector(testInjector);
 ```
 
 ### Provider Types
@@ -509,7 +502,7 @@ const injector = new Injector({parent: parentInjector});
 const injector = new Injector(); // All defaults
 ```
 
-### newTestInjector() now uses options object
+### newTestInjector() simplified - fromCurrent removed
 
 **Old API (v2.x):**
 
@@ -524,12 +517,14 @@ newTestInjector(true);
 **New API (v3.x):**
 
 ```typescript
-// Options object
-newTestInjector({ defaultAllowOverrides: true });                    // Create empty test injector with overrides allowed
-newTestInjector({ fromCurrent: { defaultAllowOverrides: true } });   // Copy from current with overrides allowed
-newTestInjector({ fromCurrent: true });                              // Copy from current with default FromOptions
-newTestInjector({ fromCurrent: { copyCache: true } });               // Copy from current with custom FromOptions
-newTestInjector(); // All defaults - no change needed
+// Simplified - only creates fresh injectors
+newTestInjector(); // Create empty test injector
+newTestInjector({defaultAllowOverrides: true}); // With overrides allowed
+newTestInjector({parent: someInjector}); // With parent injector
+
+// To copy from current injector:
+const testInjector = getInjector().copy({defaultAllowOverrides: true});
+setTestInjector(testInjector);
 ```
 
 ### Injector.from() replaced with injector.copy()
@@ -548,9 +543,9 @@ Injector.from(injector, true);
 
 ```typescript
 // Instance method with CopyOptions
-injector.copy({ copyCache: true });       // parent defaults to the current parent
-injector.copy({ parent: null });          // copyParent false → parent null
-injector.copy({ copyCache: true });       // copyCache is an option
+injector.copy({copyCache: true}); // parent defaults to the current parent
+injector.copy({parent: null}); // copyParent false → parent null
+injector.copy({copyCache: true}); // copyCache is an option
 injector.copy();
 ```
 
@@ -572,11 +567,13 @@ injector.copy();
 #### Test Injector Changes
 
 - **Replace positional arguments** with **options object**:
-  - `newTestInjector(true, true)` → `newTestInjector({ fromCurrent: { defaultAllowOverrides: true } })`
-  - `newTestInjector(false, true)` → `newTestInjector({ defaultAllowOverrides: true })`
-  - `newTestInjector(true)` → `newTestInjector({ fromCurrent: true })`
+  - `newTestInjector(true, true)` →
+    `const injector = getInjector().copy({ defaultAllowOverrides: true }); setTestInjector(injector);`
+  - `newTestInjector(false, true)` → `newTestInjector({defaultAllowOverrides: true})`
+  - `newTestInjector(true)` → `setTestInjector(getInjector().copy());`
   - `newTestInjector()` → No change needed
-- **Note**: When copying from current injector, override settings and other FromOptions must be specified within the `fromCurrent` object
+- **Note**: `fromCurrent` functionality has been removed - use explicit `getInjector().copy()` +
+  `setTestInjector()` pattern instead
 
 #### Injector.from() → injector.copy() Changes
 

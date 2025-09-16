@@ -3,7 +3,7 @@
 import {AlreadyInitializedError, TestInjectorNotAllowedError} from './errors.js';
 import {Injector} from './injector.js';
 
-import type {FromOptions} from './injector.js';
+import type {InjectorOptions} from './injector.js';
 import type {GenericProvider, Provider} from './providers.js';
 import type {InjectionId} from './types.js';
 
@@ -14,28 +14,6 @@ export interface Config {
   /** Whether test injector functions are disabled. Defaults to false. */
   noTestInjector?: boolean;
 }
-
-/** Options for creating a test injector. */
-export type TestInjectorOptions =
-  | {
-      /**
-       * Copy providers from the current global injector. Pass `true` to use `FromOptions` default,
-       * or specify `FromOptions` explicitly.
-       */
-      fromCurrent: FromOptions | true;
-    }
-  | {
-      /**
-       * Do not copy from current injector (create new injector). Must be `false` or omitted when
-       * using `defaultAllowOverrides`.
-       */
-      fromCurrent?: false;
-      /**
-       * Whether the new test injector should allow provider overrides by default. Only available
-       * when `fromCurrent` is `false` or omitted. Defaults to false.
-       */
-      defaultAllowOverrides?: boolean;
-    };
 
 /** Module-level injector instance, created lazily on first access. */
 let injector: Injector | undefined;
@@ -202,34 +180,16 @@ function checkTestInjectorAllowed(): void {
 }
 
 /**
- * Creates a new test injector, optionally copying from the current global injector.
+ * Creates a injector with the given configuration and sets it as the test injector.
  *
  * @param options - Options for creating the test injector.
  * @returns A new injector instance to be used for testing.
  * @throws {@link TestInjectorNotAllowedError} - When test injector functions are disabled.
  */
-export function newTestInjector(options?: TestInjectorOptions): Injector {
+export function newTestInjector(options?: InjectorOptions): Injector {
   checkTestInjectorAllowed();
 
-  let testInjector: Injector;
-
-  if (options?.fromCurrent) {
-    if (injector) {
-      // Copy from the global injector (not the test injector)
-      const fromOptions = options.fromCurrent === true ? undefined : options.fromCurrent;
-      testInjector = Injector.from(injector, fromOptions);
-    } else {
-      // No global injector yet, create new
-      const defaultAllowOverrides =
-        options.fromCurrent === true
-          ? false
-          : (options.fromCurrent?.defaultAllowOverrides ?? false);
-      testInjector = new Injector({defaultAllowOverrides});
-    }
-  } else {
-    const defaultAllowOverrides = options?.defaultAllowOverrides ?? false;
-    testInjector = new Injector({defaultAllowOverrides});
-  }
+  const testInjector = new Injector(options);
   setTestInjector(testInjector);
   return testInjector;
 }

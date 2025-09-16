@@ -76,7 +76,7 @@ concepts:
 
 ### Testing Support
 
-- `newTestInjector(fromCurrent?, allowOverrides?)` - Create test injector
+- `newTestInjector(options?: InjectorOptions)` - Create test injector
 - `setTestInjector(injector)` - Set custom test injector
 - `removeTestInjector()` - Restore previous injector
 - `injector.invalidate()` - Clear cached dependencies
