@@ -190,7 +190,7 @@ describe('Injector hierarchy', () => {
     });
   });
 
-  describe('from() method with hierarchy', () => {
+  describe('copy() method with hierarchy', () => {
     it('preserves parent relationship by default', () => {
       const parent = new Injector();
       const child = parent.fork();
@@ -199,22 +199,22 @@ describe('Injector hierarchy', () => {
       const childToken = new Token<string>('child-token');
       child.register({provide: childToken, useValue: 'child-value'});
 
-      const copiedChild = Injector.from(child);
+      const copiedChild = child.copy();
 
       // Should still access parent through preserved parent chain
       expect(copiedChild.inject(TOKEN)).toBe('parent-value');
       expect(copiedChild.inject(childToken)).toBe('child-value');
     });
 
-    it('can exclude parent relationship when copyParent=false', () => {
+    it('excludes parent relationship when parent=null', () => {
       const parent = new Injector();
       const child = parent.fork();
 
       parent.register({provide: TOKEN, useValue: 'parent-value'});
 
-      const copiedChild = Injector.from(child, {noParent: true});
+      const copiedChild = child.copy({parent: null});
 
-      // Should not access parent since copyParent=false
+      // Should not access parent since parent=null
       expect(() => copiedChild.inject(TOKEN)).toThrow(NotProvidedError);
     });
 
@@ -232,7 +232,7 @@ describe('Injector hierarchy', () => {
       // Warm up the cache
       const originalInstance = child.inject(ChildService);
 
-      const copiedChild = Injector.from(child, {copyCache: true});
+      const copiedChild = child.copy({copyCache: true});
 
       // Should get the cached instance
       expect(copiedChild.inject(ChildService)).toBe(originalInstance);

@@ -12,10 +12,7 @@
 
 ### 6. ✅ Fix `newTestInjector()` so its not complex as it is now
 
-### 7. Remove static `from()` method and associated interface.
-
-1. Delete `from()` method and related tests.
-1. Update documentation in `README.md` and `CHANGELOG.md`.
+### 7. ✅ Remove static `from()` method and associated interface.
 
 ### 8. Rename global `Config` to `ContainerConfig`
 

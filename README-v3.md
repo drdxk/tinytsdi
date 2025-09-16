@@ -527,12 +527,12 @@ const testInjector = getInjector().copy({defaultAllowOverrides: true});
 setTestInjector(testInjector);
 ```
 
-### Injector.from() replaced with injector.copy()
+### Injector.from() removed - use injector.copy()
 
 **Old API (v2.x):**
 
 ```typescript
-// Positional arguments on the static `from()` method
+// Static method with positional arguments - REMOVED in v3.x
 Injector.from(source, copyCache, copyParent);
 Injector.from(injector, true, true);
 Injector.from(injector, false, false);
@@ -575,12 +575,12 @@ injector.copy();
 - **Note**: `fromCurrent` functionality has been removed - use explicit `getInjector().copy()` +
   `setTestInjector()` pattern instead
 
-#### Injector.from() → injector.copy() Changes
+#### Injector.from() Removed - Use injector.copy()
 
-- **Replace static method with positional arguments** with **instance method with options object**:
+- **Replace removed static method** with **instance method with options object**:
   - `Injector.from(source, true, true)` → `source.copy({ copyCache: true })`
   - `Injector.from(source, false, false)` → `source.copy({ parent: null })`
   - `Injector.from(source, true, false)` → `source.copy({ copyCache: true, parent: null })`
   - `Injector.from(source, true)` → `source.copy({ copyCache: true })`
   - `Injector.from(source)` → `source.copy()`
-- **Note**: Third parameter `copyParent: false` is now `parent: null`
+- **Note**: The static `Injector.from()` method has been completely removed. Use the instance `copy()` method instead.

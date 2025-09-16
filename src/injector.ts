@@ -28,19 +28,6 @@ export interface InjectorOptions {
   parent?: Injector | null;
 }
 
-/** Configuration options for copying an injector with Injector.from(). */
-export interface FromOptions {
-  /** Whether to copy the cache of resolved dependencies. Defaults to false. */
-  copyCache?: boolean;
-  /** Whether to exclude the parent injector relationship. Defaults to false (parent is preserved). */
-  noParent?: boolean;
-  /**
-   * Whether to allow provider overrides by default in the new injector. If not specified, uses the
-   * source injector's defaultAllowOverrides setting.
-   */
-  defaultAllowOverrides?: boolean;
-}
-
 /** Configuration options for copying an injector with Injector.copy(). */
 export interface CopyOptions {
   /** Whether to copy the cache of resolved dependencies. Defaults to false. */
@@ -103,40 +90,6 @@ export class Injector {
       defaultAllowOverrides: this.defaultAllowOverrides,
       parent: this,
     });
-  }
-
-  /**
-   * Creates a new Injector instance from an existing one, copying all providers.
-   *
-   * @deprecated Use `injector.copy()` instead. To migrate: `Injector.from(injector, options)`
-   *   becomes `injector.copy(options)` with updated option names.
-   * @param injector - The source injector to copy from.
-   * @param options - Configuration options for copying the injector.
-   * @returns A new Injector instance with copied providers and optionally cached values.
-   */
-  static from(injector: Injector, options?: FromOptions): Injector {
-    const copyCache = options?.copyCache ?? false;
-    const noParent = options?.noParent ?? false;
-    const defaultAllowOverrides = options?.defaultAllowOverrides ?? injector.defaultAllowOverrides;
-
-    const newInjector = new Injector({
-      defaultAllowOverrides,
-      parent: noParent ? null : injector.parent,
-    });
-
-    // Copy all providers
-    for (const [id, provider] of injector.providers) {
-      newInjector.providers.set(id, provider);
-    }
-
-    // Copy cache if requested
-    if (copyCache) {
-      for (const [id, value] of injector.cache) {
-        newInjector.cache.set(id, value);
-      }
-    }
-
-    return newInjector;
   }
 
   /**

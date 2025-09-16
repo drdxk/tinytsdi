@@ -7,7 +7,7 @@ export * from './types.js';
 
 // Re-export Injector class
 export {Injector} from './injector.js';
-export type {CopyOptions, FromOptions, InjectorOptions} from './injector.js';
+export type {CopyOptions, InjectorOptions} from './injector.js';
 
 // Re-export global API functions
 export {

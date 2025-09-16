@@ -21,13 +21,13 @@
   - `new Injector(true)` → `new Injector({defaultAllowOverrides: true})`
   - `new Injector(false, parent)` → `new Injector({parent})`
   - `new Injector()` continues to work unchanged
-- **BREAKING**: `Injector.from()` static method replaced by `injector.copy()` instance method
+- **BREAKING**: `Injector.from()` static method removed - use `injector.copy()` instance method instead
   - `Injector.from(source, copyCache, copyParent)` →
     `source.copy({copyCache, parent: copyParent ? undefined : null})`
   - `Injector.from(injector, true)` → `injector.copy({copyCache: true})`
   - `Injector.from(injector, false, false)` → `injector.copy({parent: null})`
   - `Injector.from(injector)` → `injector.copy()`
-  - **Note**: `FromOptions` interface deprecated in favor of `CopyOptions`
+  - **Note**: `FromOptions` interface removed along with `Injector.from()`
 - **BREAKING**: `newTestInjector()` simplified - removed `fromCurrent` functionality
   - v2.x: `newTestInjector(fromCurrent?, allowOverrides?)` - positional arguments
   - v3.x: `newTestInjector(options?: InjectorOptions)` - accepts only basic injector options
