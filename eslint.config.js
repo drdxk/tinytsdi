@@ -37,24 +37,25 @@ export default [
       // General rules
       'no-console': 'warn',
       'no-debugger': 'error',
-      'prefer-const': 'error',
       'no-var': 'error',
+      'prefer-const': 'error',
 
       // TypeScript specific rules
-      '@typescript-eslint/no-unused-vars': 'error',
-      '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-inferrable-types': 'off',
       '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/no-unused-vars': 'error',
 
       // JSDoc
+      'jsdoc/check-tag-names': ['warn', {definedTags: ['privateRemarks']}],
+      'jsdoc/no-undefined-types': 'off',
       'jsdoc/require-jsdoc': 'off',
       'jsdoc/require-param': 'off',
       'jsdoc/require-returns': 'off',
-      'jsdoc/no-undefined-types': 'off',
+      'jsdoc/require-throws-type': 'off',
       'jsdoc/tag-lines': ['error', 'any', {startLines: 1, count: 0}],
-      'jsdoc/check-tag-names': ['warn', {definedTags: ['privateRemarks']}],
 
       // TSDoc Syntax
       'tsdoc/syntax': 'warn',
