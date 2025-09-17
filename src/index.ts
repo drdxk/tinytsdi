@@ -20,4 +20,4 @@ export {
   removeTestInjector,
   setTestInjector,
 } from './global.js';
-export type {Config} from './global.js';
+export type {ContainerConfig} from './global.js';

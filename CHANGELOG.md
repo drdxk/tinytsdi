@@ -37,6 +37,8 @@
     - `newTestInjector(false, true)` → `newTestInjector({defaultAllowOverrides: true})`
     - `newTestInjector(true)` → `setTestInjector(getInjector().copy());`
     - `newTestInjector()` → No change needed
+- **BREAKING**: Renamed `Config` interface to `ContainerConfig`
+  - Update any references of `Config` to `ContainerConfig`: `import type {Config}` → `import type {ContainerConfig}`
 
 ### Added
 

@@ -7,8 +7,8 @@ import type {InjectorOptions} from './injector.js';
 import type {GenericProvider, Provider} from './providers.js';
 import type {InjectionId} from './types.js';
 
-/** Configuration options for TSDI initialization. */
-export interface Config {
+/** Configuration options for the default global container initialization. */
+export interface ContainerConfig {
   /** Default value for allowOverrides when creating the global injector. Defaults to false. */
   defaultAllowOverrides?: boolean;
   /** Whether test injector functions are disabled. Defaults to false. */
@@ -20,17 +20,17 @@ let injector: Injector | undefined;
 /** Test injector instance, when set overrides the global injector. */
 let testInjector: Injector | undefined;
 /** Configuration object, set once via init(). */
-let config: Config | undefined;
+let config: ContainerConfig | undefined;
 
 /**
- * Initializes TSDI with configuration options.
+ * Initializes global container with configuration options.
  *
  * Can only be called once. Subsequent calls will throw AlreadyInitializedError.
  *
- * @param options - Configuration options for TSDI.
+ * @param options - Configuration options.
  * @throws {@link AlreadyInitializedError} When init() has already been called.
  */
-export function init(options: Partial<Config> = {}): void {
+export function init(options: Partial<ContainerConfig> = {}): void {
   if (config !== undefined) {
     throw new AlreadyInitializedError();
   }

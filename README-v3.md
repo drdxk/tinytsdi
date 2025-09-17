@@ -549,22 +549,48 @@ injector.copy({copyCache: true}); // copyCache is an option
 injector.copy();
 ```
 
+### `Config` interface renamed to `ContainerConfig`
+
+**Old API (v2.x):**
+
+```typescript
+import type {Config} from 'tinytsdi';
+
+// Configuration for init() function
+const config: Config = {
+  defaultAllowOverrides: true,
+  noTestInjector: false,
+};
+```
+
+**New API (v3.x):**
+
+```typescript
+import type {ContainerConfig} from 'tinytsdi';
+
+// Configuration for init() function
+const config: ContainerConfig = {
+  defaultAllowOverrides: true,
+  noTestInjector: false,
+};
+```
+
 ### Migration Guide
 
-#### Provider Changes
+#### `Provider` interface changes
 
 - **Remove `scope: 'singleton'`** - This is now the default behavior
 - **Replace `scope: 'transient'`** with **`noCache: true`**
 - **Remove `InjectScope` type imports** - No longer exists
 
-#### Constructor Changes
+#### Constructor changes
 
 - **Replace positional arguments** with **options object**:
   - `new Injector(true)` → `new Injector({ defaultAllowOverrides: true })`
   - `new Injector(false, parent)` → `new Injector({ parent })`
   - `new Injector()` → No change needed
 
-#### Test Injector Changes
+#### Test Injector changes
 
 - **Replace positional arguments** with **options object**:
   - `newTestInjector(true, true)` →
@@ -575,12 +601,19 @@ injector.copy();
 - **Note**: `fromCurrent` functionality has been removed - use explicit `getInjector().copy()` +
   `setTestInjector()` pattern instead
 
-#### Injector.from() Removed - Use injector.copy()
+#### `Injector.from()` removed - use injector.copy()
 
-- **Replace removed static method** with **instance method with options object**:
+- **Replace removed static `from()` method** with **instance `copy()` method with options object**:
   - `Injector.from(source, true, true)` → `source.copy({ copyCache: true })`
   - `Injector.from(source, false, false)` → `source.copy({ parent: null })`
   - `Injector.from(source, true, false)` → `source.copy({ copyCache: true, parent: null })`
   - `Injector.from(source, true)` → `source.copy({ copyCache: true })`
   - `Injector.from(source)` → `source.copy()`
-- **Note**: The static `Injector.from()` method has been completely removed. Use the instance `copy()` method instead.
+- **Note**: The static `Injector.from()` method has been completely removed. Use the instance
+  `copy()` method instead.
+
+#### `Config` interface renamed
+
+- **Replace type imports**:
+  - `import type {Config}` → `import type {ContainerConfig}`
+  - Variable declarations: `const config: Config` → `const config: ContainerConfig`

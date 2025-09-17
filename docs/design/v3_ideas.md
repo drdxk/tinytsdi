@@ -14,7 +14,7 @@
 
 ### 7. ✅ Remove static `from()` method and associated interface.
 
-### 8. Rename global `Config` to `ContainerConfig`
+### 8. ✅ Rename global `Config` to `ContainerConfig`
 
 ## Organizational refactorings:
 
