@@ -20,9 +20,11 @@
 
 ### 1. ✅ Move tests to subdirectories in `src/`
 
-### 2. Convert to monorepo to support container packages and maybe full-scale e2e tests
+### 2. ✅ Convert to monorepo to support container packages and maybe full-scale e2e tests
 
-### 3. e2e test package with subset of functionality
+### 3. move eslint config to its own package
+
+### 4. e2e test package with subset of functionality
 
 - maybe both unit and compile tests
 - ESM / CJS
@@ -173,3 +175,6 @@ With `tsdoc-markdown` or probably more like `typedoc`+ `typedoc-plugin-markdown`
 - Terminology / concepts (NestJS might confuse people on what a provider is)
 - Some guides on how to use the library in different contexts
 - Include testing setups
+
+
+### 3. Changesets if versioning management becomes a pain
