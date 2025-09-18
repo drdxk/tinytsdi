@@ -176,5 +176,4 @@ With `tsdoc-markdown` or probably more like `typedoc`+ `typedoc-plugin-markdown`
 - Some guides on how to use the library in different contexts
 - Include testing setups
 
-
 ### 3. Changesets if versioning management becomes a pain

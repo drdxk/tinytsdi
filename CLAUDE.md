@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 
 ## Project Overview
 
-A minimalist TypeScript Dependency Injection library called `tinytsdi`. Focuses on type-safe dependency injection for testing without decorators or runtime reflection.
+A minimalist TypeScript Dependency Injection library called `tinytsdi`. Focuses on type-safe
+dependency injection for testing without decorators or runtime reflection.
 
 ## Development Commands
 

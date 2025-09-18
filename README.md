@@ -1,6 +1,7 @@
 # tinytsdi Monorepo
 
-Minimalistic TypeScript Dependency Injection library and related tooling, managed as a monorepo using Turborepo and pnpm workspaces.
+Minimalistic TypeScript Dependency Injection library and related tooling, managed as a monorepo
+using Turborepo and pnpm workspaces.
 
 [→ `tinytsdi` documentation](./packages/tinytsdi/README.md)
 
@@ -39,6 +40,7 @@ packages/       # Core library and future packages
 ## Scripts
 
 All scripts are managed via Turborepo and available at the root:
+
 - `build`, `test`, `lint`, `fix`, `typecheck`, `pub`
 
 ## Contribution
