@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      eslint:
+        specifier: ^9.35.0
+        version: 9.35.0
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -18,26 +21,17 @@ importers:
         specifier: ^2.5.6
         version: 2.5.6
 
-  packages/tinytsdi:
-    devDependencies:
+  packages/config-eslint:
+    dependencies:
       '@eslint/js':
         specifier: ^9.35.0
         version: 9.35.0
-      '@types/node':
-        specifier: ^24.5.1
-        version: 24.5.1
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.44.0
         version: 8.44.0(@typescript-eslint/parser@8.44.0(eslint@9.35.0)(typescript@5.9.2))(eslint@9.35.0)(typescript@5.9.2)
       '@typescript-eslint/parser':
         specifier: ^8.44.0
         version: 8.44.0(eslint@9.35.0)(typescript@5.9.2)
-      '@vitest/coverage-v8':
-        specifier: ^3.2.4
-        version: 3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.5.1))
-      eslint:
-        specifier: ^9.35.0
-        version: 9.35.0
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.35.0)
@@ -56,12 +50,21 @@ importers:
       globals:
         specifier: ^16.4.0
         version: 16.4.0
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
-      prettier-plugin-jsdoc:
-        specifier: ^1.3.3
-        version: 1.3.3(prettier@3.6.2)
+      typescript:
+        specifier: '>=5.0.0'
+        version: 5.9.2
+
+  packages/tinytsdi:
+    devDependencies:
+      '@repo/config-eslint':
+        specifier: workspace:*
+        version: link:../config-eslint
+      '@types/node':
+        specifier: ^24.5.1
+        version: 24.5.1
+      '@vitest/coverage-v8':
+        specifier: ^3.2.4
+        version: 3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.5.1))
       tsc-alias:
         specifier: ^1.8.16
         version: 1.8.16
