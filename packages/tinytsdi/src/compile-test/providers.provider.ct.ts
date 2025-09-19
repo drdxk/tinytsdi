@@ -1,5 +1,6 @@
 import {Provider} from '../providers';
 import {Token} from '../types';
+
 import {describe, it} from './ct_helper';
 
 describe('Provider<T>', () => {

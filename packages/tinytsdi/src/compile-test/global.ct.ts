@@ -1,6 +1,7 @@
 import {inject, register} from '../global';
 import {Injector} from '../injector';
 import {InjectFn} from '../types';
+
 import {describe, it} from './ct_helper';
 
 describe('default global container', () => {

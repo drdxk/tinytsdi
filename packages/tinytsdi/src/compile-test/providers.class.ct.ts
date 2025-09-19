@@ -1,4 +1,5 @@
 import {ClassProvider, Provider} from '../providers';
+
 import {
   SERVICE2_NO_ARGS,
   SERVICE,

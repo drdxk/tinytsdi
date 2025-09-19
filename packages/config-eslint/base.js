@@ -69,7 +69,8 @@ export default [
             'builtin', // Node.js built-in modules
             'external', // NPM packages
             'internal', // Aliased modules (e.g., '@/components')
-            ['parent', 'sibling', 'index'], // Relative imports
+            'parent',
+            ['sibling', 'index'], // Relatives imports
             'type',
           ],
           'newlines-between': 'always',

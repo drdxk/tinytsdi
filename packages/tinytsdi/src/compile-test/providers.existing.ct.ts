@@ -1,5 +1,6 @@
 import {ExistingProvider, Provider} from '../providers';
 import {Token} from '../types.js';
+
 import {NUMBER, SERVICE, STRING, Service, ServiceNoArgs, describe, it} from './ct_helper';
 
 describe('ExistingProvider<T>', () => {

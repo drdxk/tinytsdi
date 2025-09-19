@@ -1,4 +1,5 @@
 import {Injector} from '../injector.js';
+
 import {Service, describe, it} from './ct_helper';
 
 describe('Injector constructor', () => {

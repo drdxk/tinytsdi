@@ -1,6 +1,7 @@
 /** Type tests for core types. */
 
 import {Token} from '../types.js';
+
 import {
   STRING,
   Service,

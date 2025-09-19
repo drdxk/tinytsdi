@@ -2,56 +2,34 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
-      "dependsOn": [
-        "check",
-        "^build"
-      ],
-      "outputs": [
-        "dist/**"
-      ]
+      "dependsOn": ["check", "^build"],
+      "outputs": ["dist/**"]
     },
     "check": {
-      "dependsOn": [
-        "typecheck",
-        "lint",
-        "test:run"
-      ]
+      "dependsOn": ["typecheck", "lint", "test:run"]
     },
     "dev": {
       "persistent": true,
-      "with": [
-        "typecheck:watch",
-        "test"
-      ]
+      "with": ["typecheck:watch", "test"]
     },
     "fix": {
-      "dependsOn": [
-        "fix:prettier",
-        "fix:eslint"
-      ]
+      "dependsOn": ["fix:prettier", "fix:eslint"]
     },
     "fix:eslint": {},
     "fix:prettier": {},
     "fox": {
       "cache": false,
-      "dependsOn": [
-        "fix",
-        "check"
-      ]
+      "dependsOn": ["fix", "check"]
     },
     "lint": {
-      "dependsOn": [
-        "lint:eslint",
-        "lint:prettier"
-      ]
+      "dependsOn": ["lint:eslint", "lint:prettier"],
+      "cache": false
     },
     "lint:eslint": {},
     "lint:prettier": {},
     "pub": {
       "cache": false,
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     },
     "test": {
       "cache": false,

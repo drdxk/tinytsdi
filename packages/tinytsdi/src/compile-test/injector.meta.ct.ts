@@ -1,4 +1,5 @@
 import {Injector} from '../injector';
+
 import {SERVICE, STRING, Service, ServiceNoArgs, describe, it} from './ct_helper';
 
 describe('Injector meta methods', () => {

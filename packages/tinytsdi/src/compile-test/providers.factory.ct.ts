@@ -1,5 +1,6 @@
 import {FactoryProvider, Provider} from '../providers';
 import {InjectFn} from '../types';
+
 import {NUMBER, SERVICE, STRING, Service, describe, it} from './ct_helper';
 
 describe('FactoryProvider<T>', () => {

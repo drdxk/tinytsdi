@@ -1,5 +1,6 @@
 import {Injector} from '../injector.js';
 import {Token} from '../types.js';
+
 import {
   NUMBER,
   SERVICE,

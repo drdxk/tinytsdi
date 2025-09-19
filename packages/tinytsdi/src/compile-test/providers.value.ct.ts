@@ -1,4 +1,5 @@
 import {Provider, ValueProvider} from '../providers';
+
 import {SERVICE, STRING, Service, describe, it} from './ct_helper';
 
 describe('ValueProvider<T>', () => {
