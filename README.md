@@ -32,6 +32,10 @@ packages/       # Core library and future packages
    ```bash
    pnpm fox
    ```
+5. **Dev mode (watchers):**
+   ```bash
+   pnpm dev
+   ```
 
 ## Packages
 
@@ -41,16 +45,24 @@ packages/       # Core library and future packages
 
 All scripts are managed via Turborepo and available at the root:
 
-- `build`, `test`, `lint`, `fix`, `typecheck`, `pub`
+- build: build all packages
+- check: run typecheck, lint, and test:run
+- dev: run watchers (typecheck:watch + test)
+- fix: run formatters and autofixes
+- fox: fix then check (convenience)
+- lint: run linters
+- test: interactive tests (watch)
+- test:run: test in CI/once mode
+- typecheck: type-check all packages
+- pub: publish packages (after build)
 
 ## Contribution
 
 Feel free to open issues or PRs. Most development happens off GitHub, but contributions are welcome!
 
-## Documentation (somewhat outdated)
+## Documentation
 
-- [Design Docs](./docs/design/original%20design%20doc.md)
-- [v3 Ideas](./docs/design/v3_ideas.md)
+- [project TODO](./docs/design/todo.md)
 
 ## License
 
