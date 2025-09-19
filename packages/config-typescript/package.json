@@ -1,0 +1,13 @@
+{
+  "name": "@repo/config-typescript",
+  "version": "0.0.0",
+  "description": "Shared TypeScript configuration for tinytsdi monorepo",
+  "private": true,
+  "type": "module",
+  "files": [
+    "*.json"
+  ],
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

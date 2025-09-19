@@ -22,12 +22,16 @@
 
 ### 2. ✅ Convert to monorepo to support container packages and maybe full-scale e2e tests
 
-### 3. move eslint config to its own package
+### 3. ✅ move eslint config to its own package
 
-### 4. e2e test package with subset of functionality
+### 4. ✅ move ts config to its own package
+
+### 6. e2e test package with subset of functionality
 
 - maybe both unit and compile tests
 - ESM / CJS
+
+### 7 . Verify that overriding clears caches.
 
 ## v3+ ideas:
 
