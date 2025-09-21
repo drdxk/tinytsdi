@@ -18,6 +18,7 @@ export {
   newTestInjector,
   register,
   removeTestInjector,
+  resetInitForTestOnly,
   setTestInjector,
 } from './global.js';
 export type {ContainerConfig} from './global.js';

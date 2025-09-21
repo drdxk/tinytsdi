@@ -1,0 +1,30 @@
+{
+  "name": "@repo/e2e-core",
+  "version": "0.0.0",
+  "description": "End-to-end tests for tinytsdi library",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "e2e:test:run": "vitest",
+    "e2e:test": "vitest run",
+    "e2e:typecheck": "tsc --noEmit",
+    "fix:eslint": "eslint --fix",
+    "fix:prettier": "prettier --write src",
+    "lint:eslint": "eslint",
+    "lint:prettier": "prettier --check src"
+  },
+  "dependencies": {
+    "tinytsdi": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/config-eslint": "workspace:*",
+    "@repo/config-typescript": "workspace:*",
+    "@types/node": "^24.5.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

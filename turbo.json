@@ -6,7 +6,7 @@
       "outputs": ["dist/**"]
     },
     "check": {
-      "dependsOn": ["typecheck", "lint", "test:run"]
+      "dependsOn": ["typecheck", "lint", "test:run", "e2e"]
     },
     "dev": {
       "persistent": true,
@@ -40,6 +40,16 @@
     "typecheck:watch": {
       "cache": false,
       "persistent": true
+    },
+    "e2e": {
+      "dependsOn": ["e2e:typecheck", "e2e:test"]
+    },
+
+    "e2e:test": {
+      "dependsOn": ["^build"]
+    },
+    "e2e:typecheck": {
+      "dependsOn": ["^build"]
     }
   },
   "ui": "tui"

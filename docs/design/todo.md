@@ -26,12 +26,15 @@
 
 ### 4. ✅ move ts config to its own package
 
-### 6. e2e test package with subset of functionality
+### 5. ✅ e2e test package with subset of functionality
 
-- maybe both unit and compile tests
-- ESM / CJS
+### 6 . ✅ Verify that overriding provider clears caches.
 
-### 7 . ✅ Verify that overriding provider clears caches.
+### 7. Fix eslint configuration (correct paths).
+
+### 8. Use pnpm catalogs for core dev deps.
+
+### 9. Update CLAUDE.md (re initialize)?
 
 ## v3+ ideas:
 

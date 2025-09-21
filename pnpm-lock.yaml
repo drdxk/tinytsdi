@@ -60,6 +60,31 @@ importers:
         specifier: ^5.9.2
         version: 5.9.2
 
+  packages/e2e-core:
+    dependencies:
+      tinytsdi:
+        specifier: workspace:*
+        version: link:../tinytsdi
+    devDependencies:
+      '@repo/config-eslint':
+        specifier: workspace:*
+        version: link:../config-eslint
+      '@repo/config-typescript':
+        specifier: workspace:*
+        version: link:../config-typescript
+      '@types/node':
+        specifier: ^24.5.1
+        version: 24.5.1
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.1)
+
   packages/tinytsdi:
     devDependencies:
       '@repo/config-eslint':
