@@ -8,34 +8,13 @@ using Turborepo and pnpm workspaces.
 ## Structure
 
 ```
-apps/           # Example applications (currently empty)
-docs/           # Design docs and ideas
-packages/       # Core library and future packages
-  tinytsdi/     # Main DI library
+docs/                  # Project TODOs and design notes
+packages/
+   config-eslint/     # Shared ESLint config
+   config-typescript/ # Shared TypeScript config
+   e2e-core/          # End-to-end tests
+   tinytsdi/          # Main DI library
 ```
-
-## Getting Started
-
-1. **Install dependencies:**
-   ```bash
-   pnpm install
-   ```
-2. **Build all packages:**
-   ```bash
-   pnpm build
-   ```
-3. **Run checks and tests:**
-   ```bash
-   pnpm check
-   ```
-4. **Fix, format, and check:**
-   ```bash
-   pnpm fox
-   ```
-5. **Dev mode (watchers):**
-   ```bash
-   pnpm dev
-   ```
 
 ## Packages
 
@@ -45,20 +24,31 @@ packages/       # Core library and future packages
 
 All scripts are managed via Turborepo and available at the root:
 
-- build: build all packages
-- check: run typecheck, lint, and test:run
-- dev: run watchers (typecheck:watch + test)
-- fix: run formatters and autofixes
-- fox: fix then check (convenience)
-- lint: run linters
-- test: interactive tests (watch)
-- test:run: test in CI/once mode
-- typecheck: type-check all packages
-- pub: publish packages (after build)
+- `build`: build all packages
+- `check`: run typecheck, lint, and test:run
+- `dev`: run dev/watch tasks
+- `e2e`: run end-to-end tests
+- `fix`: run formatters and autofixes
+- `fox`: fix then check (convenience)
+- `lint`: run linters
+- `test`: interactive tests (watch)
+- `test:run`: test in CI/once mode
+- `typecheck`: type-check all packages
+- `pub`: publish packages (after build)
+- `root:check`: check markdown formatting
+- `root:fix`: format markdown files
+- `root:fox`: format then check markdown
+- `root:lint`: lint markdown files
+
+Normal dev flow is:
+
+1. `dev` to run dev tasks in watch mode
+1. modify code, update documentation
+1. `check` to verify everything is fine
 
 ## Contribution
 
-Feel free to open issues or PRs. Most development happens off GitHub, but contributions are welcome!
+Feel free to open issues. Most development happens off GitHub at the moment.
 
 ## Documentation
 

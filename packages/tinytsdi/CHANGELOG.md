@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.0.0] - WIP
+## [3.0.0] - 2025.09.21
 
 ### Breaking Changes
 
@@ -42,9 +42,9 @@
   - Update any references of `Config` to `ContainerConfig`: `import type {Config}` →
     `import type {ContainerConfig}`
 
-### Fixes
+### Fixed
 
-- Fixed: clear cached resolved value when a provider is overridden
+- Clear cached resolved value when a provider is overridden
 
 ### Added
 
@@ -71,7 +71,7 @@
 
 - Cached behavior is now the default for class and factory providers
 
-## [2.1.0] - 2025-08-30
+## [2.1.0] - 2025.08.30
 
 ### Added
 
@@ -82,7 +82,7 @@
 - Migrated to pnpm for package management.
 - Vite is now the default build tool.
 
-## [2.0.0] - 2025-07-05
+## [2.0.0] - 2025.07.05
 
 ### Breaking Changes
 
@@ -102,14 +102,14 @@
 - Removed unnecessary TypeScript compiler options
 - Improved build system with separate configurations for types, ESM, and CJS
 
-## [1.0.1] - 2025-07-01
+## [1.0.1] - 2025.07.01
 
 ### Fixed
 
 - Fixed repository link in package.json
 - Refined file inclusion patterns in package.json
 
-## [1.0.0] - 2025-07-01
+## [1.0.0] - 2025.07.01
 
 ### Added
 

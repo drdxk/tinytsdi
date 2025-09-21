@@ -1,6 +1,6 @@
 {
   "name": "tinytsdi",
-  "version": "3.0.0-beta.3",
+  "version": "3.0.0-rc.1",
   "description": "Minimalistic TypeScript Dependency Injection library",
   "repository": {
     "type": "git",
@@ -41,13 +41,13 @@
     "pub": "pnpm publish"
   },
   "devDependencies": {
-  "@repo/config-eslint": "workspace:*",
-  "@repo/config-typescript": "workspace:*",
-  "@types/node": "catalog:types",
-  "typescript": "catalog:dev",
-  "vite": "catalog:build",
-  "vite-plugin-dts": "catalog:build",
-  "vitest": "catalog:dev"
+    "@repo/config-eslint": "workspace:*",
+    "@repo/config-typescript": "workspace:*",
+    "@types/node": "catalog:types",
+    "typescript": "catalog:dev",
+    "vite-plugin-dts": "catalog:build",
+    "vite": "catalog:build",
+    "vitest": "catalog:dev"
   },
   "keywords": [
     "typescript",

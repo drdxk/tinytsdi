@@ -1,60 +1,22 @@
-## v3.0.0 ideas:
+## Next releases:
 
-### 1. ✅ Add basic support for hierarchical injectors
+### v3.1. Support hierarchy-aware providers with tags
 
-### 2. ✅ Modify `scope` provider setting, rename to `noCache`, defaulting to `false`
+`InjectorOptions` has `tag: string|Symbol` property, defaulting to `root` if no parent and `null`
+otherwise. Internally, tag is storied as a `Symbol`, strings converted with `Symbol.for()`.
 
-### 3. ✅ Make passing of `InjectFn` to constructors of class providers (shorthand and full) optional, false by default.
-
-### 4. ✅ Use options objects instead of lists of optional args:
-
-### 5. ✅ Change static `from()` to `copy()` instance method.
-
-### 6. ✅ Fix `newTestInjector()` so its not complex as it is now
-
-### 7. ✅ Remove static `from()` method and associated interface.
-
-### 8. ✅ Rename global `Config` to `ContainerConfig`
-
-## Organizational refactorings:
-
-### 1. ✅ Move tests to subdirectories in `src/`
-
-### 2. ✅ Convert to monorepo to support container packages and maybe full-scale e2e tests
-
-### 3. ✅ move eslint config to its own package
-
-### 4. ✅ move ts config to its own package
-
-### 5. ✅ e2e test package with subset of functionality
-
-### 6. ✅ Verify that overriding provider clears caches.
-
-### 7. ✅ Fix eslint configuration (correct paths).
-
-### 8. Use pnpm catalogs for core dev deps.
-
-### 9. Update CLAUDE.md (re initialize)?
-
-## v3+ ideas:
-
-### v3.1. Support hierarchy-aware providers via `atRoot` boolean property:
-
-- If set, `register()` will pass the registration to the parent injector when parent is set.
-
-Alternatively: tag injectors, and have `at: tag` property on providers.
+Providers have `at?: string|Symbol` option, which if specified, will register the provider only if
+the injector has the matching tag. If not, will pass to parent, and so on. If no matching injector
+is found, throw an error.
 
 - Special tag for `root` assigned by default.
 - Special tag for `sink` for testing: injector tagged with sink ignores `at` option and register the
   provider itself.
 
-- If specified, will check if the injector has the matching tag, and if not, will pass to parent. If
-  there's no parent, will error out.
-
 - Add tag to constructor options and `fork`
 - Add tag to `newTestInjector()`
 
-### v3.2. Global: add `hijackGlobalContext` API function -- Maybe?
+### v3.2. Global: add `hijackGlobalContext` API function
 
 - `hijackGlobalContext(getInjector: () => Injector)` allows to create own "DI container" using
   library methods, since global `inject()` and `register()` simply call `getInjector()[method])()`.
@@ -63,9 +25,11 @@ Alternatively: tag injectors, and have `at: tag` property on providers.
 - Put non-hijacked functions in error mode (i.e. `if hijacked throw`).
 - `restoreGlobalContext()` to restore the original global context.
 
+## Not scheduled yet:
+
 ### 0. Implement testing mode as a hijacked global context, i.e. create a test container, think how to map existing flows onto this
 
-- mark test global functions as deprecated from then on
+- mark test global functions as deprecated from then on, to be delted in v4.
 
 ### 1. `node-als` either as a submodule or separate script in the built directory
 
