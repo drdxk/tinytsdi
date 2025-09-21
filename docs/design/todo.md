@@ -28,9 +28,9 @@
 
 ### 5. ✅ e2e test package with subset of functionality
 
-### 6 . ✅ Verify that overriding provider clears caches.
+### 6. ✅ Verify that overriding provider clears caches.
 
-### 7. Fix eslint configuration (correct paths).
+### 7. ✅ Fix eslint configuration (correct paths).
 
 ### 8. Use pnpm catalogs for core dev deps.
 
