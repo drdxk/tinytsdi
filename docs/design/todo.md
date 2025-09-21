@@ -31,7 +31,7 @@
 - maybe both unit and compile tests
 - ESM / CJS
 
-### 7 . Verify that overriding provider clears caches.
+### 7 . ✅ Verify that overriding provider clears caches.
 
 ## v3+ ideas:
 

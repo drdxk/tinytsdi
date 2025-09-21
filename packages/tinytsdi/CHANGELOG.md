@@ -21,7 +21,8 @@
   - `new Injector(true)` → `new Injector({defaultAllowOverrides: true})`
   - `new Injector(false, parent)` → `new Injector({parent})`
   - `new Injector()` continues to work unchanged
-- **BREAKING**: `Injector.from()` static method removed - use `injector.copy()` instance method instead
+- **BREAKING**: `Injector.from()` static method removed - use `injector.copy()` instance method
+  instead
   - `Injector.from(source, copyCache, copyParent)` →
     `source.copy({copyCache, parent: copyParent ? undefined : null})`
   - `Injector.from(injector, true)` → `injector.copy({copyCache: true})`
@@ -38,7 +39,12 @@
     - `newTestInjector(true)` → `setTestInjector(getInjector().copy());`
     - `newTestInjector()` → No change needed
 - **BREAKING**: Renamed `Config` interface to `ContainerConfig`
-  - Update any references of `Config` to `ContainerConfig`: `import type {Config}` → `import type {ContainerConfig}`
+  - Update any references of `Config` to `ContainerConfig`: `import type {Config}` →
+    `import type {ContainerConfig}`
+
+### Fixes
+
+- Fixed: clear cached resolved value when a provider is overridden
 
 ### Added
 

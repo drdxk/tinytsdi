@@ -143,15 +143,21 @@ export class Injector {
     const providerArray = Array.isArray(providerOrProviders)
       ? providerOrProviders
       : [providerOrProviders];
-    const shouldThrowOnOverride = !(allowOverrides !== undefined
+
+    const throwOnOverride = !(allowOverrides !== undefined
       ? allowOverrides
       : this.defaultAllowOverrides);
 
     for (const provider of providerArray) {
       const injectorProvider = this.createInjectorProvider(provider);
 
-      if (shouldThrowOnOverride && this.providers.has(injectorProvider.id)) {
-        throw new AlreadyProvidedError(injectorProvider.id);
+      if (this.providers.has(injectorProvider.id)) {
+        // Provider already exists, check if overrides are allowed
+        if (throwOnOverride) {
+          throw new AlreadyProvidedError(injectorProvider.id);
+        }
+        // Clear cache when overriding
+        this.cache.delete(injectorProvider.id);
       }
 
       this.providers.set(injectorProvider.id, injectorProvider);

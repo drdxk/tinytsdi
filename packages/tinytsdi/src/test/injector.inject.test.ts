@@ -215,6 +215,39 @@ describe('Injector.inject()', () => {
     });
   });
 
+  describe('overrides', () => {
+    it('returns default value when provider not found', () => {
+      const injector = new Injector();
+      const token = new Token<string>('missing');
+
+      expect(injector.inject(token, 'default')).toBe('default');
+    });
+
+    it('returns overriden provider value', () => {
+      const injector = new Injector();
+      const token = new Token<string>('test');
+
+      injector.register({provide: token, useValue: 'original'});
+
+      expect(injector.inject(token)).toBe('original');
+
+      injector.register({provide: token, useValue: 'override'}, /* allowOverrides=true */ true);
+
+      expect(injector.inject(token)).toBe('override');
+    });
+
+    it('returns overriden provider value for cached providers', () => {
+      const injector = new Injector();
+      const token = new Token<number>('test');
+
+      injector.register({provide: token, useFactory: () => 31});
+      expect(injector.inject(token)).toBe(31);
+
+      injector.register({provide: token, useFactory: () => 42}, /* allowOverrides=true */ true);
+      expect(injector.inject(token)).toBe(42);
+    });
+  });
+
   describe('error', () => {
     it('throws NotProvidedError when provider not found and no default', () => {
       const injector = new Injector();
