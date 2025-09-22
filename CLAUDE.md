@@ -8,6 +8,7 @@ A minimalist TypeScript Dependency Injection library called `tinytsdi`. Focuses 
 dependency injection for testing without decorators or runtime reflection.
 
 This is a monorepo managed with Turborepo and pnpm workspaces containing:
+
 - `packages/tinytsdi/` - Main DI library
 - `packages/config-eslint/` - Shared ESLint configuration
 - `packages/config-typescript/` - Shared TypeScript configuration
@@ -16,6 +17,7 @@ This is a monorepo managed with Turborepo and pnpm workspaces containing:
 ## Development Commands
 
 **Root level (runs across all packages via Turborepo):**
+
 - `pnpm check` - Run all quality checks (typecheck + lint + test:run + e2e)
 - `pnpm build` - Build all packages
 - `pnpm dev` - Run watchers (typecheck:watch + test in watch mode)
@@ -28,6 +30,7 @@ This is a monorepo managed with Turborepo and pnpm workspaces containing:
 - `pnpm e2e` - Run end-to-end tests
 
 **Package level (in packages/tinytsdi/):**
+
 - `pnpm test:run` - Run vitest tests once
 - `pnpm test` - Run vitest in watch mode
 - `pnpm typecheck` - TypeScript checking with tsc --noEmit
@@ -37,6 +40,7 @@ This is a monorepo managed with Turborepo and pnpm workspaces containing:
 ## Key Architecture
 
 **Core Module Structure:**
+
 - `src/index.ts` - Main exports
 - `src/injector.ts` - Injector class implementation
 - `src/global.ts` - Global container API
@@ -44,9 +48,8 @@ This is a monorepo managed with Turborepo and pnpm workspaces containing:
 - `src/types.ts` - Core TypeScript types
 - `src/errors.ts` - Custom error classes
 
-**Global API**: `register()`, `inject()`, `getInjector()`
-**Injector Methods**: `injector.copy()`, `injector.fork()`
-**Provider Types**: Constructor (shorthand), Class, Factory, Value, Existing
+**Global API**: `register()`, `inject()`, `getInjector()` **Injector Methods**: `injector.copy()`,
+`injector.fork()` **Provider Types**: Constructor (shorthand), Class, Factory, Value, Existing
 **Testing**: `newTestInjector()`, `setTestInjector()`, `removeTestInjector()`
 
 ## Development Notes

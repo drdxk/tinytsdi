@@ -35,7 +35,7 @@ All scripts are managed via Turborepo and available at the root:
 - `test:run`: test in CI/once mode
 - `typecheck`: type-check all packages
 - `pub`: publish packages (after build)
-- `root:check`: check markdown formatting
+- `root:check`: same as `root:lint`
 - `root:fix`: format markdown files
 - `root:fox`: format then check markdown
 - `root:lint`: lint markdown files

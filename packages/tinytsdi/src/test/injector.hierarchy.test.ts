@@ -9,7 +9,7 @@ import {Token} from '../types.js';
 const TOKEN = new Token<string>('test');
 
 describe('Injector hierarchy', () => {
-  describe('fork method', () => {
+  describe('fork()', () => {
     it('creates child injector', () => {
       const parent = new Injector();
       const child1 = parent.fork();

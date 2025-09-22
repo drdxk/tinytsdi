@@ -42,7 +42,7 @@ describe('Injector creation', () => {
     });
   });
 
-  describe('copy', () => {
+  describe('copy()', () => {
     it('creates new injector with copied providers', () => {
       const sourceInjector = new Injector();
       const token = new Token<string>('test');
