@@ -1,6 +1,10 @@
 packages:
   - 'packages/*'
 
+# number of minutes that must pass after a version is published before pnpm will install it
+# 1 week = 60*24*7 = 10080
+minimumReleaseAge: 10080
+
 catalogs:
   dev:
     'eslint': '^9.36.0'
