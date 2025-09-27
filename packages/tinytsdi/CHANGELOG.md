@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.1.0] - TBD
+
+### Added
+
+- Tag system for hierarchical injectors
+  - `TAG_ROOT` constant - automatically added for any injector without parent that doesn't
+    explicitly specify one
+  - `TAG_SINK` constant - sink injector ignores `at` property of providers and registers all
+    incoming providers
+  - `TagValue` type for string or symbol tag values
+
 ## [3.0.0] - 2025.09.21
 
 ### Breaking Changes

@@ -20,7 +20,7 @@ is found, throw an error.
 
 #### Plan
 
-**1. Core Infrastructure (`src/types.ts`):**
+**1. ✅ Core Infrastructure (`src/types.ts`):**
 
 - Add `TAG_ROOT = Symbol.for('root')` and `TAG_SINK = Symbol.for('sink')` constants
 - Add `TagValue = string | symbol` type

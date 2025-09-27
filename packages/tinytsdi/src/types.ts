@@ -1,5 +1,20 @@
 /** Core type definitions for TSDI */
 
+/**
+ * Tag for the root injector, automatically added for any injector without parent that doesn't
+ * explicitly specify one.
+ */
+export const TAG_ROOT = Symbol.for('root');
+
+/**
+ * Tag for the "sink" injector. Sink injector ignores `at` property of providers and registers all
+ * incoming providers.
+ */
+export const TAG_SINK = Symbol.for('sink');
+
+/** Valid tag value types */
+export type TagValue = string | symbol;
+
 /** Constructor type that can be used as InjectionId */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Constructor<T> = new (...args: any[]) => T;
@@ -32,4 +47,9 @@ export class Token<T> {
   logT(t: T): void {
     void t; // Suppress unused parameter warning
   }
+}
+
+/** Normalizes tag values to symbols for internal use */
+export function normalizeTag(tag: TagValue): symbol {
+  return typeof tag === 'string' ? Symbol.for(tag) : tag;
 }

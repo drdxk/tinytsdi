@@ -1,6 +1,5 @@
 /** Type tests for core types. */
-
-import {Token} from '../types.js';
+import {TAG_ROOT, TAG_SINK, Token, normalizeTag} from '../types.js';
 
 import {
   STRING,
@@ -12,7 +11,13 @@ import {
   it,
 } from './ct_helper.js';
 
-import type {Constructor, InjectFn, InjectableConstructor, InjectionId} from '../types.js';
+import type {
+  Constructor,
+  InjectFn,
+  InjectableConstructor,
+  InjectionId,
+  TagValue,
+} from '../types.js';
 
 describe('InjectionId<T>', () => {
   it('Token is assignable to InjectionId', () => {
@@ -191,5 +196,63 @@ describe('Token<T>', () => {
 
     void incompatibleToken;
     void incompatibleToken2;
+  });
+});
+
+describe('TagValue', () => {
+  it('accepts string values', () => {
+    const stringTag: TagValue = 'test-tag';
+    const rootTag: TagValue = 'root';
+    void stringTag;
+    void rootTag;
+  });
+
+  it('accepts symbol values', () => {
+    const symbolTag: TagValue = Symbol('test');
+    const forSymbol: TagValue = Symbol.for('test');
+    void symbolTag;
+    void forSymbol;
+  });
+
+  it('rejects invalid types', () => {
+    // @ts-expect-error - number not assignable to TagValue
+    const numberTag: TagValue = 42;
+
+    // @ts-expect-error - object not assignable to TagValue
+    const objectTag: TagValue = {};
+
+    // @ts-expect-error - array not assignable to TagValue
+    const arrayTag: TagValue = [];
+
+    void numberTag;
+    void objectTag;
+    void arrayTag;
+  });
+
+  it('constants are assignable to TagValue', () => {
+    const rootAsTag: TagValue = TAG_ROOT;
+    const sinkAsTag: TagValue = TAG_SINK;
+    void rootAsTag;
+    void sinkAsTag;
+  });
+});
+
+describe('normalizeTag()', () => {
+  it('accepts TagValue and returns symbol', () => {
+    const stringResult: symbol = normalizeTag('test');
+    const symbolResult: symbol = normalizeTag(Symbol('test'));
+    void stringResult;
+    void symbolResult;
+  });
+
+  it('rejects invalid argument types', () => {
+    // @ts-expect-error - number not assignable to TagValue
+    const numberResult: symbol = normalizeTag(42);
+
+    // @ts-expect-error - object not assignable to TagValue
+    const objectResult: symbol = normalizeTag({});
+
+    void numberResult;
+    void objectResult;
   });
 });
