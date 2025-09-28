@@ -4,16 +4,27 @@
 
 ### Added
 
-- Provider targeting with `at` property
-  - All provider types (`ValueProvider`, `ClassProvider`, `FactoryProvider`, `ExistingProvider`) now support optional `at?: TagValue` property
-  - Providers with `at` property will only register on injectors with matching tags
-  - Providers without `at` property register on the current injector (existing behavior)
+**Hierarchy-aware providers**
+
 - Tag type and constants
   - `TagValue` type for string or symbol tag values
   - `TAG_ROOT` constant - automatically added for any injector without parent that doesn't
     explicitly specify one
   - `TAG_SINK` constant - sink injector ignores `at` property of providers and registers all
     incoming providers
+- Injector tagging
+  - `InjectorOptions` now has optional `tag?: TagValue` property
+  - Injectors automatically tagged as `TAG_ROOT` when no parent and no tag specified
+  - Otherwise an injector has `null` tag by default unless explicitly tagged
+  - `getTag(): symbol | null` method to retrieve injector's tag
+- Provider targeting with `at` property
+  - All provider types (`ValueProvider`, `ClassProvider`, `FactoryProvider`, `ExistingProvider`) now support optional `at?: TagValue` property
+  - Providers with `at` property will only register on injectors with matching tags
+  - Providers without `at` property register on the current injector (existing behavior)
+
+**Misc:**
+
+- Added `getParent(): Injector | null` method to retrieve injector's parent
 
 ## [3.0.0] - 2025.09.21
 

@@ -51,13 +51,38 @@ describe('Injector constructor', () => {
     void invalidChildInjector2;
   });
 
-  it('accepts options with both defaultAllowOverrides and parent', () => {
+  it('accepts options with string tag', () => {
+    const injector: Injector = new Injector({tag: 'test'});
+    void injector;
+  });
+
+  it('accepts options with symbol tag as symbol', () => {
+    const injector: Injector = new Injector({tag: Symbol('test')});
+    void injector;
+  });
+
+  it('rejects invalid tag types', () => {
+    // @ts-expect-error - number not assignable to TagValue
+    const invalidInjector1: Injector = new Injector({tag: 42});
+    void invalidInjector1;
+
+    // @ts-expect-error - object not assignable to TagValue
+    const invalidInjector2: Injector = new Injector({tag: {}});
+    void invalidInjector2;
+
+    // @ts-expect-error - array not assignable to TagValue
+    const invalidInjector3: Injector = new Injector({tag: []});
+    void invalidInjector3;
+  });
+
+  it('accepts combination of options', () => {
     const parentInjector: Injector = new Injector();
-    const childInjector: Injector = new Injector({
+    const injector: Injector = new Injector({
       defaultAllowOverrides: true,
       parent: parentInjector,
+      tag: 'test',
     });
-    void childInjector;
+    void injector;
   });
 
   it('rejects unknown properties in options', () => {

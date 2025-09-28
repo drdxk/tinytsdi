@@ -54,12 +54,12 @@ is found, throw an error.
     logic
 - Update `CHANGELOG.md` draft entry for v3.1.0.
 
-**3. Injector Changes, constructor (`src/injector.ts`):**
+**3. ✅ Injector Changes, constructor (`src/injector.ts`):**
 
 - Extend `InjectorOptions` with `tag?: TagValue` property
 - Add private `tag: symbol | null` field to Injector class
 - Constructor if no tag is specified: assign `TAG_ROOT` if no parent, `null` if has parent
-  - if tag is specified: normalize string tags to symbols
+  - if tag is specified: store normalized tag with `normalizeTag()`
 - Add `getTag(): symbol | null` method
 - Add `getParent(): Injector | null` method as a drive-by
 - Update compile tests (`src/compile-test/injector.constructor.ct.ts`):
@@ -73,7 +73,6 @@ is found, throw an error.
   - Test explicit tag assignment (string and symbol values)
   - Test `getTag()` method returns correct tag values
   - Test `getParent()` method returns correct parent reference
-  - Test string tags are normalized to symbols using `Symbol.for()`
   - Update `CHANGELOG.md` draft entry for v3.1.0.
 
 **4. Injector Changes, registration (`src/injector.ts`):**
@@ -307,7 +306,6 @@ Like within a react app running off vite or something. Maybe create a React cont
 hook that creates and returns a configured context provider.
 
 ## v-ANY:
-
 
 ### 0. Hierarchy support for meta methods
 

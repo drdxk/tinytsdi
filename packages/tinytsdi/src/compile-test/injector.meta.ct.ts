@@ -5,6 +5,20 @@ import {SERVICE, STRING, Service, ServiceNoArgs, describe, it} from './ct_helper
 describe('Injector meta methods', () => {
   const injector = new Injector();
 
+  describe('getTag()', () => {
+    it('returns symbol or null', () => {
+      const tag: symbol | null = injector.getTag();
+      void tag;
+    });
+  });
+
+  describe('getParent()', () => {
+    it('returns Injector or null', () => {
+      const parent: Injector | null = injector.getParent();
+      void parent;
+    });
+  });
+
   describe('copy()', () => {
     it('returns Injector type', () => {
       const newInjector: Injector = injector.copy();

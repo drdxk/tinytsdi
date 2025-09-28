@@ -13,9 +13,10 @@ import {
   isFactoryProvider,
   isValueProvider,
 } from './providers.js';
+import {TAG_ROOT, normalizeTag} from './types.js';
 
 import type {GenericProvider, Provider} from './providers.js';
-import type {GenericInjectionId, InjectionId} from './types.js';
+import type {GenericInjectionId, InjectionId, TagValue} from './types.js';
 
 /** Configuration options for Injector instance. */
 export interface InjectorOptions {
@@ -26,6 +27,8 @@ export interface InjectorOptions {
   defaultAllowOverrides?: boolean;
   /** Parent injector. Defaults to null. */
   parent?: Injector | null;
+  /** Tag for this injector. Defaults to TAG_ROOT if no parent, null if has parent. */
+  tag?: TagValue;
 }
 
 /** Configuration options for copying an injector with Injector.copy(). */
@@ -61,6 +64,7 @@ interface InjectorProvider {
 /** Main dependency injection container that manages providers and resolved values. */
 export class Injector {
   private parent: Injector | null;
+  private tag: symbol | null;
   private defaultAllowOverrides: boolean;
 
   private providers = new Map<GenericInjectionId, InjectorProvider>();
@@ -77,6 +81,23 @@ export class Injector {
   constructor(options?: InjectorOptions) {
     this.defaultAllowOverrides = options?.defaultAllowOverrides ?? false;
     this.parent = options?.parent ?? null;
+
+    // Set tag: use provided tag, or TAG_ROOT if no parent, or null if has parent
+    if (options?.tag !== undefined) {
+      this.tag = normalizeTag(options.tag);
+    } else {
+      this.tag = this.parent === null ? TAG_ROOT : null;
+    }
+  }
+
+  /** @returns The parent injector, or null if this is a root injector. */
+  getParent(): Injector | null {
+    return this.parent;
+  }
+
+  /** @returns The tag symbol of this injector, or null if no tag is set. */
+  getTag(): symbol | null {
+    return this.tag;
   }
 
   /**
