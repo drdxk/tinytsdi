@@ -81,6 +81,24 @@ describe('ClassProvider predicates', () => {
     expect(isConstructorProvider(provider)).toBe(false);
   });
 
+  it('identifies ClassProvider with at property', () => {
+    class Test {}
+    const token = new Token<Test>('class');
+
+    const provider = {
+      provide: token,
+      useClass: Test,
+      at: 'custom-tag',
+    } as const;
+
+    provider satisfies ClassProvider<Test>;
+    expect(isClassProvider(provider)).toBe(true);
+    expect(isValueProvider(provider)).toBe(false);
+    expect(isFactoryProvider(provider)).toBe(false);
+    expect(isExistingProvider(provider)).toBe(false);
+    expect(isConstructorProvider(provider)).toBe(false);
+  });
+
   it('identifies ClassProvider with edge options', () => {
     class Test {}
     const token = new Token<Test>('class');
@@ -89,6 +107,30 @@ describe('ClassProvider predicates', () => {
       provide: token,
       useClass: Test,
       noCache: false,
+    } as const;
+
+    provider satisfies ClassProvider<Test>;
+    expect(isClassProvider(provider)).toBe(true);
+    expect(isValueProvider(provider)).toBe(false);
+    expect(isFactoryProvider(provider)).toBe(false);
+    expect(isExistingProvider(provider)).toBe(false);
+    expect(isConstructorProvider(provider)).toBe(false);
+  });
+
+  it('identifies ClassProvider with all options', () => {
+    class Test {
+      constructor(inject: InjectFn) {
+        void inject;
+      }
+    }
+    const token = new Token<Test>('class');
+
+    const provider = {
+      provide: token,
+      useClass: Test,
+      injectFn: true,
+      noCache: true,
+      at: Symbol('tag'),
     } as const;
 
     provider satisfies ClassProvider<Test>;
@@ -169,6 +211,44 @@ describe('FactoryProvider predicates', () => {
     expect(isExistingProvider(provider)).toBe(false);
     expect(isConstructorProvider(provider)).toBe(false);
   });
+
+  it('identifies FactoryProvider with at property', () => {
+    const token = new Token<string>('factory');
+
+    const provider = {
+      provide: token,
+      useFactory: () => 'result',
+      at: 'custom-tag',
+    } as const;
+
+    provider satisfies FactoryProvider<string>;
+    expect(isFactoryProvider(provider)).toBe(true);
+    expect(isValueProvider(provider)).toBe(false);
+    expect(isClassProvider(provider)).toBe(false);
+    expect(isExistingProvider(provider)).toBe(false);
+    expect(isConstructorProvider(provider)).toBe(false);
+  });
+
+  it('identifies FactoryProvider with all options', () => {
+    const token = new Token<string>('factory');
+
+    const provider = {
+      provide: token,
+      useFactory: (inject: InjectFn) => {
+        void inject;
+        return 'result';
+      },
+      noCache: true,
+      at: Symbol('tag'),
+    } as const;
+
+    provider satisfies FactoryProvider<string>;
+    expect(isFactoryProvider(provider)).toBe(true);
+    expect(isValueProvider(provider)).toBe(false);
+    expect(isClassProvider(provider)).toBe(false);
+    expect(isExistingProvider(provider)).toBe(false);
+    expect(isConstructorProvider(provider)).toBe(false);
+  });
 });
 
 describe('ExistingProvider predicates', () => {
@@ -179,6 +259,24 @@ describe('ExistingProvider predicates', () => {
     const provider = {
       provide: targetToken,
       useExisting: sourceToken,
+    } as const;
+
+    provider satisfies ExistingProvider<string>;
+    expect(isExistingProvider(provider)).toBe(true);
+    expect(isValueProvider(provider)).toBe(false);
+    expect(isClassProvider(provider)).toBe(false);
+    expect(isFactoryProvider(provider)).toBe(false);
+    expect(isConstructorProvider(provider)).toBe(false);
+  });
+
+  it('identifies ExistingProvider with at property', () => {
+    const sourceToken = new Token<string>('source');
+    const targetToken = new Token<string>('target');
+
+    const provider = {
+      provide: targetToken,
+      useExisting: sourceToken,
+      at: 'custom-tag',
     } as const;
 
     provider satisfies ExistingProvider<string>;
@@ -201,6 +299,23 @@ describe('ValueProvider predicates', () => {
 
     provider satisfies ValueProvider<string>;
     // Predicate functions (assumed to be imported)
+    expect(isValueProvider(provider)).toBe(true);
+    expect(isClassProvider(provider)).toBe(false);
+    expect(isFactoryProvider(provider)).toBe(false);
+    expect(isExistingProvider(provider)).toBe(false);
+    expect(isConstructorProvider(provider)).toBe(false);
+  });
+
+  it('identifies ValueProvider with at property', () => {
+    const token = new Token<string>('value');
+
+    const provider = {
+      provide: token,
+      useValue: 'test value',
+      at: 'custom-tag',
+    } as const;
+
+    provider satisfies ValueProvider<string>;
     expect(isValueProvider(provider)).toBe(true);
     expect(isClassProvider(provider)).toBe(false);
     expect(isFactoryProvider(provider)).toBe(false);

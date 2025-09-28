@@ -33,7 +33,7 @@ is found, throw an error.
 - Update runtime tests (`src/test/types.test.ts`):
   - Test `normalizeTag` function with string and symbol inputs, verify correct symbol output
 
-**2. Provider Extensions (`src/providers.ts`):**
+**2. ✅ Provider Extensions (`src/providers.ts`):**
 
 - Add `at?: TagValue` property to: `ValueProvider<T>`, `ClassProviderWithInjectFn<T>`,
   `ClassProviderNoArgs<T>`, `FactoryProvider<T>`, `ExistingProvider<T>`
@@ -307,6 +307,9 @@ Like within a react app running off vite or something. Maybe create a React cont
 hook that creates and returns a configured context provider.
 
 ## v-ANY:
+
+
+### 0. Hierarchy support for meta methods
 
 ### 1. Add generated documentation
 

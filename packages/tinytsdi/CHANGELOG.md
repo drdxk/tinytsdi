@@ -4,12 +4,16 @@
 
 ### Added
 
-- Tag system for hierarchical injectors
+- Provider targeting with `at` property
+  - All provider types (`ValueProvider`, `ClassProvider`, `FactoryProvider`, `ExistingProvider`) now support optional `at?: TagValue` property
+  - Providers with `at` property will only register on injectors with matching tags
+  - Providers without `at` property register on the current injector (existing behavior)
+- Tag type and constants
+  - `TagValue` type for string or symbol tag values
   - `TAG_ROOT` constant - automatically added for any injector without parent that doesn't
     explicitly specify one
   - `TAG_SINK` constant - sink injector ignores `at` property of providers and registers all
     incoming providers
-  - `TagValue` type for string or symbol tag values
 
 ## [3.0.0] - 2025.09.21
 

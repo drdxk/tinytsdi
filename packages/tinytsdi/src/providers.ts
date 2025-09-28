@@ -1,11 +1,12 @@
 /** Provider type definitions for TSDI */
 
-import type {InjectFn, InjectableConstructor, InjectionId} from './types.js';
+import type {InjectFn, InjectableConstructor, InjectionId, TagValue} from './types.js';
 
 /** Associates a static value with an InjectionId */
 export interface ValueProvider<T> {
   provide: InjectionId<T>;
   useValue: T;
+  at?: TagValue;
 }
 
 /** ClassProvider for constructors that require InjectFn */
@@ -14,6 +15,7 @@ export interface ClassProviderWithInjectFn<T> {
   useClass: new (inject: InjectFn) => T;
   noCache?: boolean;
   injectFn: true;
+  at?: TagValue;
 }
 
 /** ClassProvider for constructors with no required parameters */
@@ -22,6 +24,7 @@ export interface ClassProviderNoArgs<T> {
   useClass: new () => T;
   noCache?: boolean;
   injectFn?: false;
+  at?: TagValue;
 }
 
 /** Associates a constructor with an InjectionId */
@@ -32,12 +35,14 @@ export interface FactoryProvider<T> {
   provide: InjectionId<T>;
   useFactory: (() => T) | ((inject: InjectFn) => T);
   noCache?: boolean;
+  at?: TagValue;
 }
 
 /** Associates one InjectionId with another (aliasing) */
 export interface ExistingProvider<T> {
   provide: InjectionId<T>;
   useExisting: InjectionId<T>;
+  at?: TagValue;
 }
 
 /** Union type of all provider types */

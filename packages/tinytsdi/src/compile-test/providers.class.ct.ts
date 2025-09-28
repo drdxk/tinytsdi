@@ -188,6 +188,36 @@ describe('ClassProvider<T>', () => {
     });
   });
 
+  describe('at option', () => {
+    it('accepts string tag values', () => {
+      const classProviderWithAt: ClassProvider<ServiceNoArgs> = {
+        provide: SERVICE_NO_ARGS,
+        useClass: ServiceNoArgs,
+        at: 'custom-tag',
+      };
+      void classProviderWithAt;
+    });
+
+    it('accepts symbol tag values', () => {
+      const classProviderWithAtSymbol: ClassProvider<ServiceNoArgs> = {
+        provide: SERVICE_NO_ARGS,
+        useClass: ServiceNoArgs,
+        at: Symbol('custom'),
+      };
+      void classProviderWithAtSymbol;
+    });
+
+    it('rejects invalid at property types', () => {
+      const invalidAtProvider: ClassProvider<ServiceNoArgs> = {
+        provide: SERVICE_NO_ARGS,
+        useClass: ServiceNoArgs,
+        // @ts-expect-error - number not assignable to TagValue
+        at: 42,
+      };
+      void invalidAtProvider;
+    });
+  });
+
   describe('assignability', () => {
     it('ClassProvider<T> is assignable to Provider<T>', () => {
       const classProvider: ClassProvider<ServiceNoArgs> = {
@@ -195,6 +225,18 @@ describe('ClassProvider<T>', () => {
         useClass: ServiceNoArgs,
       };
       const provider: Provider<ServiceNoArgs> = classProvider;
+      void provider;
+    });
+
+    it('class provider with all options assignable to Provider<T>', () => {
+      const classProviderWithAllOptions: ClassProvider<ServiceWithInject> = {
+        provide: SERVICE_WITH_INJECT,
+        useClass: ServiceWithInject,
+        injectFn: true,
+        noCache: true,
+        at: 'tag',
+      };
+      const provider: Provider<ServiceWithInject> = classProviderWithAllOptions;
       void provider;
     });
 

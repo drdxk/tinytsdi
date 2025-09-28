@@ -82,3 +82,43 @@ describe('ValueProvider<T>', () => {
     void invalidProvider;
   });
 });
+
+describe('ValueProvider<T> at property', () => {
+  it('accepts string tag values', () => {
+    const stringTagProvider: ValueProvider<string> = {
+      provide: STRING,
+      useValue: 'test',
+      at: 'custom-tag',
+    };
+    void stringTagProvider;
+  });
+
+  it('accepts symbol tag values', () => {
+    const symbolTagProvider: ValueProvider<string> = {
+      provide: STRING,
+      useValue: 'test',
+      at: Symbol('custom'),
+    };
+    void symbolTagProvider;
+  });
+
+  it('rejects invalid tag types', () => {
+    const invalidTagProvider: ValueProvider<string> = {
+      provide: STRING,
+      useValue: 'test',
+      // @ts-expect-error - number not assignable to TagValue
+      at: 42,
+    };
+    void invalidTagProvider;
+  });
+
+  it('maintains Provider<T> assignability with at property', () => {
+    const classValueProviderWithAt: ValueProvider<Service> = {
+      provide: SERVICE,
+      useValue: new Service('test'),
+      at: 'tag',
+    };
+    const provider: Provider<Service> = classValueProviderWithAt;
+    void provider;
+  });
+});
