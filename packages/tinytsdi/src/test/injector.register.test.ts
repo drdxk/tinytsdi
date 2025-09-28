@@ -1,8 +1,8 @@
 import {describe, expect, it} from 'vitest';
 
-import {AlreadyProvidedError, UnknownProviderError} from '../errors.js';
+import {AlreadyProvidedError, NoMatchingTagError, UnknownProviderError} from '../errors.js';
 import {Injector} from '../injector.js';
-import {Token} from '../types.js';
+import {TAG_ROOT, TAG_SINK, Token} from '../types.js';
 
 describe('Injector.register()', () => {
   describe('providers support', () => {
@@ -180,5 +180,133 @@ describe('Injector.register()', () => {
       expect(() => injector.register(emptyProvider)).toThrow(UnknownProviderError);
     });
     /* eslint-enable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-argument */
+  });
+
+  describe('at property targeting', () => {
+    it('root injector registers providers with at: "root"', () => {
+      const injector = new Injector();
+      const token = new Token<string>('test');
+
+      expect(injector.getTag()).toBe(TAG_ROOT);
+      expect(() => {
+        injector.register({provide: token, useValue: 'test', at: 'root'});
+      }).not.toThrow();
+
+      expect(injector.hasProviderFor(token)).toBe(true);
+      expect(injector.inject(token)).toBe('test');
+    });
+
+    it('root injector registers providers with at: TAG_ROOT', () => {
+      const injector = new Injector();
+      const token = new Token<string>('test');
+
+      expect(() => {
+        injector.register({provide: token, useValue: 'test', at: TAG_ROOT});
+      }).not.toThrow();
+
+      expect(injector.hasProviderFor(token)).toBe(true);
+      expect(injector.inject(token)).toBe('test');
+    });
+
+    it('sink injector ignores providers targeting', () => {
+      const injector = new Injector({tag: TAG_SINK});
+      const token1 = new Token<string>('test1');
+      const token2 = new Token<string>('test2');
+      const token3 = new Token<string>('test3');
+
+      expect(() => {
+        injector.register([
+          {provide: token1, useValue: 'test1', at: Symbol.for('other')},
+          {provide: token2, useValue: 'test2', at: 'custom'},
+          {provide: token3, useValue: 'test3', at: Symbol()},
+        ]);
+      }).not.toThrow();
+
+      // All providers should be registered locally despite different 'at' values
+      expect(injector.hasProviderFor(token1)).toBe(true);
+      expect(injector.hasProviderFor(token2)).toBe(true);
+      expect(injector.hasProviderFor(token3)).toBe(true);
+      expect(injector.inject(token1)).toBe('test1');
+      expect(injector.inject(token2)).toBe('test2');
+      expect(injector.inject(token3)).toBe('test3');
+    });
+
+    it('injector with custom symbol tag registers matching targeted providers', () => {
+      const customTag = Symbol();
+      const injector = new Injector({tag: customTag});
+      const token = new Token<string>('test');
+
+      expect(injector.getTag()).toBe(customTag);
+
+      expect(() => {
+        injector.register({provide: token, useValue: 'test', at: customTag});
+      }).not.toThrow();
+
+      expect(injector.hasProviderFor(token)).toBe(true);
+      expect(injector.inject(token)).toBe('test');
+    });
+
+    it('injector with custom string tag registers matching targeted providers', () => {
+      const injector = new Injector({tag: 'custom'});
+      const token = new Token<string>('test');
+      const token2 = new Token<string>('test2');
+
+      expect(() => {
+        injector.register({provide: token, useValue: 'test', at: 'custom'});
+        injector.register({provide: token2, useValue: 'test2', at: Symbol.for('custom')});
+      }).not.toThrow();
+
+      expect(injector.hasProviderFor(token)).toBe(true);
+      expect(injector.hasProviderFor(token2)).toBe(true);
+      expect(injector.inject(token)).toBe('test');
+      expect(injector.inject(token2)).toBe('test2');
+    });
+
+    it('throws NoMatchingTagError when unmatched tag and no parent exists', () => {
+      const injector = new Injector({tag: 'custom'});
+      const token = new Token<string>('test');
+
+      expect(() => {
+        injector.register({provide: token, useValue: 'test', at: 'different'});
+      }).toThrow(NoMatchingTagError);
+    });
+
+    it('works with all provider types having at property', () => {
+      const injector = new Injector({tag: 'custom'});
+      const valueToken = new Token<string>('value');
+      const classToken = new Token<TestService>('class');
+      const factoryToken = new Token<number>('factory');
+      const aliasToken = new Token<string>('alias');
+
+      class TestService {
+        readonly marker = 'test';
+      }
+
+      expect(() => {
+        injector.register([
+          {provide: valueToken, useValue: 'test', at: 'custom'},
+          {provide: classToken, useClass: TestService, at: 'custom'},
+          {provide: factoryToken, useFactory: () => 42, at: 'custom'},
+          {provide: aliasToken, useExisting: valueToken, at: 'custom'},
+        ]);
+      }).not.toThrow();
+
+      expect(injector.hasProviderFor(valueToken)).toBe(true);
+      expect(injector.hasProviderFor(classToken)).toBe(true);
+      expect(injector.hasProviderFor(factoryToken)).toBe(true);
+      expect(injector.hasProviderFor(aliasToken)).toBe(true);
+    });
+
+    it('providers without at property register locally regardless of injector tag', () => {
+      const injector = new Injector({tag: 'custom'});
+      const token = new Token<string>('test');
+
+      expect(() => {
+        injector.register({provide: token, useValue: 'test'});
+      }).not.toThrow();
+
+      expect(injector.hasProviderFor(token)).toBe(true);
+      expect(injector.inject(token)).toBe('test');
+    });
   });
 });

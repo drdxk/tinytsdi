@@ -1,4 +1,4 @@
-/** Error classes for TSDI */
+/** Error classes for tinytsdi */
 
 import {Token} from './types.js';
 
@@ -36,10 +36,10 @@ export class UnknownProviderError extends Error {
   }
 }
 
-/** Error thrown when attempting to initialize TSDI more than once */
+/** Error thrown when attempting to initialize tinytsdi more than once */
 export class AlreadyInitializedError extends Error {
   constructor() {
-    super('TSDI has already been initialized. init() can only be called once.');
+    super('Container has already been initialized. init() can only be called once');
     this.name = 'AlreadyInitializedError';
   }
 }
@@ -47,8 +47,16 @@ export class AlreadyInitializedError extends Error {
 /** Error thrown when test injector functions are called but disabled via configuration */
 export class TestInjectorNotAllowedError extends Error {
   constructor() {
-    super('Test injector functions are disabled via noTestInjector configuration.');
+    super('Test injector functions are disabled via noTestInjector configuration');
     this.name = 'TestInjectorNotAllowedError';
+  }
+}
+
+/** Error thrown when no injector with matching tag is found in the hierarchy */
+export class NoMatchingTagError extends Error {
+  constructor(tag: symbol) {
+    super(`No injector with tag ${tag.toString()} found in the hierarchy`);
+    this.name = 'NoMatchingTagError';
   }
 }
 

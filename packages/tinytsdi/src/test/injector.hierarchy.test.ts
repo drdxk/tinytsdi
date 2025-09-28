@@ -2,9 +2,9 @@
 
 import {describe, expect, it} from 'vitest';
 
-import {NotProvidedError} from '../errors.js';
+import {NoMatchingTagError, NotProvidedError} from '../errors.js';
 import {Injector} from '../injector.js';
-import {Token} from '../types.js';
+import {TAG_ROOT, TAG_SINK, Token} from '../types.js';
 
 const TOKEN = new Token<string>('test');
 
@@ -238,6 +238,209 @@ describe('Injector hierarchy', () => {
       expect(copiedChild.inject(ChildService)).toBe(originalInstance);
       // Should still access parent
       expect(copiedChild.inject(TOKEN)).toBe('parent-value');
+    });
+  });
+
+  describe('provider targeting', () => {
+    it('works for parent injector target', () => {
+      const parent = new Injector({tag: 'parent-tag'});
+      const child = new Injector({parent});
+      const token = new Token<string>('test');
+
+      // Register on child but target parent
+      child.register({provide: token, useValue: 'targeted-value', at: 'parent-tag'});
+
+      // Provider should be registered on parent
+      expect(parent.hasProviderFor(token)).toBe(true);
+      expect(child.hasProviderFor(token)).toBe(false);
+      expect(parent.inject(token)).toBe('targeted-value');
+      expect(child.inject(token)).toBe('targeted-value');
+    });
+
+    it('works for grandparent injector target', () => {
+      const grandparent = new Injector({tag: 'grandparent-tag'});
+      const parent = new Injector({tag: 'parent-tag', parent: grandparent});
+      const child = new Injector({parent});
+      const token = new Token<string>('test');
+
+      // Register on child but target grandparent
+      child.register({provide: token, useValue: 'targeted-value', at: 'grandparent-tag'});
+
+      // Provider should be registered on grandparent
+      expect(grandparent.hasProviderFor(token)).toBe(true);
+      expect(parent.hasProviderFor(token)).toBe(false);
+      expect(child.hasProviderFor(token)).toBe(false);
+      expect(grandparent.inject(token)).toBe('targeted-value');
+      expect(parent.inject(token)).toBe('targeted-value');
+      expect(child.inject(token)).toBe('targeted-value');
+    });
+
+    it('works with multiple targeted injectors', () => {
+      const root = new Injector(); // TAG_ROOT
+      const middle = new Injector({tag: 'middle', parent: root});
+      const leaf = new Injector({tag: 'leaf', parent: middle});
+
+      const rootToken = new Token<string>('root-token');
+      const middleToken = new Token<string>('middle-token');
+      const leafToken = new Token<string>('leaf-token');
+
+      // Register from leaf targeting different levels
+      leaf.register([
+        {provide: rootToken, useValue: 'root-value', at: 'root'},
+        {provide: middleToken, useValue: 'middle-value', at: 'middle'},
+        {provide: leafToken, useValue: 'leaf-value', at: 'leaf'},
+      ]);
+
+      // Verify registration at correct levels
+      expect(root.hasProviderFor(rootToken)).toBe(true);
+      expect(root.hasProviderFor(middleToken)).toBe(false);
+      expect(root.hasProviderFor(leafToken)).toBe(false);
+
+      expect(middle.hasProviderFor(rootToken)).toBe(false);
+      expect(middle.hasProviderFor(middleToken)).toBe(true);
+      expect(middle.hasProviderFor(leafToken)).toBe(false);
+
+      expect(leaf.hasProviderFor(rootToken)).toBe(false);
+      expect(leaf.hasProviderFor(middleToken)).toBe(false);
+      expect(leaf.hasProviderFor(leafToken)).toBe(true);
+
+      expect(leaf.inject(rootToken)).toBe('root-value');
+      expect(leaf.inject(middleToken)).toBe('middle-value');
+      expect(leaf.inject(leafToken)).toBe('leaf-value');
+    });
+
+    it('works for root target', () => {
+      const root = new Injector();
+      const middle = new Injector({tag: 'other', parent: root});
+      const leaf = new Injector({tag: 'another', parent: middle});
+      const token = new Token<string>('test');
+
+      // Register from leaf targeting root
+      leaf.register({provide: token, useValue: 'value', at: TAG_ROOT});
+
+      // Should skip middle and register on root
+      expect(root.hasProviderFor(token)).toBe(true);
+      expect(middle.hasProviderFor(token)).toBe(false);
+      expect(leaf.hasProviderFor(token)).toBe(false);
+      expect(leaf.inject(token)).toBe('value');
+    });
+
+    it('throws when no matching tag exists in entire hierarchy', () => {
+      const root = new Injector();
+      const middle = new Injector({tag: 'middle', parent: root});
+      const leaf = new Injector({tag: 'leaf', parent: middle});
+      const token = new Token<string>('test');
+
+      // Try to target non-existent tag
+      expect(() => {
+        leaf.register({provide: token, useValue: 'value', at: 'nonexistent'});
+      }).toThrow(NoMatchingTagError);
+    });
+
+    it('works with caching', () => {
+      const parent = new Injector({tag: 'parent'});
+      const child = parent.fork();
+
+      class TestService {
+        static instanceCount = 0;
+        constructor() {
+          TestService.instanceCount++;
+        }
+      }
+
+      // Register from child targeting parent
+      child.register({provide: TestService, useClass: TestService, at: 'parent'});
+
+      // Provider is on parent, so parent's cache is used
+      const instance1 = parent.inject(TestService);
+      expect(TestService.instanceCount).toBe(1);
+
+      const instance2 = child.inject(TestService);
+      expect(TestService.instanceCount).toBe(1);
+
+      expect(instance1).toBe(instance2);
+    });
+
+    it('works with overrides', () => {
+      const parent = new Injector({tag: 'parent', defaultAllowOverrides: true});
+      const child = new Injector({parent});
+      const token = new Token<string>('test');
+
+      // Register initial value on parent
+      parent.register({provide: token, useValue: 'original'});
+
+      // Override from child targeting parent (should work due to allowOverrides)
+      expect(() => {
+        child.register({provide: token, useValue: 'overridden', at: 'parent'});
+      }).not.toThrow();
+
+      expect(parent.inject(token)).toBe('overridden');
+      expect(child.inject(token)).toBe('overridden');
+    });
+
+    it('works for mixed providers arrays', () => {
+      const parent = new Injector({tag: 'parent'});
+      const child = new Injector({tag: 'child', parent});
+
+      const localToken = new Token<string>('local');
+      const parentToken = new Token<string>('parent');
+      const childToken = new Token<string>('child');
+
+      child.register([
+        {provide: localToken, useValue: 'local-value'}, // no 'at' - registers locally
+        {provide: parentToken, useValue: 'parent-value', at: 'parent'}, // targets parent
+        {provide: childToken, useValue: 'child-value', at: 'child'}, // targets self
+      ]);
+
+      // Verify registration locations
+      expect(child.hasProviderFor(localToken)).toBe(true);
+      expect(child.hasProviderFor(childToken)).toBe(true);
+      expect(child.hasProviderFor(parentToken)).toBe(false);
+
+      expect(parent.hasProviderFor(parentToken)).toBe(true);
+      expect(parent.hasProviderFor(localToken)).toBe(false);
+      expect(parent.hasProviderFor(childToken)).toBe(false);
+
+      // All accessible from child
+      expect(child.inject(localToken)).toBe('local-value');
+      expect(child.inject(parentToken)).toBe('parent-value');
+      expect(child.inject(childToken)).toBe('child-value');
+    });
+
+    it('works with sink injector in hierarchy', () => {
+      const root = new Injector(); // TAG_ROOT
+      const sink = new Injector({tag: TAG_SINK, parent: root});
+      const child = new Injector({parent: sink});
+
+      const token1 = new Token<string>('token1');
+      const token2 = new Token<string>('token2');
+      const token3 = new Token<string>('token3');
+
+      // Register from child with various 'at' values
+      // sink should capture all, except local
+      child.register([
+        {provide: token1, useValue: 'value1', at: 'root'},
+        {provide: token2, useValue: 'value2', at: 'nonexistent'},
+        {provide: token3, useValue: 'value3'},
+      ]);
+
+      // All should be registered on sink despite different 'at' values
+      expect(child.hasProviderFor(token1)).toBe(false);
+      expect(child.hasProviderFor(token2)).toBe(false);
+      expect(child.hasProviderFor(token3)).toBe(true);
+
+      expect(sink.hasProviderFor(token1)).toBe(true);
+      expect(sink.hasProviderFor(token2)).toBe(true);
+      expect(sink.hasProviderFor(token3)).toBe(false);
+
+      expect(root.hasProviderFor(token1)).toBe(false);
+      expect(root.hasProviderFor(token2)).toBe(false);
+      expect(root.hasProviderFor(token3)).toBe(false);
+
+      // All should resolve correctly from child
+      expect(child.inject(token1)).toBe('value1');
+      expect(child.inject(token2)).toBe('value2');
+      expect(child.inject(token3)).toBe('value3');
     });
   });
 });

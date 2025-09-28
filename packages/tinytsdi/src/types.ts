@@ -49,7 +49,8 @@ export class Token<T> {
   }
 }
 
-/** Normalizes tag values to symbols for internal use */
-export function normalizeTag(tag: TagValue): symbol {
+/** Returns normalized tag or null if undefined */
+export function normalizeTag(tag: TagValue | null | undefined): symbol | null {
+  if (!tag) return null;
   return typeof tag === 'string' ? Symbol.for(tag) : tag;
 }

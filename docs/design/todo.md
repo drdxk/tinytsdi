@@ -75,7 +75,7 @@ is found, throw an error.
   - Test `getParent()` method returns correct parent reference
   - Update `CHANGELOG.md` draft entry for v3.1.0.
 
-**4. Injector Changes, registration (`src/injector.ts`):**
+**4. ✅ Injector Changes, registration (`src/injector.ts`):**
 
 - Add `NoMatchingTagError` class to `src/errors.ts` for when no injector with matching tag found in
   hierarchy

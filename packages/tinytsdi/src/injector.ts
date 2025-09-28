@@ -3,6 +3,7 @@
 import {
   AlreadyProvidedError,
   NeverCachedError,
+  NoMatchingTagError,
   NotProvidedError,
   UnknownProviderError,
 } from './errors.js';
@@ -13,7 +14,7 @@ import {
   isFactoryProvider,
   isValueProvider,
 } from './providers.js';
-import {TAG_ROOT, normalizeTag} from './types.js';
+import {TAG_ROOT, TAG_SINK, normalizeTag} from './types.js';
 
 import type {GenericProvider, Provider} from './providers.js';
 import type {GenericInjectionId, InjectionId, TagValue} from './types.js';
@@ -59,6 +60,8 @@ interface InjectorProvider {
   cache: boolean;
   /** Function that creates/returns the provider's value. */
   resolve: () => unknown;
+  /** Target tag for this provider (normalized symbol or null). */
+  at: symbol | null;
 }
 
 /** Main dependency injection container that manages providers and resolved values. */
@@ -81,13 +84,7 @@ export class Injector {
   constructor(options?: InjectorOptions) {
     this.defaultAllowOverrides = options?.defaultAllowOverrides ?? false;
     this.parent = options?.parent ?? null;
-
-    // Set tag: use provided tag, or TAG_ROOT if no parent, or null if has parent
-    if (options?.tag !== undefined) {
-      this.tag = normalizeTag(options.tag);
-    } else {
-      this.tag = this.parent === null ? TAG_ROOT : null;
-    }
+    this.tag = normalizeTag(options?.tag) || (this.parent ? null : TAG_ROOT);
   }
 
   /** @returns The parent injector, or null if this is a root injector. */
@@ -156,6 +153,8 @@ export class Injector {
    * @throws {@link AlreadyProvidedError} - When attempting to register a provider that already
    *   exists and allowOverrides is false.
    * @throws {@link UnknownProviderError} - When provider type is not supported.
+   * @throws {@link NoMatchingTagError} - When provider has 'at' property but no matching tag is
+   *   found in hierarchy.
    */
   register<T>(
     providerOrProviders: Provider<T> | GenericProvider[],
@@ -165,23 +164,9 @@ export class Injector {
       ? providerOrProviders
       : [providerOrProviders];
 
-    const throwOnOverride = !(allowOverrides !== undefined
-      ? allowOverrides
-      : this.defaultAllowOverrides);
-
     for (const provider of providerArray) {
       const injectorProvider = this.createInjectorProvider(provider);
-
-      if (this.providers.has(injectorProvider.id)) {
-        // Provider already exists, check if overrides are allowed
-        if (throwOnOverride) {
-          throw new AlreadyProvidedError(injectorProvider.id);
-        }
-        // Clear cache when overriding
-        this.cache.delete(injectorProvider.id);
-      }
-
-      this.providers.set(injectorProvider.id, injectorProvider);
+      this.registerInternal(injectorProvider, allowOverrides);
     }
   }
 
@@ -335,6 +320,7 @@ export class Injector {
         id: provider,
         cache: true,
         resolve: () => new provider(this.boundInject),
+        at: null,
       };
     }
 
@@ -343,6 +329,7 @@ export class Injector {
         id: provider.provide,
         cache: false, // Value providers are never cached
         resolve: () => provider.useValue,
+        at: normalizeTag(provider.at),
       };
     }
 
@@ -358,6 +345,7 @@ export class Injector {
             return new provider.useClass();
           }
         },
+        at: normalizeTag(provider.at),
       };
     }
 
@@ -366,6 +354,7 @@ export class Injector {
         id: provider.provide,
         cache: !provider.noCache,
         resolve: () => provider.useFactory(this.boundInject),
+        at: normalizeTag(provider.at),
       };
     }
 
@@ -374,9 +363,49 @@ export class Injector {
         id: provider.provide,
         cache: false, // Existing providers delegate to the target provider's caching
         resolve: () => this.inject(provider.useExisting),
+        at: normalizeTag(provider.at),
       };
     }
 
     throw new UnknownProviderError(provider);
+  }
+
+  /**
+   * Register an injector provider with the current injector or delegates to parent depending on
+   * provider targeting.
+   *
+   * @param injectorProvider - The internal provider wrapper to register.
+   * @param allowOverrides - Whether to allow overriding existing providers.
+   * @throws {@link AlreadyProvidedError} - When attempting to register a provider that already
+   *   exists and allowOverrides is false.
+   * @throws {@link NoMatchingTagError} - When provider has 'at' property but no matching tag is
+   *   found in hierarchy.
+   */
+  private registerInternal(
+    injectorProvider: InjectorProvider,
+    allowOverrides: boolean | undefined
+  ): void {
+    // Check if provider is targeting a different injector
+    if (injectorProvider.at && this.tag !== TAG_SINK && this.tag !== injectorProvider.at) {
+      // Provider is targetting a different injector and current injector is not a sink
+      if (this.parent) {
+        // Delegate to parent
+        return this.parent.registerInternal(injectorProvider, allowOverrides);
+      }
+      // No matching injector found
+      throw new NoMatchingTagError(injectorProvider.at);
+    }
+
+    if (this.providers.has(injectorProvider.id)) {
+      // Provider already exists, check if overrides are allowed
+      const throwOnOverride = !(allowOverrides ?? this.defaultAllowOverrides);
+      if (throwOnOverride) {
+        throw new AlreadyProvidedError(injectorProvider.id);
+      }
+      // Clear cache when overriding
+      this.cache.delete(injectorProvider.id);
+    }
+
+    this.providers.set(injectorProvider.id, injectorProvider);
   }
 }

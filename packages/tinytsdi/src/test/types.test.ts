@@ -22,7 +22,7 @@ describe('Token', () => {
   });
 });
 
-describe('normalizeTag', () => {
+describe('normalizeTag()', () => {
   it('converts string to symbol using Symbol.for', () => {
     const result = normalizeTag('test');
     expect(result).toBe(Symbol.for('test'));
@@ -30,7 +30,7 @@ describe('normalizeTag', () => {
   });
 
   it('returns symbol unchanged', () => {
-    const symbol = Symbol('test');
+    const symbol = Symbol();
     const result = normalizeTag(symbol);
     expect(result).toBe(symbol);
     expect(typeof result).toBe('symbol');
@@ -70,5 +70,20 @@ describe('normalizeTag', () => {
     expect(normalizeTag(Symbol.for('sink'))).toBe(TAG_SINK);
     expect(normalizeTag(TAG_ROOT)).toBe(TAG_ROOT);
     expect(normalizeTag(TAG_SINK)).toBe(TAG_SINK);
+  });
+
+  it('returns null for undefined', () => {
+    const result = normalizeTag(undefined);
+    expect(result).toBeNull();
+  });
+
+  it('returns null for null', () => {
+    const result = normalizeTag(null);
+    expect(result).toBeNull();
+  });
+
+  it('returns null for empty string', () => {
+    const result = normalizeTag('');
+    expect(result).toBeNull();
   });
 });

@@ -238,19 +238,26 @@ describe('TagValue', () => {
 });
 
 describe('normalizeTag()', () => {
-  it('accepts TagValue and returns symbol', () => {
-    const stringResult: symbol = normalizeTag('test');
-    const symbolResult: symbol = normalizeTag(Symbol('test'));
+  it('accepts TagValue', () => {
+    const stringResult: symbol | null = normalizeTag('test');
+    const symbolResult: symbol | null = normalizeTag(Symbol('test'));
     void stringResult;
     void symbolResult;
   });
 
-  it('rejects invalid argument types', () => {
-    // @ts-expect-error - number not assignable to TagValue
-    const numberResult: symbol = normalizeTag(42);
+  it('accepts undefined and null', () => {
+    const undefinedResult: symbol | null = normalizeTag(undefined);
+    const nullResult: symbol | null = normalizeTag(null);
+    void undefinedResult;
+    void nullResult;
+  });
 
-    // @ts-expect-error - object not assignable to TagValue
-    const objectResult: symbol = normalizeTag({});
+  it('rejects invalid argument types', () => {
+    // @ts-expect-error - number not assignable to TagValue | null | undefined
+    const numberResult: symbol | null = normalizeTag(42);
+
+    // @ts-expect-error - object not assignable to TagValue | null | undefined
+    const objectResult: symbol | null = normalizeTag({});
 
     void numberResult;
     void objectResult;

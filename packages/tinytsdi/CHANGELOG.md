@@ -8,18 +8,17 @@
 
 - Tag type and constants
   - `TagValue` type for string or symbol tag values
-  - `TAG_ROOT` constant - automatically added for any injector without parent that doesn't
-    explicitly specify one
-  - `TAG_SINK` constant - sink injector ignores `at` property of providers and registers all
-    incoming providers
-- Injector tagging
+  - `TAG_ROOT` constant - automatically assigned to injectors without parent that don't explicitly specify a tag
+  - `TAG_SINK` constant - sink injectors ignore `at` property and register all incoming providers locally
   - `InjectorOptions` now has optional `tag?: TagValue` property
   - Injectors automatically tagged as `TAG_ROOT` when no parent and no tag specified
-  - Otherwise an injector has `null` tag by default unless explicitly tagged
-  - `getTag(): symbol | null` method to retrieve injector's tag
+  - Child injectors have `null` tag by default unless explicitly tagged
+  - `getTag(): symbol | null` method to retrieve injector's normalized tag
 - Provider targeting with `at` property
   - All provider types (`ValueProvider`, `ClassProvider`, `FactoryProvider`, `ExistingProvider`) now support optional `at?: TagValue` property
-  - Providers with `at` property will only register on injectors with matching tags
+  - Providers with `at` property will only register on injectors with matching tags in the hierarchy
+  - Provider registration delegates up the hierarchy until a matching tag is found
+  - Sink injectors (`TAG_SINK`) ignore `at` property and register all providers locally
   - Providers without `at` property register on the current injector (existing behavior)
 
 **Misc:**

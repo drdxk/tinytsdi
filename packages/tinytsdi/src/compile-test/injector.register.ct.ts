@@ -24,7 +24,9 @@ describe('Injector.register', () => {
   describe('ValueProvider', () => {
     it('accepts compatible types', () => {
       injector.register({provide: STRING, useValue: 'test string'});
+      injector.register({provide: STRING, useValue: 'test string', at: 'custom'});
       injector.register({provide: NUMBER, useValue: 42});
+      injector.register({provide: NUMBER, useValue: 42, at: Symbol.for('custom')});
       injector.register({provide: SERVICE, useValue: new Service('test service')});
     });
 
@@ -35,6 +37,8 @@ describe('Injector.register', () => {
       injector.register({provide: NUMBER, useValue: 'not a number'});
       // @ts-expect-error - Service2NoArgs not assignable to Service
       injector.register({provide: SERVICE, useValue: new Service2NoArgs()});
+      // @ts-expect-error - number not assignable to TagValue
+      injector.register({provide: STRING, useValue: 'test', at: 42});
     });
   });
 
@@ -52,6 +56,7 @@ describe('Injector.register', () => {
       injector.register({
         provide: SERVICE,
         useExisting: Service,
+        at: 'custom',
       });
     });
 
@@ -70,6 +75,15 @@ describe('Injector.register', () => {
         useExisting: Service2NoArgs,
       });
     });
+
+    it('rejects invalid provider types', () => {
+      // @ts-expect-error - Types of property 'injectFn' are incompatible.
+      injector.register({provide: SERVICE, useExisting: Service, injectFn: []});
+      // @ts-expect-error - Types of property 'noCache' are incompatible.
+      injector.register({provide: SERVICE, useExisting: Service, noCache: {}});
+      // @ts-expect-error - number not assignable to TagValue
+      injector.register({provide: SERVICE, useExisting: Service, at: 42});
+    });
   });
 
   describe('FactoryProvider', () => {
@@ -86,11 +100,13 @@ describe('Injector.register', () => {
           return str.length;
         },
         noCache: true,
+        at: 'custom',
       });
 
       injector.register({
         provide: SERVICE,
         useFactory: () => new Service('from factory'),
+        at: Symbol('custom'),
       });
     });
 
@@ -112,6 +128,21 @@ describe('Injector.register', () => {
       injector.register({
         provide: SERVICE,
         useFactory: () => new Service2NoArgs(),
+      });
+    });
+
+    it('rejects invalid provider types', () => {
+      // @ts-expect-error - Types of property 'noCache' are incompatible.
+      injector.register({
+        provide: STRING,
+        useFactory: () => 'test',
+        noCache: 42,
+      });
+      injector.register({
+        provide: STRING,
+        useFactory: () => 'test',
+        // @ts-expect-error - number not assignable to TagValue
+        at: 42,
       });
     });
   });
@@ -143,8 +174,17 @@ describe('Injector.register', () => {
       injector.register({
         provide: SERVICE_WITH_INJECT,
         useClass: ServiceWithInject,
+        at: 'custom',
         noCache: true,
         injectFn: true,
+      });
+
+      injector.register({
+        provide: SERVICE_NO_ARGS,
+        useClass: ServiceNoArgs,
+        at: Symbol('custom'),
+        noCache: false,
+        injectFn: false,
       });
     });
 
@@ -172,6 +212,13 @@ describe('Injector.register', () => {
         provide: SERVICE_NO_ARGS,
         useClass: ServiceNoArgs,
         noCache: 'invalid',
+      });
+
+      injector.register({
+        provide: SERVICE_NO_ARGS,
+        useClass: ServiceNoArgs,
+        // @ts-expect-error - number not assignable to TagValue
+        at: 42,
       });
     });
   });
@@ -209,7 +256,7 @@ describe('Injector.register', () => {
     it('accepts arrays of valid providers', () => {
       injector.register([
         {provide: STRING, useValue: 'test'},
-        {provide: NUMBER, useValue: 42},
+        {provide: NUMBER, useValue: 42, at: 'custom'},
       ]);
 
       injector.register([
@@ -218,6 +265,8 @@ describe('Injector.register', () => {
         {
           provide: STRING,
           useFactory: () => 'from factory',
+          noCache: true,
+          at: Symbol('custom'),
         },
       ]);
     });
