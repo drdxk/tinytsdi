@@ -3,7 +3,7 @@ packages:
 
 catalogs:
   build:
-    vite: ^7.1.6
+    vite: ^7.1.7
     vite-plugin-dts: ^4.5.4
   dev:
     eslint: ^9.36.0
