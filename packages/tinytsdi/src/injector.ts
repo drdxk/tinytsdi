@@ -19,6 +19,8 @@ import {TAG_ROOT, TAG_SINK, normalizeTag} from './types.js';
 import type {GenericProvider, Provider} from './providers.js';
 import type {GenericInjectionId, InjectionId, TagValue} from './types.js';
 
+// TODO: move types to a separate file (injector_types.ts). Re-export public types from index.ts.
+
 /** Configuration options for Injector instance. */
 export interface InjectorOptions {
   /**
@@ -28,8 +30,13 @@ export interface InjectorOptions {
   defaultAllowOverrides?: boolean;
   /** Parent injector. Defaults to null. */
   parent?: Injector | null;
-  /** Tag for this injector. Defaults to TAG_ROOT if no parent, null if has parent. */
-  tag?: TagValue;
+  /**
+   * Tag for this injector.
+   *
+   * - If not set (undefined), defaults to TAG_ROOT if no parent, null if has parent.
+   * - If explicitly set (including null), uses the provided value.
+   */
+  tag?: TagValue | null;
 }
 
 /** Configuration options for copying an injector with Injector.copy(). */
@@ -50,6 +57,13 @@ export interface CopyOptions {
    * - If explicitly set (including null), uses the provided value.
    */
   parent?: Injector | null;
+  /**
+   * Tag for the new injector.
+   *
+   * - If not set (undefined), uses the current instance's tag.
+   * - If explicitly set (including null), uses the provided value.
+   */
+  tag?: TagValue | null;
 }
 
 /** Internal provider wrapper that provides a uniform interface for all provider types. */
@@ -84,7 +98,8 @@ export class Injector {
   constructor(options?: InjectorOptions) {
     this.defaultAllowOverrides = options?.defaultAllowOverrides ?? false;
     this.parent = options?.parent ?? null;
-    this.tag = normalizeTag(options?.tag) || (this.parent ? null : TAG_ROOT);
+    this.tag =
+      options?.tag !== undefined ? normalizeTag(options.tag) : this.parent ? null : TAG_ROOT;
   }
 
   /** @returns The parent injector, or null if this is a root injector. */
@@ -123,10 +138,12 @@ export class Injector {
       options?.defaultAllowOverrides !== undefined
         ? options.defaultAllowOverrides
         : this.defaultAllowOverrides;
+    const tag = options?.tag !== undefined ? options.tag : this.tag;
 
     const newInjector = new Injector({
       defaultAllowOverrides,
       parent,
+      tag,
     });
 
     // Copy all providers

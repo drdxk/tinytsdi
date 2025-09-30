@@ -49,6 +49,8 @@ export class Token<T> {
   }
 }
 
+// TODO: move normalizeTag to types_internal.ts (no re-export from index.ts).
+
 /** Returns normalized tag or null if undefined */
 export function normalizeTag(tag: TagValue | null | undefined): symbol | null {
   if (!tag) return null;

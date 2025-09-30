@@ -108,9 +108,9 @@ is found, throw an error.
     - Testing with arrays of mixed providers (some with `at`, some without)
 - Update `CHANGELOG.md` draft entry for v3.1.0.
 
-**5. Injector Changes, copy() method (`src/injector.ts`):**
+**5. ✅ Injector Changes, copy() method (`src/injector.ts`):**
 
-- Extend `CopyOptions` interface with `tag?: TagValue` property
+- Extend `CopyOptions` interface with `tag?: TagValue | null` property
 - Update `copy()` method: use `options.tag` if specified, otherwise copy current tag.
 - Update compile tests (`src/compile-test/injector.meta.ct.ts`):
   - Add tests in existing `describe('copy()')` section for `tag` property

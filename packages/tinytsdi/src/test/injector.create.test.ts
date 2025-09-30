@@ -6,6 +6,8 @@ import {NotProvidedError} from '../errors.js';
 import {Injector} from '../injector.js';
 import {InjectFn, TAG_ROOT, TAG_SINK, Token} from '../types.js';
 
+// TODO: split this into multiple files.
+
 describe('Injector creation', () => {
   describe('constructor', () => {
     it('creates injector with default allowOverrides=false', () => {
@@ -77,6 +79,16 @@ describe('Injector creation', () => {
       const parent = new Injector();
       const child = new Injector({parent, tag: 'override'});
       expect(child.getTag()).toBe(Symbol.for('override'));
+    });
+
+    it('assigns null tag when explicitly specified', () => {
+      const injector = new Injector({tag: null});
+      expect(injector.getTag()).toBe(null);
+    });
+
+    it('overrides default TAG_ROOT with explicit null tag', () => {
+      const injector = new Injector({tag: null});
+      expect(injector.getTag()).toBe(null);
     });
 
     it('root injector does not have a parent', () => {
@@ -243,6 +255,58 @@ describe('Injector creation', () => {
 
       expect(childInjector.inject(token)).toBe('original parent');
       expect(newInjector.inject(token)).toBe('new parent');
+    });
+
+    it('creates new injector with tag preserved by default', () => {
+      const sourceInjector = new Injector({tag: 'custom'});
+      const newInjector = sourceInjector.copy();
+
+      expect(newInjector.getTag()).toBe(Symbol.for('custom'));
+    });
+
+    it('creates new injector with explicit string tag', () => {
+      const sourceInjector = new Injector({tag: 'original'});
+      const newInjector = sourceInjector.copy({tag: 'new'});
+
+      expect(sourceInjector.getTag()).toBe(Symbol.for('original'));
+      expect(newInjector.getTag()).toBe(Symbol.for('new'));
+    });
+
+    it('creates new injector with explicit symbol tag', () => {
+      const originalTag = Symbol('original');
+      const newTag = Symbol('new');
+      const sourceInjector = new Injector({tag: originalTag});
+      const newInjector = sourceInjector.copy({tag: newTag});
+
+      expect(sourceInjector.getTag()).toBe(originalTag);
+      expect(newInjector.getTag()).toBe(newTag);
+    });
+
+    it('creates new injector with explicit null tag', () => {
+      const sourceInjector = new Injector({tag: 'original'});
+      const newInjector = sourceInjector.copy({tag: null});
+
+      expect(sourceInjector.getTag()).toBe(Symbol.for('original'));
+      expect(newInjector.getTag()).toBe(null);
+    });
+
+    it('creates new injector with tag combined with other options', () => {
+      const parentInjector = new Injector();
+      const sourceInjector = new Injector({
+        parent: parentInjector,
+        tag: 'original',
+        defaultAllowOverrides: false,
+      });
+
+      const newInjector = sourceInjector.copy({
+        tag: 'new',
+        copyCache: true,
+        parent: null,
+        defaultAllowOverrides: true,
+      });
+
+      expect(newInjector.getTag()).toBe(Symbol.for('new'));
+      expect(newInjector.getParent()).toBe(null);
     });
 
     it('creates new injector with multiple providers copied', () => {

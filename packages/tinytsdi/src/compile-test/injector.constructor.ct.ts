@@ -61,6 +61,11 @@ describe('Injector constructor', () => {
     void injector;
   });
 
+  it('accepts options with null tag', () => {
+    const injector: Injector = new Injector({tag: null});
+    void injector;
+  });
+
   it('rejects invalid tag types', () => {
     // @ts-expect-error - number not assignable to TagValue
     const invalidInjector1: Injector = new Injector({tag: 42});

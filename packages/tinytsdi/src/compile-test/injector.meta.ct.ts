@@ -83,11 +83,36 @@ describe('Injector meta methods', () => {
       );
     });
 
+    it('accepts valid values for tag option', () => {
+      const withStringTag: Injector = injector.copy({tag: 'test'});
+      const withSymbolTag: Injector = injector.copy({tag: Symbol('test')});
+      const withNullTag: Injector = injector.copy({tag: null});
+      void withStringTag;
+      void withSymbolTag;
+      void withNullTag;
+    });
+
+    it('rejects invalid values for tag option', () => {
+      injector.copy(
+        // @ts-expect-error - tag must be TagValue or null
+        {tag: 42}
+      );
+      injector.copy(
+        // @ts-expect-error - tag must be TagValue or null
+        {tag: {}}
+      );
+      injector.copy(
+        // @ts-expect-error - tag must be TagValue or null
+        {tag: []}
+      );
+    });
+
     it('accepts all options together', () => {
       const newInjector: Injector = injector.copy({
         copyCache: true,
         parent: null,
         defaultAllowOverrides: true,
+        tag: 'test',
       });
       void newInjector;
     });

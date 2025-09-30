@@ -10,7 +10,7 @@
   - `TagValue` type for string or symbol tag values
   - `TAG_ROOT` constant - automatically assigned to injectors without parent that don't explicitly specify a tag
   - `TAG_SINK` constant - sink injectors ignore `at` property and register all incoming providers locally
-  - `InjectorOptions` now has optional `tag?: TagValue` property
+  - `InjectorOptions` now has optional `tag?: TagValue | null` property
   - Injectors automatically tagged as `TAG_ROOT` when no parent and no tag specified
   - Child injectors have `null` tag by default unless explicitly tagged
   - `getTag(): symbol | null` method to retrieve injector's normalized tag
@@ -20,6 +20,9 @@
   - Provider registration delegates up the hierarchy until a matching tag is found
   - Sink injectors (`TAG_SINK`) ignore `at` property and register all providers locally
   - Providers without `at` property register on the current injector (existing behavior)
+- `CopyOptions` now supports `tag?: TagValue | null` property
+  - When not specified, copied injector preserves the original injector's tag
+  - When explicitly set (including `null`), copied injector uses the provided tag value
 
 **Misc:**
 
