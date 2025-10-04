@@ -162,7 +162,7 @@ is found, throw an error.
   - Test integration with existing global API e2e functionality
 - Update `CHANGELOG.md` draft entry for v3.1.0.
 
-**9. E2E Testing:**
+**9. ✅ E2E Testing:**
 
 - Move existing hierarchy tests from `packages/e2e-core/src/injector.e2e.test.ts` to new file
   `packages/e2e-core/src/hierarchy.e2e.test.ts`:
