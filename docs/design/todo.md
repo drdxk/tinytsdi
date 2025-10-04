@@ -124,9 +124,9 @@ is found, throw an error.
   - Test tag behavior combined with other copy options
 - Update `CHANGELOG.md` draft entry for v3.1.0.
 
-**6. Injector Changes, fork() method (`src/injector.ts`):**
+**6. ✅ Injector Changes, fork() method (`src/injector.ts`):**
 
-- Create `ForkOptions` interface with `tag?: TagValue` and `defaultAllowOverrides?: boolean`
+- Create `ForkOptions` interface with `tag?: TagValue | null` and `defaultAllowOverrides?: boolean`
   properties
 - Update `fork()` method signature from `fork()` to `fork(options?: ForkOptions)`
 - Update `fork()` method: assign `null` tag by default, allow override with `options.tag`
@@ -143,7 +143,9 @@ is found, throw an error.
     - Test `fork()` with combined options (`tag` and `defaultAllowOverrides`)
 - Update `CHANGELOG.md` draft entry for v3.1.0.
 
-**7. Global API (`src/global.ts`):**
+**7. Address TODOs in code**
+
+**8. Global API (`src/global.ts`):**
 
 - Update `newTestInjector(options?: InjectorOptions)` to default tag to `TAG_SINK` if not specified
 - Document that test injectors use `TAG_SINK` by default for predictable testing behavior
@@ -160,7 +162,7 @@ is found, throw an error.
   - Test integration with existing global API e2e functionality
 - Update `CHANGELOG.md` draft entry for v3.1.0.
 
-**8. E2E Testing (`packages/e2e-core/src/injector.e2e.test.ts`):**
+**9. E2E Testing (`packages/e2e-core/src/injector.e2e.test.ts`):**
 
 - Update existing multi-level hierarchy tests to include tag functionality
 - Add simple test in existing hierarchy section to verify multi-level hierarchy with tags and tagged
@@ -168,7 +170,7 @@ is found, throw an error.
 - Test end-to-end behavior of provider targeting across hierarchy levels
 - Verify real-world usage scenarios of tag-based provider registration
 
-**9. Documentation Updates:**
+**10. Documentation Updates:**
 
 Update `README.md` to document new `at` property for providers, `tag` option for injectors, Injector
 constructor and affected methods.

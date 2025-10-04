@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.1.0] - TBD
+## [3.1.0] - WIP
 
 ### Added
 
@@ -8,14 +8,17 @@
 
 - Tag type and constants
   - `TagValue` type for string or symbol tag values
-  - `TAG_ROOT` constant - automatically assigned to injectors without parent that don't explicitly specify a tag
-  - `TAG_SINK` constant - sink injectors ignore `at` property and register all incoming providers locally
+  - `TAG_ROOT` constant - automatically assigned to injectors without parent that don't explicitly
+    specify a tag
+  - `TAG_SINK` constant - sink injectors ignore `at` property and register all incoming providers
+    locally
   - `InjectorOptions` now has optional `tag?: TagValue | null` property
   - Injectors automatically tagged as `TAG_ROOT` when no parent and no tag specified
   - Child injectors have `null` tag by default unless explicitly tagged
   - `getTag(): symbol | null` method to retrieve injector's normalized tag
 - Provider targeting with `at` property
-  - All provider types (`ValueProvider`, `ClassProvider`, `FactoryProvider`, `ExistingProvider`) now support optional `at?: TagValue` property
+  - All provider types (`ValueProvider`, `ClassProvider`, `FactoryProvider`, `ExistingProvider`) now
+    support optional `at?: TagValue` property
   - Providers with `at` property will only register on injectors with matching tags in the hierarchy
   - Provider registration delegates up the hierarchy until a matching tag is found
   - Sink injectors (`TAG_SINK`) ignore `at` property and register all providers locally
@@ -23,6 +26,10 @@
 - `CopyOptions` now supports `tag?: TagValue | null` property
   - When not specified, copied injector preserves the original injector's tag
   - When explicitly set (including `null`), copied injector uses the provided tag value
+- `ForkOptions` interface for configuring child injector creation with `injector.fork()`
+  - `defaultAllowOverrides?: boolean` - Override setting for child injector (default: current
+    instance's setting)
+  - `tag?: TagValue | null` - Tag for child injector (default: `null`)
 
 **Misc:**
 

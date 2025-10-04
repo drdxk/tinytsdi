@@ -66,6 +66,24 @@ export interface CopyOptions {
   tag?: TagValue | null;
 }
 
+/** Configuration options for forking an injector with Injector.fork(). */
+export interface ForkOptions {
+  /**
+   * Whether to allow provider overrides by default in the child injector.
+   *
+   * - If not set (undefined), uses the current instance's defaultAllowOverrides setting.
+   * - If explicitly set (true/false), uses the provided value.
+   */
+  defaultAllowOverrides?: boolean;
+  /**
+   * Tag for the child injector.
+   *
+   * - If not set (undefined), defaults to null (child injectors have no tag by default).
+   * - If explicitly set (including null), uses the provided value.
+   */
+  tag?: TagValue | null;
+}
+
 /** Internal provider wrapper that provides a uniform interface for all provider types. */
 interface InjectorProvider {
   /** The injection identifier (token or constructor). */
@@ -115,13 +133,20 @@ export class Injector {
   /**
    * Creates a child injector with the current injector as its parent.
    *
-   * @returns A new Injector instance with the current injector as parent, using the same
-   *   defaultAllowOverrides setting.
+   * @param options - Configuration options for the child injector.
+   * @returns A new Injector instance with the current injector as parent.
    */
-  fork(): Injector {
+  fork(options?: ForkOptions): Injector {
+    const defaultAllowOverrides =
+      options?.defaultAllowOverrides !== undefined
+        ? options.defaultAllowOverrides
+        : this.defaultAllowOverrides;
+    const tag = options?.tag !== undefined ? options.tag : null;
+
     return new Injector({
-      defaultAllowOverrides: this.defaultAllowOverrides,
+      defaultAllowOverrides,
       parent: this,
+      tag,
     });
   }
 
