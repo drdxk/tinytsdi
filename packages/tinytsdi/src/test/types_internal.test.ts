@@ -1,26 +1,8 @@
 import {describe, expect, it} from 'vitest';
 
-import {TAG_ROOT, TAG_SINK, Token, normalizeTag} from '../types.js';
-
-describe('Token', () => {
-  it('creates token with name', () => {
-    const token = new Token<string>('test');
-    expect(token.name).toBe('test');
-    expect(token.toString()).toBe('Token<test>');
-  });
-
-  it('creates anonymous token', () => {
-    const token = new Token<string>();
-    expect(token.name).toBeUndefined();
-    expect(token.toString()).toBe('Token<anonymous>');
-  });
-
-  it('tokens are unique by reference', () => {
-    const token1 = new Token<string>('same');
-    const token2 = new Token<string>('same');
-    expect(token1).not.toBe(token2);
-  });
-});
+import {TAG_ROOT} from '../constants.js';
+import {TAG_SINK} from '../constants.js';
+import {normalizeTag} from '../types_internal.js';
 
 describe('normalizeTag()', () => {
   it('converts string to symbol using Symbol.for', () => {

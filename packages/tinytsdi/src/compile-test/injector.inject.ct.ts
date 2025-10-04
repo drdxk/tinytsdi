@@ -12,7 +12,7 @@ import {
   it,
 } from './ct_helper';
 
-describe('Injector.inject', () => {
+describe('Injector.inject()', () => {
   const injector = new Injector();
 
   describe('InjectionId', () => {

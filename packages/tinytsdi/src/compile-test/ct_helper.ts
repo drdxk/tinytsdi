@@ -1,6 +1,6 @@
 /** Helper functions to structure compile tests. */
 
-import {Token} from '../types';
+import {Token} from '../token';
 
 import type {InjectFn} from '../types';
 

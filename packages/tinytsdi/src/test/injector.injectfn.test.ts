@@ -1,7 +1,8 @@
 import {describe, expect, it} from 'vitest';
 
 import {Injector} from '../injector.js';
-import {InjectFn, Token} from '../types.js';
+import {Token} from '../token.js';
+import {InjectFn} from '../types.js';
 
 describe('Injector inject function', () => {
   describe('works in', () => {

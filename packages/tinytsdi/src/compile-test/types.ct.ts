@@ -1,5 +1,7 @@
 /** Type tests for core types. */
-import {TAG_ROOT, TAG_SINK, Token, normalizeTag} from '../types.js';
+import {TAG_ROOT, TAG_SINK} from '../constants.js';
+import {Token} from '../token.js';
+import {normalizeTag} from '../types_internal.js';
 
 import {
   STRING,

@@ -1,8 +1,8 @@
 /** Error classes for tinytsdi */
 
-import {Token} from './types.js';
+import {Token} from './token.js';
 
-import type {GenericInjectionId} from './types.js';
+import type {GenericInjectionId} from './types_internal.js';
 
 /** Error thrown when attempting to register a provider that already exists */
 export class AlreadyProvidedError extends Error {

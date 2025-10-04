@@ -1,13 +1,12 @@
 /** TypeScript Dependency Injection library - Main exports */
 
-// Re-export all types
+// Re-export all public types and classes
+export * from './constants.js';
 export * from './errors.js';
+export * from './injector.js';
 export * from './providers.js';
+export * from './token.js';
 export * from './types.js';
-
-// Re-export Injector class
-export {Injector} from './injector.js';
-export type {CopyOptions, InjectorOptions} from './injector.js';
 
 // Re-export global API functions
 export {

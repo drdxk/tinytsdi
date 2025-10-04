@@ -1,8 +1,9 @@
 import {describe, expect, it} from 'vitest';
 
+import {TAG_ROOT, TAG_SINK} from '../constants.js';
 import {AlreadyProvidedError, NoMatchingTagError, UnknownProviderError} from '../errors.js';
 import {Injector} from '../injector.js';
-import {TAG_ROOT, TAG_SINK, Token} from '../types.js';
+import {Token} from '../token.js';
 
 describe('Injector.register()', () => {
   describe('providers support', () => {

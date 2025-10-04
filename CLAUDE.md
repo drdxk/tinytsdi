@@ -45,7 +45,10 @@ This is a monorepo managed with Turborepo and pnpm workspaces containing:
 - `src/injector.ts` - Injector class implementation
 - `src/global.ts` - Global container API
 - `src/providers.ts` - Provider type definitions and logic
-- `src/types.ts` - Core TypeScript types
+- `src/token.ts` - Token creation and management
+- `src/types.ts` - Public TypeScript types
+- `src/types_internal.ts` - Internal type definitions
+- `src/constants.ts` - Shared constants
 - `src/errors.ts` - Custom error classes
 
 **Global API**: `register()`, `inject()`, `getInjector()` **Injector Methods**: `injector.copy()`,
@@ -54,10 +57,16 @@ This is a monorepo managed with Turborepo and pnpm workspaces containing:
 
 ## Development Notes
 
-- ES modules only (`"type": "module"`)
-- Tests in `src/test/*.test.ts`, compile tests in `src/compile-test/*.ct.ts`
-- E2E tests in `packages/e2e-core/src/*.e2e.test.ts`
-- Uses `vitest` for testing with `describe`/`it` blocks
+- Dual build output: ES modules (main) + CommonJS (dist/cjs/, dist/esm/)
+- Tests: `packages/tinytsdi/src/test/*.test.ts` (vitest with describe/it blocks)
+- Compile tests: `packages/tinytsdi/src/compile-test/*.ct.ts` (type-only verification)
+- E2E tests: `packages/e2e-core/src/*.e2e.test.ts`
 - Prefer `function` keyword for top-level declarations
 - Uses pnpm workspaces with catalog dependencies for version management
 - Turborepo handles task orchestration and caching
+
+**Quick debugging:**
+
+- Type errors → `pnpm typecheck` (or `typecheck:watch` for live feedback)
+- Test failures → `pnpm test` for watch mode, `pnpm test:run` for CI mode
+- Lint issues → `pnpm fox` (fixes then checks)

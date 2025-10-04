@@ -13,7 +13,7 @@ import {
   setTestInjector,
 } from '../global.js';
 import {Injector} from '../injector.js';
-import {Token} from '../types.js';
+import {Token} from '../token.js';
 
 describe('Global API', () => {
   beforeEach(() => {

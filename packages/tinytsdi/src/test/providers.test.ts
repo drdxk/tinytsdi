@@ -7,7 +7,8 @@ import {
   isFactoryProvider,
   isValueProvider,
 } from '../providers.js';
-import {InjectFn, Token} from '../types.js';
+import {Token} from '../token.js';
+import {InjectFn} from '../types.js';
 
 import type {
   ClassProvider,

@@ -1,5 +1,5 @@
 import {Injector} from '../injector.js';
-import {Token} from '../types.js';
+import {Token} from '../token.js';
 
 import {
   NUMBER,
@@ -18,7 +18,7 @@ import {
   it,
 } from './ct_helper';
 
-describe('Injector.register', () => {
+describe('Injector.register()', () => {
   const injector = new Injector();
 
   describe('ValueProvider', () => {

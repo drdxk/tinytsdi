@@ -143,7 +143,7 @@ is found, throw an error.
     - Test `fork()` with combined options (`tag` and `defaultAllowOverrides`)
 - Update `CHANGELOG.md` draft entry for v3.1.0.
 
-**7. Address TODOs in code**
+**7. ✅ Address TODOs in code**
 
 **8. Global API (`src/global.ts`):**
 

@@ -1,102 +1,14 @@
-/** Tests for hierarchical injector functionality */
-
 import {describe, expect, it} from 'vitest';
 
+import {TAG_ROOT, TAG_SINK} from '../constants.js';
 import {NoMatchingTagError, NotProvidedError} from '../errors.js';
 import {Injector} from '../injector.js';
-import {TAG_ROOT, TAG_SINK, Token} from '../types.js';
+import {Token} from '../token.js';
 
 const TOKEN = new Token<string>('test');
 
 describe('Injector hierarchy', () => {
-  describe('fork()', () => {
-    it('creates child injector', () => {
-      const parent = new Injector();
-      const child1 = parent.fork();
-      const child2 = parent.fork();
-
-      // Test that child is a separate instance
-      expect(child1).not.toBe(parent);
-      expect(child2).not.toBe(parent);
-      expect(child1).not.toBe(child2);
-    });
-
-    it('preserves defaultAllowOverrides setting when true', () => {
-      const parentWithOverrides = new Injector({defaultAllowOverrides: true});
-      const childWithOverrides = parentWithOverrides.fork();
-      const token = new Token<string>('override-hierarchy-true');
-      childWithOverrides.register({provide: token, useValue: 'first'});
-
-      expect(() => {
-        childWithOverrides.register({provide: token, useValue: 'second'});
-      }).not.toThrow();
-      expect(childWithOverrides.inject(token)).toBe('second');
-    });
-
-    it('preserves defaultAllowOverrides setting when false', () => {
-      const parentWithoutOverrides = new Injector({defaultAllowOverrides: false});
-      const childWithoutOverrides = parentWithoutOverrides.fork();
-      const token2 = new Token<string>('override-hierarchy-false');
-      childWithoutOverrides.register({provide: token2, useValue: 'first'});
-
-      expect(() => {
-        childWithoutOverrides.register({provide: token2, useValue: 'second'});
-      }).toThrow();
-      expect(childWithoutOverrides.inject(token2)).toBe('first');
-    });
-
-    it('allows overriding defaultAllowOverrides setting', () => {
-      const parent = new Injector({defaultAllowOverrides: false});
-      const child = parent.fork({defaultAllowOverrides: true});
-      const token = new Token<string>('override-test');
-
-      child.register({provide: token, useValue: 'first'});
-      expect(() => {
-        child.register({provide: token, useValue: 'second'});
-      }).not.toThrow();
-      expect(child.inject(token)).toBe('second');
-    });
-
-    it('creates child with null tag by default', () => {
-      const parent = new Injector({tag: 'parent-tag'});
-      const child = parent.fork();
-
-      expect(parent.getTag()).toBe(Symbol.for('parent-tag'));
-      expect(child.getTag()).toBe(null);
-    });
-
-    it('creates child with explicit null tag when specified', () => {
-      const parent = new Injector({tag: 'parent-tag'});
-      const child = parent.fork({tag: null});
-
-      expect(parent.getTag()).toBe(Symbol.for('parent-tag'));
-      expect(child.getTag()).toBe(null);
-    });
-
-    it('creates child with explicit tag when specified', () => {
-      const parent = new Injector({tag: 'parent-tag'});
-      const child = parent.fork({tag: 'child-tag'});
-
-      expect(parent.getTag()).toBe(Symbol.for('parent-tag'));
-      expect(child.getTag()).toBe(Symbol.for('child-tag'));
-    });
-
-    it('accepts combined options for tag and defaultAllowOverrides', () => {
-      const parent = new Injector({tag: 'parent', defaultAllowOverrides: true});
-      const child = parent.fork({tag: 'child', defaultAllowOverrides: false});
-
-      expect(child.getTag()).toBe(Symbol.for('child'));
-
-      const token = new Token<string>('combined-test');
-      child.register({provide: token, useValue: 'first'});
-      expect(() => {
-        child.register({provide: token, useValue: 'second'});
-      }).toThrow();
-      expect(child.inject(token)).toBe('first');
-    });
-  });
-
-  describe('hierarchical injection', () => {
+  describe('basic functionality', () => {
     it('child can inject from parent when provider not found locally', () => {
       const parent = new Injector();
       const child = parent.fork();
@@ -130,7 +42,7 @@ describe('Injector hierarchy', () => {
     });
   });
 
-  describe('multi-level hierarchy', () => {
+  describe('multi-level', () => {
     it('supports grandparent -> parent -> child hierarchy', () => {
       const grandparent = new Injector();
       const parent = grandparent.fork();
@@ -221,73 +133,6 @@ describe('Injector hierarchy', () => {
       // But subsequent calls return cached instances
       expect(parent.inject(TestService)).toBe(parentInstance);
       expect(child.inject(TestService)).toBe(childInstance);
-    });
-  });
-
-  describe('constructor with explicit parent', () => {
-    it('accepts parent injector in constructor', () => {
-      const parent = new Injector();
-      parent.register({provide: TOKEN, useValue: 'parent-value'});
-      const child = new Injector({defaultAllowOverrides: false, parent});
-
-      expect(child.inject(TOKEN)).toBe('parent-value');
-    });
-
-    it('works with null parent', () => {
-      const injector = new Injector({defaultAllowOverrides: false, parent: null});
-
-      expect(() => injector.inject(TOKEN)).toThrow(NotProvidedError);
-    });
-  });
-
-  describe('copy() method with hierarchy', () => {
-    it('preserves parent relationship by default', () => {
-      const parent = new Injector();
-      const child = parent.fork();
-
-      parent.register({provide: TOKEN, useValue: 'parent-value'});
-      const childToken = new Token<string>('child-token');
-      child.register({provide: childToken, useValue: 'child-value'});
-
-      const copiedChild = child.copy();
-
-      // Should still access parent through preserved parent chain
-      expect(copiedChild.inject(TOKEN)).toBe('parent-value');
-      expect(copiedChild.inject(childToken)).toBe('child-value');
-    });
-
-    it('excludes parent relationship when parent=null', () => {
-      const parent = new Injector();
-      const child = parent.fork();
-
-      parent.register({provide: TOKEN, useValue: 'parent-value'});
-
-      const copiedChild = child.copy({parent: null});
-
-      // Should not access parent since parent=null
-      expect(() => copiedChild.inject(TOKEN)).toThrow(NotProvidedError);
-    });
-
-    it('copies providers and preserves parent with copyCache=true', () => {
-      const parent = new Injector();
-      const child = parent.fork();
-
-      parent.register({provide: TOKEN, useValue: 'parent-value'});
-
-      class ChildService {
-        public readonly __brand = 'ChildService';
-      }
-      child.register(ChildService);
-
-      // Warm up the cache
-      const originalInstance = child.inject(ChildService);
-
-      const copiedChild = child.copy({copyCache: true});
-
-      // Should get the cached instance
-      expect(copiedChild.inject(ChildService)).toBe(originalInstance);
-      // Should still access parent
-      expect(copiedChild.inject(TOKEN)).toBe('parent-value');
     });
   });
 

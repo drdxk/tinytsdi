@@ -1,5 +1,6 @@
 /** Main Injector class for managing dependencies. */
 
+import {TAG_ROOT, TAG_SINK} from './constants.js';
 import {
   AlreadyProvidedError,
   NeverCachedError,
@@ -14,12 +15,11 @@ import {
   isFactoryProvider,
   isValueProvider,
 } from './providers.js';
-import {TAG_ROOT, TAG_SINK, normalizeTag} from './types.js';
+import {normalizeTag} from './types_internal.js';
 
 import type {GenericProvider, Provider} from './providers.js';
-import type {GenericInjectionId, InjectionId, TagValue} from './types.js';
-
-// TODO: move types to a separate file (injector_types.ts). Re-export public types from index.ts.
+import type {InjectionId, TagValue} from './types.js';
+import type {GenericInjectionId, InjectorProvider} from './types_internal.js';
 
 /** Configuration options for Injector instance. */
 export interface InjectorOptions {
@@ -82,18 +82,6 @@ export interface ForkOptions {
    * - If explicitly set (including null), uses the provided value.
    */
   tag?: TagValue | null;
-}
-
-/** Internal provider wrapper that provides a uniform interface for all provider types. */
-interface InjectorProvider {
-  /** The injection identifier (token or constructor). */
-  id: GenericInjectionId;
-  /** Whether the resolved value should be cached. */
-  cache: boolean;
-  /** Function that creates/returns the provider's value. */
-  resolve: () => unknown;
-  /** Target tag for this provider (normalized symbol or null). */
-  at: symbol | null;
 }
 
 /** Main dependency injection container that manages providers and resolved values. */

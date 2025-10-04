@@ -2,7 +2,7 @@ import {describe, expect, it} from 'vitest';
 
 import {NeverCachedError, NotProvidedError} from '../errors.js';
 import {Injector} from '../injector.js';
-import {Token} from '../types.js';
+import {Token} from '../token.js';
 
 describe('Injector meta methods', () => {
   describe('hasProviderFor', () => {

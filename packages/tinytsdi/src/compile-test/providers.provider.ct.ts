@@ -1,5 +1,5 @@
 import {Provider} from '../providers';
-import {Token} from '../types';
+import {Token} from '../token';
 
 import {describe, it} from './ct_helper';
 

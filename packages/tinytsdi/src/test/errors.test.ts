@@ -3,7 +3,7 @@
 import {describe, expect, it} from 'vitest';
 
 import {AlreadyProvidedError, NeverCachedError, NotProvidedError} from '../errors.js';
-import {Token} from '../types.js';
+import {Token} from '../token.js';
 
 describe('Error classes', () => {
   it('creates AlreadyProvidedError with token', () => {
