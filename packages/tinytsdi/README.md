@@ -4,15 +4,14 @@ Minimalistic (yet _useful_ and _elegant_) TypeScript Dependency Injection librar
 runtime reflection or complex terminology - just a simple, type-safe dependency management with a
 default global container.
 
-_Currently, most of the development happens off GitHub, which mostly sees squashed release commits.
-Lmk if you want to contribute!_
+✅ **v3.1.0:** now with targeted providers!
 
 ## Quick Start
 
 ### Installation
 
-```shell
-$ npm install tinytsdi
+```sh
+npm install tinytsdi
 ```
 
 ### Basic Usage
@@ -58,9 +57,8 @@ In other words, it tells the injector how to _resolve_ a dependency with the giv
 
 > _"when this ID is requested, return ...(this value, an instance of this class, etc.)"_
 
-Providers can also give instructions to injector, such as whether to cache the resolved value.
-
-Providers need to be registered before an injection takes place:
+Providers can also give instructions to injector, such as whether to cache the resolved value, or
+which injector in a hierarchy should handle the registration.
 
 ```typescript
 register([
@@ -68,44 +66,28 @@ register([
   // "When CONFIG is injected, return this static value"
   {provide: CONFIG, useValue: {apiUrl: 'https://api.example.com'}},
 
-  // Factory provider - cached by default
+  // Factory provider
   // "When LOGGER is injected, call this function and use the result"
   {
     provide: LOGGER,
     useFactory: (inject) => new ConsoleLogger(inject(CONFIG).logLevel),
   },
 
-  // Factory provider with no caching
-  // "Create a new logger instance every time this ID is injected"
-  {
-    provide: REQUEST_LOGGER,
-    useFactory: (inject) => new RequestLogger(inject(CONFIG)),
-    noCache: true, // "Don't cache - create new instance every time"
-  },
-
-  // Class provider - cached by default
+  // Class provider
   // "When MY_SERVICE is injected, create an instance of MyService"
   {
     provide: MY_SERVICE,
     useClass: MyService,
   },
 
-  // Class provider with inject function passed to constructor
+  // Class provider with inject function passed to constructor and caching disabled
   // "When SERVICE_WITH_DEPS is injected, create an instance of ServiceWithDependencies,
   // pass inject function to its constructor"
   {
     provide: SERVICE_WITH_DEPS,
     useClass: ServiceWithDependencies,
     injectFn: true, // "Pass inject function to constructor"
-  },
-
-  // Class provider with no caching
-  // "Create a new MyService instance every time this ID is injected"
-  {
-    provide: TRANSIENT_SERVICE,
-    useClass: MyService,
-    noCache: true, // "Don't cache - create new instance every time"
-    injectFn: false, // "Don't pass inject function" (this is the default)
+    noCache: false, // "Create new instance every time this ID is injected"
   },
 
   // Constructor shorthand
@@ -139,8 +121,8 @@ class MyService {
 
 Or in function parameters:
 
-_This is a good pattern to use as itcreates a good interface and allows for easier testing (without
-the requirement of using injection)._
+> _This is a good pattern to use as itcreates a good interface and allows for easier testing
+> (without the requirement of using injection)._
 
 ```typescript
 function processData(config = inject(CONFIG)) {
@@ -185,15 +167,12 @@ One of the benefits of [IOC](https://en.wikipedia.org/wiki/Inversion_of_control)
 testability. The default container comes with a few utilities to isolate tests and specify
 dependencies in test scenarios.
 
-> **NOTE**: this will be moved to a separate testing container in the future. Testing container will
-> still be part of the core package.
-
 ```typescript
 import {newTestInjector, setTestInjector, removeTestInjector} from 'tinytsdi';
 
 describe('MyService', () => {
   beforeEach(() => {
-    // Create isolated test injector
+    // Create isolated test injector (tagged with TAG_SINK by default)
     newTestInjector({defaultAllowOverrides: true});
 
     // Provide testing implementations
@@ -212,6 +191,9 @@ describe('MyService', () => {
 });
 ```
 
+> **Note**: Test injectors use `TAG_SINK` by default, which ignores the `at` property on providers.
+> This ensures all providers register locally for testing simplicity.
+
 ## API Reference
 
 See JSDoc comments in the source code for detailed API documentation! Generated doc is coming soon!
@@ -223,8 +205,8 @@ See JSDoc comments in the source code for detailed API documentation! Generated 
 - **`inject(id, defaultValue?)`** - Resolve dependency using the global injector
 - **`getInjector()`** - Get the current global injector instance
 
-> **IMPORTANT**: global container only allows accessing single root injector. It is not aware of
-> children injectors.
+> **IMPORTANT**: default global container only allows accessing single root injector. It is not
+> aware of children injectors.
 
 #### Testing Utilities
 
@@ -288,7 +270,8 @@ const injector = new Injector();
 // With options
 const injector = new Injector({
   defaultAllowOverrides: false,  // Optional, defaults to false
-  parent: null                   // Optional, defaults to null
+  parent: null,                  // Optional, defaults to null
+  tag: 'app'                     // Optional, defaults to TAG_ROOT (no parent) or null (has parent)
 });
 
 // Core methods
@@ -300,14 +283,20 @@ injector.hasProviderFor(id);    // Check if provider exists
 injector.hasCachedValue(id);    // Check if value is cached (throws for noCache providers)
 injector.invalidate(ids?);      // Clear cache (for specific IDs)
 injector.unregister(ids?);      // Remove providers and cache (reset the injector)
+injector.getTag();              // Get normalized injector's tag (symbol | null)
+injector.getParent();           // Get parent injector reference
 
 // Instance methods
 injector.copy({                     // Copy injector with optional CopyOptions
   copyCache?: boolean,              // Copy cached values from source (default: false)
   parent?: null | Injector,         // Parent injector for copy (default: current instance's parent)
   defaultAllowOverrides?: boolean,  // Override setting for new injector (default: current instance's setting)
+  tag?: TagValue | null,            // Tag for copy (default: current instance's tag)
 });
-injector.fork();                    // Create child injector with current injector as parent
+injector.fork({                     // Create child injector with ForkOptions
+  defaultAllowOverrides?: boolean,  // Override setting (default: current instance's setting)
+  tag?: TagValue | null,            // Tag for child (default: null)
+});
 ```
 
 ### Other Types
@@ -356,7 +345,57 @@ child.inject(SERVICE); // Returns instance of ChildService (own provider)
 const child = new Injector({parent});
 ```
 
-### Async Support
+### Provider Targeting
+
+Injectors can be tagged to enable targeted provider registration across hierarchies. This is useful
+for architectures with multiple scoped layers (e.g., root → app → request).
+
+Providers can use the optional `at` property to target a specific injector in the hierarchy by tag:
+
+```typescript
+import {Injector, Token, TAG_ROOT} from 'tinytsdi';
+
+// Create a 3-level hierarchy: root → app → request
+const root = new Injector(); // Implicitly tagged as 'root' (TAG_ROOT)
+const app = new Injector({tag: 'app', parent: root});
+const request = new Injector({tag: 'request', parent: app});
+
+const rootService = new Token<string>('root-service');
+const appService = new Token<string>('app-service');
+const requestService = new Token<string>('request-service');
+
+// Register from request level, targeting different levels
+request.register([
+  {provide: rootService, useValue: 'shared-config', at: TAG_ROOT},
+  {provide: appService, useValue: 'app-state', at: 'app'},
+  {provide: requestService, useValue: 'request-data', at: 'request'},
+]);
+
+// Providers registered at targeted levels
+root.hasProviderFor(rootService); // true
+app.hasProviderFor(appService); // true
+request.hasProviderFor(requestService); // true
+
+// All accessible from request level via hierarchy
+request.inject(rootService); // 'shared-config'
+request.inject(appService); // 'app-state'
+request.inject(requestService); // 'request-data'
+```
+
+> **Note**: `tag` and `at` options can be specified as symbols or strings. Strings are normalized to
+> symbols using `Symbol.for(str)`.
+
+When a provider has `at: 'app'`, registration walks up the hierarchy to the first injector with tag
+`'app'`. Throws `NoMatchingTagError` if no match is found. Providers without `at` register locally.
+
+**Predefined Tags**:
+
+- `TAG_ROOT` (`=== Symbol.for('root')`) - Automatically assigned to injectors without a parent
+  (unless explicitly tagged)
+- `TAG_SINK` (`=== Symbol.for('sink')`) - Injectors tagged as sinks ignore provider targeting. This
+  tag is meant to be used for testing environment injectors.
+
+### Async
 
 ```typescript
 const ASYNC_SERVICE = new Token<Promise<Service>>('async-service');
@@ -392,14 +431,19 @@ aka "this is by design" of _minimialistic_ DI
 
 ## Coming Up Next
 
-- Hierarchy-aware providers
 - Custom containers support
 - Separate default testing container
 - Hierarchical containers (`node` (`ALS`), `fastify`, `express`, `react`, in that order of
   likelihood)
 - More documentation: generated API reference, examples, more text
 
-## Breaking Changes from v2.x
+## v3.0.0
+
+<details>
+
+<summary>Breaking Changes from v2.x</summary>
+
+### Breaking Changes from v2.x
 
 ### `scope` replaced with `noCache`
 
@@ -530,6 +574,11 @@ const config: ContainerConfig = {
 };
 ```
 
+</details>
+<details>
+
+  <summary>Migration Guide</summary>
+
 ### Migration Guide
 
 #### `Provider` interface changes
@@ -572,3 +621,5 @@ const config: ContainerConfig = {
 - **Replace type imports**:
   - `import type {Config}` → `import type {ContainerConfig}`
   - Variable declarations: `const config: Config` → `const config: ContainerConfig`
+
+</details>
