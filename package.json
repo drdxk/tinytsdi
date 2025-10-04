@@ -21,6 +21,7 @@
     "check": "turbo run check",
     "dev": "turbo run dev",
     "e2e": "turbo run e2e",
+    "e2e:dev": "turbo run e2e:dev",
     "fix": "turbo run fix",
     "fox": "turbo run fox",
     "lint": "turbo run lint",

@@ -41,11 +41,24 @@
       "cache": false,
       "persistent": true
     },
-    "e2e": {
-      "dependsOn": ["e2e:typecheck", "e2e:test"]
+    "e2e:dev": {
+      "persistent": true,
+      "with": ["e2e:typecheck:watch", "e2e:test"]
     },
-
+    "e2e:typecheck:watch": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
     "e2e:test": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "e2e": {
+      "dependsOn": ["e2e:typecheck", "e2e:test:run"]
+    },
+    "e2e:test:run": {
       "dependsOn": ["^build"]
     },
     "e2e:typecheck": {

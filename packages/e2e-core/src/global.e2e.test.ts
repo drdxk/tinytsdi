@@ -1,6 +1,7 @@
 import {
   AlreadyInitializedError,
   Injector,
+  TAG_SINK,
   TestInjectorNotAllowedError,
   Token,
   deleteInjector,
@@ -167,7 +168,7 @@ describe('Global API', () => {
     });
   });
 
-  describe('test injector functionality', () => {
+  describe('test injector', () => {
     describe('newTestInjector', () => {
       it('creates a new empty test injector', () => {
         const testInjector = newTestInjector();
@@ -194,6 +195,29 @@ describe('Global API', () => {
           testInjector.register({provide: token, useValue: 'second'});
         }).not.toThrow();
         expect(testInjector.inject(token)).toBe('second');
+      });
+
+      it('sink behavior registers providers with at property locally', () => {
+        const token = new Token<string>('sink-test');
+        const otherTag = Symbol('other');
+
+        const testInjector = newTestInjector();
+
+        expect(testInjector.getTag()).toBe(TAG_SINK);
+
+        // Register provider with 'at' property - should be ignored due to TAG_SINK
+        expect(() => {
+          testInjector.register({provide: token, useValue: 'local', at: otherTag});
+        }).not.toThrow();
+
+        // Should be registered locally in the test injector
+        expect(testInjector.inject(token)).toBe('local');
+      });
+
+      it('allows explicit tag option override', () => {
+        const customTag = Symbol('custom');
+        const testInjector = newTestInjector({tag: customTag});
+        expect(testInjector.getTag()).toBe(customTag);
       });
     });
 

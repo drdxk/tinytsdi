@@ -34,6 +34,7 @@
 **Misc:**
 
 - Added `getParent(): Injector | null` method to retrieve injector's parent
+- `newTestInjector()` now defaults to `TAG_SINK` tag for predictable test isolation behavior
 
 ## [3.0.0] - 2025.09.21
 

@@ -8,9 +8,10 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "e2e:test:run": "vitest",
-    "e2e:test": "vitest run",
+    "e2e:test:run": "vitest run",
+    "e2e:test": "vitest",
     "e2e:typecheck": "tsc --noEmit",
+    "e2e:typecheck:watch": "tsc --noEmit  --watch",
     "fix:eslint": "eslint --fix",
     "fix:prettier": "prettier --write src",
     "lint:eslint": "eslint",
@@ -20,11 +21,11 @@
     "tinytsdi": "workspace:*"
   },
   "devDependencies": {
-  "@repo/config-eslint": "workspace:*",
-  "@repo/config-typescript": "workspace:*",
-  "@types/node": "catalog:types",
-  "prettier": "catalog:dev",
-  "typescript": "catalog:dev",
-  "vitest": "catalog:dev"
+    "@repo/config-eslint": "workspace:*",
+    "@repo/config-typescript": "workspace:*",
+    "@types/node": "catalog:types",
+    "prettier": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
   }
 }

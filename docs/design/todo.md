@@ -145,7 +145,7 @@ is found, throw an error.
 
 **7. ✅ Address TODOs in code**
 
-**8. Global API (`src/global.ts`):**
+**8. ✅ Global API (`src/global.ts`):**
 
 - Update `newTestInjector(options?: InjectorOptions)` to default tag to `TAG_SINK` if not specified
 - Document that test injectors use `TAG_SINK` by default for predictable testing behavior
@@ -162,13 +162,21 @@ is found, throw an error.
   - Test integration with existing global API e2e functionality
 - Update `CHANGELOG.md` draft entry for v3.1.0.
 
-**9. E2E Testing (`packages/e2e-core/src/injector.e2e.test.ts`):**
+**9. E2E Testing:**
 
-- Update existing multi-level hierarchy tests to include tag functionality
-- Add simple test in existing hierarchy section to verify multi-level hierarchy with tags and tagged
-  providers
-- Test end-to-end behavior of provider targeting across hierarchy levels
-- Verify real-world usage scenarios of tag-based provider registration
+- Move existing hierarchy tests from `packages/e2e-core/src/injector.e2e.test.ts` to new file
+  `packages/e2e-core/src/hierarchy.e2e.test.ts`:
+  - Move "hierarchical injection" describe block (lines 159-195)
+  - Move "multi-level hierarchy" describe block (lines 197-235)
+- Add new `describe('provider targeting')` section in `hierarchy.e2e.test.ts` with 3 focused tests:
+  - Test 1: "supports tag-based provider targeting across hierarchy" - Real-world 3-level scenario
+    (root → app → request) with providers targeting different layers using `at` property
+  - Test 2: "works with all provider types using at property" - Verify class, factory, value, and
+    existing providers all work correctly with `at` targeting, including caching behavior across
+    hierarchy
+  - Test 3: "throws NoMatchingTagError when targeting non-existent tag" - Error handling in
+    multi-level hierarchy when no matching tag exists
+- Keep remaining tests in `injector.e2e.test.ts` (providers support, default value, errors)
 
 **10. Documentation Updates:**
 

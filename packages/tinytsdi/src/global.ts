@@ -1,5 +1,6 @@
 /** Global API functions for dependency injection using a module-level singleton injector. */
 
+import {TAG_SINK} from './constants.js';
 import {AlreadyInitializedError, TestInjectorNotAllowedError} from './errors.js';
 import {Injector} from './injector.js';
 
@@ -182,6 +183,10 @@ function checkTestInjectorAllowed(): void {
 /**
  * Creates a injector with the given configuration and sets it as the test injector.
  *
+ * By default, the test injector is created with `tag: TAG_SINK`, which causes it to ignore the `at`
+ * property of providers and register all providers locally. This ensures predictable test
+ * isolation. You can override this by explicitly providing a `tag` in the options.
+ *
  * @param options - Options for creating the test injector.
  * @returns A new injector instance to be used for testing.
  * @throws {@link TestInjectorNotAllowedError} - When test injector functions are disabled.
@@ -189,7 +194,12 @@ function checkTestInjectorAllowed(): void {
 export function newTestInjector(options?: InjectorOptions): Injector {
   checkTestInjectorAllowed();
 
-  const testInjector = new Injector(options);
+  const injectorOptions: InjectorOptions = {
+    tag: TAG_SINK,
+    ...options,
+  };
+
+  const testInjector = new Injector(injectorOptions);
   setTestInjector(testInjector);
   return testInjector;
 }

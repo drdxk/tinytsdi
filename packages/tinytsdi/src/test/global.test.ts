@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 
+import {TAG_SINK} from '../constants.js';
 import {AlreadyInitializedError, TestInjectorNotAllowedError} from '../errors.js';
 import {
   deleteInjector,
@@ -194,6 +195,32 @@ describe('Global API', () => {
           testInjector.register({provide: token, useValue: 'second'});
         }).not.toThrow();
         expect(testInjector.inject(token)).toBe('second');
+      });
+
+      it('creates injector with TAG_SINK by default', () => {
+        const testInjector = newTestInjector();
+        expect(testInjector.getTag()).toBe(TAG_SINK);
+      });
+
+      it('allows explicit tag option override', () => {
+        const customTag = Symbol('custom');
+        const testInjector = newTestInjector({tag: customTag});
+        expect(testInjector.getTag()).toBe(customTag);
+      });
+
+      it('ignores at property on providers (sink behavior)', () => {
+        const token = new Token<string>('sink-test');
+        const otherTag = Symbol('other');
+
+        const testInjector = newTestInjector();
+
+        // Register provider with 'at' property - should be ignored due to TAG_SINK
+        expect(() => {
+          testInjector.register({provide: token, useValue: 'local', at: otherTag});
+        }).not.toThrow();
+
+        // Should be registered locally in the test injector
+        expect(testInjector.inject(token)).toBe('local');
       });
     });
 
