@@ -4,7 +4,7 @@
 
 ### Added
 
-**Hierarchy-aware providers**
+**Provider targeting**
 
 - Tag type and constants
   - `TagValue` type for string or symbol tag values
