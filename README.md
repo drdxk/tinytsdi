@@ -18,7 +18,7 @@ packages/
 
 ## Packages
 
-- [`packages/tinytsdi`](./packages/tinytsdi/README.md): Minimalistic DI library for TypeScript
+- [`packages/tinytsdi`](./packages/tinytsdi/): Minimalistic DI library for TypeScript
 
 ## Scripts
 
@@ -28,6 +28,7 @@ All scripts are managed via Turborepo and available at the root:
 - `check`: run typecheck, lint, and test:run
 - `dev`: run dev/watch tasks
 - `e2e`: run end-to-end tests
+- `e2e:dev`: run end-to-end dev/watch tasks
 - `fix`: run formatters and autofixes
 - `fox`: fix then check (convenience)
 - `lint`: run linters
