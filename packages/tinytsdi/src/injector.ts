@@ -28,8 +28,10 @@ export interface InjectorOptions {
    * provided. Defaults to false.
    */
   defaultAllowOverrides?: boolean;
+
   /** Parent injector. Defaults to null. */
   parent?: Injector | null;
+
   /**
    * Tag for this injector.
    *
@@ -43,6 +45,7 @@ export interface InjectorOptions {
 export interface CopyOptions {
   /** Whether to copy the cache of resolved dependencies. Defaults to false. */
   copyCache?: boolean;
+
   /**
    * Whether to allow provider overrides by default in the new injector.
    *
@@ -50,6 +53,7 @@ export interface CopyOptions {
    * - If explicitly set (true/false), uses the provided value.
    */
   defaultAllowOverrides?: boolean;
+
   /**
    * Parent injector for the new injector.
    *
@@ -57,6 +61,7 @@ export interface CopyOptions {
    * - If explicitly set (including null), uses the provided value.
    */
   parent?: Injector | null;
+
   /**
    * Tag for the new injector.
    *
@@ -75,6 +80,7 @@ export interface ForkOptions {
    * - If explicitly set (true/false), uses the provided value.
    */
   defaultAllowOverrides?: boolean;
+
   /**
    * Tag for the child injector.
    *
@@ -86,13 +92,13 @@ export interface ForkOptions {
 
 /** Main dependency injection container that manages providers and resolved values. */
 export class Injector {
-  private parent: Injector | null;
-  private tag: symbol | null;
-  private defaultAllowOverrides: boolean;
+  private readonly parent: Injector | null;
+  private readonly tag: symbol | null;
+  private readonly defaultAllowOverrides: boolean;
 
-  private providers = new Map<GenericInjectionId, InjectorProvider>();
-  private cache = new Map<GenericInjectionId, unknown>();
-  private boundInject = this.inject.bind(this);
+  private readonly providers = new Map<GenericInjectionId, InjectorProvider>();
+  private readonly cache = new Map<GenericInjectionId, unknown>();
+  private readonly boundInject = this.inject.bind(this);
 
   /** Whether to allow provider overrides by default. */
 

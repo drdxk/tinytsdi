@@ -7,13 +7,16 @@ export type GenericInjectionId = InjectionId<unknown>;
 export interface InjectorProvider {
   /** The injection identifier (token or constructor). */
   id: GenericInjectionId;
+
   /** Whether the resolved value should be cached. */
   cache: boolean;
+
   /** Function that creates/returns the provider's value. */
   resolve: () => unknown;
+
   /** Target tag for this provider (normalized symbol or null). */
   at: symbol | null;
-} /** Returns normalized tag or null if undefined */
+}
 
 /** Normalizes a tag value to a symbol or null. */
 export function normalizeTag(tag: TagValue | null | undefined): symbol | null {

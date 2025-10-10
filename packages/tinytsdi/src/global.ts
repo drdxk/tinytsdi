@@ -12,6 +12,7 @@ import type {InjectionId} from './types.js';
 export interface ContainerConfig {
   /** Default value for allowOverrides when creating the global injector. Defaults to false. */
   defaultAllowOverrides?: boolean;
+
   /** Whether test injector functions are disabled. Defaults to false. */
   noTestInjector?: boolean;
 }
@@ -105,7 +106,7 @@ export function deleteInjector(): void {
  * {provide: token, useExisting: otherToken}
  *
  * // Constructor shorthand
- * SomeClass // Equivalent to {provide: SomeClass, useClass: SomeClass} (always cached)
+ * SomeClass // Equivalent to {provide: SomeClass, useClass: SomeClass, injectFn: true} (always cached)
  * ```
  *
  * Usage example:
