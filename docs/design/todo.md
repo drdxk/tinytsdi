@@ -86,20 +86,9 @@ Existing mapping for default / test containers:
   - v3.3.1: if the current container is the test container, uninstall it.
   - v4: delete
 
-How to check if the current container is X?
+Q: How to check if the current container is X (only needed internally)?
 
-- A `global.ts` store `container` if installed.
-- `install()` sets the container, checking if one is already installed. Check `allowOverride` flag,
-  throw `ContainerAlreadyInstalledError` if not allowed.
-- `uninstall()` sets `container = undefined` (does NOT clear `injector` or `testInjector` to
-  preserve current functionality).
-- `init()` -> not modified in v3.2, continues to work with default injector only.
-- `getInjector()` -> check if `testInjector` exists (return it), then check if `container` exists
-  (return `container.getInjector()`), otherwise proceed with current default behavior.
-- `deleteInjector()` -> check if `container` exists (call `container.deleteInjector()`), otherwise
-  proceed with current default behavior.
-- `newTestInjector()`, `setTestInjector()`, `removeTestInjector()` -> not modified in v3.2, no
-  interaction with custom containers.
+- compare `getContainer().getInjecor` (functions, not injectors) ?
 
 Test container:
 
