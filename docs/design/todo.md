@@ -4,11 +4,15 @@
 
 - `install()` allows to create own "DI container" using library methods, since global `inject()` and
   `register()` simply call `getInjector()[method])()`.
-  - API: `install(container: Container, allowOverride: boolean = false)`, where `Container` has
-    `getInjector()` and `deleteInjector()` methods.
-  - `uninstall()` removes current container.
-  - Installing container when one is already installed throws `ContainerAlreadyInstalledError`
-    (unless `allowOverride = true`).
+  - API:
+  - `install(container: Container, mode: InstallMode = InstallMode.THROW)`
+    - where `Container` has `getInjector()` and `deleteInjector()` methods.
+    - `InstallMode` is an enum `THROW, OVERRIDE, STACK`:
+      - `THROW` default, throws if another container is already installed
+        (`ContainerAlreadyInstalledError`)
+      - `OVERRIDE` overrides the existing injector (pop the current injector, add the new one)
+      - `STACK` adds the container on top of the stack.
+  - `uninstall()` removes current container (popping it from the stack)
 - Container is expected to have its own `init()` / configuration function - where it does the
   install and configuration.
 - Container can expose additional methods; all that matter is that global `inject()` and
@@ -19,7 +23,8 @@ Existing mapping:
 - In `global.ts` store `container` if installed.
 - `install()` sets the container, checking if one is already installed. Check `allowOverride` flag,
   throw `ContainerAlreadyInstalledError` if not allowed.
-- `uninstall()` sets `container = undefined` (does NOT clear `injector` or `testInjector`).
+- `uninstall()` sets `container = undefined` (does NOT clear `injector` or `testInjector` to
+  preserve current functionality).
 - `init()` -> not modified in v3.2, continues to work with default injector only.
 - `getInjector()` -> check if `testInjector` exists (return it), then check if `container` exists
   (return `container.getInjector()`), otherwise proceed with current default behavior.
@@ -28,18 +33,16 @@ Existing mapping:
 - `newTestInjector()`, `setTestInjector()`, `removeTestInjector()` -> not modified in v3.2, no
   interaction with custom containers.
 
-How default container might look like (future):
+Test container:
 
-- `import {initDefaultContainer} from 'tinytsdi/dc'`
-- `initDefaultContainer()` - calls `install()`, code is the same as currently except for doesn't
+- `import {installTestContainer} from 'tinytsdi/tc'`
+- `installTestContainer(mode)` - calls `install()` with a test container, passing through `mode`
+
+How default container might look like (implicit):
+
+- `import {installDefaultContainer} from 'tinytsdi/dc'`
+- `installDefaultContainer()` - calls `install()`, code is the same as currently except for doesn't
   have testing methods.
-
-Test container (future):
-
-- `import {initTestContainer} from 'tinytsdi/tc'`
-- `initTestContainer()` - calls `install()` with a test container, which is basically
-  `newTestInjector()`
-- `newTestInjector()` - calls `install()` with a new injector.
 
 Before v4:
 
@@ -77,8 +80,8 @@ Before v4:
 **Files to modify:** `src/global.ts`
 
 - Update `getInjector()`:
-  - If `testInjector` exists, return it (unchanged behavior)
   - If `container` exists, return `container.getInjector()`
+  - If `testInjector` exists, return it (current behavior)
   - Otherwise, lazy-create default injector (current behavior)
 - Update `deleteInjector()`:
   - If `container` exists, call `container.deleteInjector()`

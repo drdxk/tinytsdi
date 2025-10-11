@@ -92,15 +92,16 @@ export interface ForkOptions {
 
 /** Main dependency injection container that manages providers and resolved values. */
 export class Injector {
+  /** Injector's parent */
   private readonly parent: Injector | null;
+  /** Injector's tag. */
   private readonly tag: symbol | null;
+  /** Whether to allow provider overrides by default. */
   private readonly defaultAllowOverrides: boolean;
 
   private readonly providers = new Map<GenericInjectionId, InjectorProvider>();
   private readonly cache = new Map<GenericInjectionId, unknown>();
   private readonly boundInject = this.inject.bind(this);
-
-  /** Whether to allow provider overrides by default. */
 
   /**
    * Creates a new Injector instance.
