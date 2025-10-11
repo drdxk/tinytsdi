@@ -37,6 +37,8 @@ Implementation phases:
 - v3.2: `container.ts` implementation; `getInjector()`, `deleteInjector()` simply check
   `getContainer()`, if it returns null, continue with the current flow (check test injector, check
   or create default injector).
+  - `install`, `uninstall`, `uninstallAll`, `Container`, `InstallMode` are re-exported from
+    `/index`.
 - v3.3: `containers/test.ts` (test container) implementation (available as a standalone, mark
   current test methods as deprecated to be removed in v4); exported as `/tc` in the distro. write
   tests and e2e tests.
@@ -50,6 +52,41 @@ Implementation phases:
 - eventually v4: drop deprecated methods, delete tests.
 
 Existing mapping for default / test containers:
+
+- `init()`:
+  - v3.4.1: mark as deprecated in favor of `init(InjectorOptions)` (almost compatible, so maybe only
+    mark `testInjectorAllowed` as deprecated)?
+  - v3.4.1: `installDefaultContainer(options)`
+
+- `resetInitForTestOnly`:
+  - v3.4.1: mark as deprecated to be deleted, or maybe keep around as default container's uninstall
+    call.
+
+- `getInjector()`:
+  - v3.2: check `getContainer` first, if null proceed as current.
+  - v3.3.1: remove special handling for test container.
+  - v3.4.1: calls `getOrCreateContainer().getInjector()`.
+
+- `deleteInjector()`:
+  - v3.2: check `getContainer` first, if null proceed as current.
+  - v3.4.1: if `getContainer` return nulls exit silently, otherwise call
+    `container.deleteInjector()`.
+
+- `newTestInjector()`:
+  - v3.3.1: `checkTestInjectorAllowed` should also check if current contain is a test one. If not,
+    it should initialize test container (using stack). Then call test container's `newTestInjector`.
+  - v3.3.1: mark as deprecated in the favor of the above.
+  - v4: delete
+
+- `setTestInjector()`:
+  - same as `newTestInjector()`.
+
+- `removeTestInjector()`:
+  - similar to `newTestInjector()`
+  - v3.3.1: if the current container is the test container, uninstall it.
+  - v4: delete
+
+How to check if the current container is X?
 
 - A `global.ts` store `container` if installed.
 - `install()` sets the container, checking if one is already installed. Check `allowOverride` flag,
