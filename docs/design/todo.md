@@ -18,9 +18,40 @@
 - Container can expose additional methods; all that matter is that global `inject()` and
   `register()` work correctly.
 
-Existing mapping:
+Implementation:
 
-- In `global.ts` store `container` if installed.
+- Add `container.ts` with `install()` and `uninstall()` methods and associated types (`Container`,
+  `InstallMode`).
+  - also `getContianer(): Container | null` that will be used by the `global`.
+  - Also `uninstallAll()` that clears the stack.
+- Container stack is stored in a module local `stack: Container[]` variable.
+- `global.ts`:
+  - `getInjector()`, `deleteInjector()` - first check if `getContainer()` reutrn a container,
+    - if so, pass the call through to the currently installed container.
+    - if not, install the default container, then call `getContainer()`. If the second
+      `getContainer()` dosen't return a container, throw `ThisShouldNeverHappenTMError`.
+    - `getOrCreateContainer()` local function does this and guarantees to return a `Container`.
+
+Implementation phases:
+
+- v3.2: `container.ts` implementation; `getInjector()`, `deleteInjector()` simply check
+  `getContainer()`, if it returns null, continue with the current flow (check test injector, check
+  or create default injector).
+- v3.3: `containers/test.ts` (test container) implementation (available as a standalone, mark
+  current test methods as deprecated to be removed in v4); exported as `/tc` in the distro. write
+  tests and e2e tests.
+- v3.3.1: convert current test global methods to install / uninstall and use the test container. all
+  existing tests should pass unmodified.
+- v3.4: `containers/default.ts` (default container) implementation (not available from anywhwere).
+  write tests.
+- v 3.4.1: convert existing global container to use the default one under the hood
+  (`getOrCreateContainer()` described above). mark `init` as deprecated in favor of something that
+  configures the default container (likely with `InjectorOptions`).
+- eventually v4: drop deprecated methods, delete tests.
+
+Existing mapping for default / test containers:
+
+- A `global.ts` store `container` if installed.
 - `install()` sets the container, checking if one is already installed. Check `allowOverride` flag,
   throw `ContainerAlreadyInstalledError` if not allowed.
 - `uninstall()` sets `container = undefined` (does NOT clear `injector` or `testInjector` to
@@ -38,16 +69,11 @@ Test container:
 - `import {installTestContainer} from 'tinytsdi/tc'`
 - `installTestContainer(mode)` - calls `install()` with a test container, passing through `mode`
 
-How default container might look like (implicit):
+Default container might look like (implicit):
 
 - `import {installDefaultContainer} from 'tinytsdi/dc'`
 - `installDefaultContainer()` - calls `install()`, code is the same as currently except for doesn't
   have testing methods.
-
-Before v4:
-
-- Document the fact that this means that other global functions will not work (they will be marked
-  as deprecated as of v3.4).
 
 ### v3.2. Global: add `install()` and `uninstall()` API functions
 
