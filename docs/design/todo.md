@@ -1,6 +1,6 @@
 ## Next releases:
 
-#### Next goal overview
+### Next goal overview
 
 - `install()` allows to create own "DI container" using library methods, since global `inject()` and
   `register()` simply call `getInjector()[method])()`.
@@ -101,100 +101,158 @@ Default container might look like (implicit):
 - `installDefaultContainer()` - calls `install()`, code is the same as currently except for doesn't
   have testing methods.
 
-### v3.2. Global: add `install()` and `uninstall()` API functions
+### v3.2. Add container infrastructure with `install()` / `uninstall()` API
 
-#### Step 1: Define Container interface and error class
+#### Step 1: Define types, error class, and container module
 
-**Files to modify:** `src/global.ts`
+**Files to create:** `src/container.ts`
 
-- Add `Container` interface with:
+- Define `Container` interface with:
   - `getInjector(): Injector`
   - `deleteInjector(): void`
+- Define `InstallMode` enum with values:
+  - `THROW` - Throw error if container already installed (default)
+  - `OVERRIDE` - Pop current container and push new one
+  - `STACK` - Push new container on top of stack
+- Add module-level variable: `const stack: Container[] = []`
+- Implement `getContainer(): Container | null`
+  - Return `stack[stack.length - 1]` if stack not empty, otherwise `null`
+- Implement `install(container: Container, mode: InstallMode = InstallMode.THROW): void`
+  - If `stack.length > 0` and `mode === InstallMode.THROW`:
+    - Throw `ContainerAlreadyInstalledError`
+  - If `mode === InstallMode.OVERRIDE` and stack not empty:
+    - Call `stack.pop()`
+  - Push `container` onto stack
+- Implement `uninstall(): void`
+  - Pop from stack (no-op if empty)
 
 **Files to modify:** `src/errors.ts`
 
-- Add `ContainerAlreadyInstalledError` class
+- Add `ContainerAlreadyInstalledError` class following existing pattern:
+  - Extends `Error`
+  - Sets `this.name = 'ContainerAlreadyInstalledError'`
+  - Constructor with message about container already being installed
 
-#### Step 2: Add container management to global.ts
+#### Step 2: Unit tests for container.ts
+
+**Files to create:** `src/test/container.test.ts`
+
+Test coverage for `container.ts` module:
+
+- `getContainer()` returns null when stack is empty
+- `install()` with default mode (THROW) adds container to stack
+- `install()` with THROW mode throws `ContainerAlreadyInstalledError` when stack not empty
+- `install()` with OVERRIDE mode replaces current container (pops old, pushes new)
+- `install()` with OVERRIDE mode works when stack is empty (no pop, just push)
+- `install()` with STACK mode adds container on top of existing stack
+- `install()` with STACK mode works when stack is empty
+- `uninstall()` removes top container from stack
+- `uninstall()` is no-op when stack is empty (doesn't throw)
+- `getContainer()` returns most recently installed container
+- Multiple installs with STACK mode create proper stack (LIFO behavior on uninstall)
+- Container methods (`getInjector`, `deleteInjector`) are callable on returned container
+- Stack operations maintain correct order: install A, install B with STACK, uninstall → A is current
+
+#### Step 3: Compile tests for container.ts
+
+**Files to create:** `src/compile-test/container.ct.ts`
+
+- Import from `'../container'`
+- Verify `Container` interface structure (has `getInjector` and `deleteInjector` methods)
+- Verify `install()` parameter types and accepts objects implementing `Container` interface
+- Verify `uninstall()` signature (no parameters, returns void)
+- Verify `getContainer()` returns `Container | null`
+
+**Note:** Do NOT verify InstallMode enum values in compile tests
+
+#### Step 4: Integrate container into global.ts
 
 **Files to modify:** `src/global.ts`
 
-- Add module-level variable: `let container: Container | undefined`
-- Implement `install(container: Container, allowOverride: boolean = false)`
-  - Check if `container` already exists
-  - Throw `ContainerAlreadyInstalledError` if exists and `allowOverride === false`
-  - Set the `container` variable
-- Implement `uninstall()`
-  - Set `container = undefined`
-
-#### Step 3: Modify getInjector() and deleteInjector()
-
-**Files to modify:** `src/global.ts`
-
+- Import `getContainer` from `'./container'`
 - Update `getInjector()`:
-  - If `container` exists, return `container.getInjector()`
-  - If `testInjector` exists, return it (current behavior)
+  - First check `getContainer()` - if not null, return `container.getInjector()`
+  - Then check `testInjector` - if exists, return it (current behavior)
   - Otherwise, lazy-create default injector (current behavior)
 - Update `deleteInjector()`:
-  - If `container` exists, call `container.deleteInjector()`
-  - Otherwise, set `injector = undefined` (current behavior)
+  - First check `getContainer()` - if not null, call `container.deleteInjector()` and return
+  - Otherwise, proceed with current behavior (check testInjector, clear injector)
 
-#### Step 4: Export new APIs
+**Note:** Container takes precedence over testInjector. Order is: container → testInjector → default
+
+#### Step 5: Unit tests for global.ts container integration
+
+**Files to modify:** `src/test/global.test.ts`
+
+Add test coverage for global.ts integration with containers:
+
+- `getInjector()` uses container's injector when installed
+- `getInjector()` checks container BEFORE testInjector (container takes precedence)
+- `getInjector()` falls back to testInjector when no container installed (current behavior)
+- `getInjector()` falls back to default injector when neither container nor testInjector exist
+- `deleteInjector()` delegates to container's `deleteInjector()` when installed
+- `deleteInjector()` proceeds with normal flow when no container installed
+- After `uninstall()`, global functions revert to previous behavior
+- Stacked containers: top container takes precedence for `getInjector()`
+- Order verification: container → testInjector → default
+- After container is uninstalled, testInjector becomes active if it exists
+
+#### Step 6: Export new APIs
 
 **Files to modify:** `src/index.ts`
 
-- Export `install` and `uninstall` from `global.ts`
-- Export `Container` type from `global.ts`
-- Export `ContainerAlreadyInstalledError` from `errors.ts`
-
-#### Step 5: Compile tests
-
-**Files to modify:** `src/compile-test/global.ct.ts`
-
-- Add new `describe` block for `install()` function
-- Verify `install()` accepts objects implementing `Container` interface
-- Verify `install()` parameter types (container and optional allowOverride boolean)
-
-#### Step 6: Unit tests
-
-**Files to create:** `src/test/global.container.test.ts`
-
-Test coverage:
-
-- `install()` sets a container successfully
-- `install()` throws `ContainerAlreadyInstalledError` when called twice without `allowOverride`
-- `install()` allows override when `allowOverride = true`
-- `uninstall()` removes the container
-- `uninstall()` does NOT clear `injector` or `testInjector` variables
-- `getInjector()` uses container's injector when installed
-- `getInjector()` checks container AFTER testInjector but BEFORE default injector
-- `deleteInjector()` delegates to container's `deleteInjector()` when installed
-- Verify test injector still takes precedence over container injector
-- Verify fallback to default injector when no container installed
+- Export `install`, `uninstall`, `getContainer` from `'./container'`
+- Export `Container` type from `'./container'`
+- Export `InstallMode` enum from `'./container'`
+- Export `ContainerAlreadyInstalledError` from `'./errors'`
 
 #### Step 7: E2E tests
 
-**Files to create:** `packages/e2e-core/src/global.container.e2e.test.ts`
+**Files to create:** `packages/e2e-core/src/container.e2e.test.ts`
 
 Test coverage:
 
-- Create a simple custom container implementation
-- Install it and verify `inject()` and `register()` work correctly
-- Verify container lifecycle (install → use → uninstall → reinstall)
-- Verify existing global API functions still work with custom container
+- Create a simple custom container implementation with `getInjector()` and `deleteInjector()`
+- Install with default mode (THROW) and verify `inject()` and `register()` work correctly
+- Verify `ContainerAlreadyInstalledError` is thrown on second install without mode
+- Verify container lifecycle: install → use → uninstall → reinstall
+- Verify OVERRIDE mode: install container1 → install container2 with OVERRIDE → verify container2
+  active → verify container1 no longer in stack
+- Verify STACK mode: install container1 → install container2 with STACK → verify container2 active →
+  uninstall → verify container1 active
+- Verify existing global API functions (`inject()`, `register()`, `getInjector()`) work with custom
+  containers
+- Verify providers registered in one container are isolated from another container
 
 #### Step 8: Documentation updates
 
 **Files to modify:**
 
-- `CHANGELOG.md` - Document new APIs under v3.2
+- `CHANGELOG.md` - Document new APIs under v3.2:
+  - `install(container, mode)` function with all three InstallMode options
+  - `uninstall()` function
+  - `getContainer()` function
+  - `Container` interface
+  - `InstallMode` enum (THROW, OVERRIDE, STACK)
+  - `ContainerAlreadyInstalledError` error class
+  - Explain precedence order: container → testInjector → default
+  - Explain use cases for each InstallMode
 
 #### Step 9: README examples
 
 **Files to modify:**
 
-- `README.md` - Add section on custom containers with example implementation showing how to create
-  and use a custom container
+- `README.md` - Add "Custom Containers" section with:
+  - Explanation of container concept and architecture
+  - Basic custom container implementation example
+  - Example using `install()` with default THROW mode
+  - Example using OVERRIDE mode to replace containers
+  - Example using STACK mode for hierarchical/nested containers
+  - Example of `uninstall()` for cleanup
+  - Explanation of when to use each InstallMode:
+    - THROW: Single container applications, fail-fast on mistakes
+    - OVERRIDE: Hot-swapping containers, testing different configurations
+    - STACK: Nested scopes, temporary overrides with automatic restoration
 
 ### v3.3. Create test container module
 
@@ -202,6 +260,8 @@ Test coverage:
 
 **Files to create:** `src/tc.ts`
 
+- Import `install` from `'./container'`
+- Import `InstallMode` from `'./container'`
 - Module-level variable: `let injector: Injector | undefined`
 - Function `getInjector(): Injector`
   - If `injector` is undefined, create new `Injector({ tag: TAG_SINK })`
@@ -218,8 +278,8 @@ Test coverage:
   - Return the injector
 - Function `removeInjector(): void`
   - Set `injector = undefined`
-- Function `initTestContainer(allowOverride: boolean = false): void`
-  - Call `install({ getInjector, deleteInjector }, allowOverride)` from `global.ts`
+- Function `initTestContainer(mode: InstallMode = InstallMode.STACK): void`
+  - Call `install({ getInjector, deleteInjector }, mode)`
 
 #### Step 2: Compile tests
 
@@ -229,7 +289,7 @@ Test coverage:
 - Verify `newInjector()` parameter types (optional options) and return type `Injector`
 - Verify `setInjector()` parameter type `Injector` and return type `Injector`
 - Verify `removeInjector()` has no parameters and returns void
-- Verify `initTestContainer()` parameter type (optional allowOverride boolean) and returns void
+- Verify `initTestContainer()` parameter type (optional `InstallMode`) and returns void
 - Verify `getInjector()` returns `Injector`
 - Verify `deleteInjector()` returns void
 
@@ -254,10 +314,10 @@ Test coverage:
 - `setInjector()` sets the module injector
 - `setInjector()` returns the injector
 - `removeInjector()` clears the injector
-- `initTestContainer()` installs a container successfully
-- `initTestContainer()` throws `ContainerAlreadyInstalledError` when called twice without
-  `allowOverride`
-- `initTestContainer()` allows override when `allowOverride = true`
+- `initTestContainer()` installs a container successfully with default mode (STACK)
+- `initTestContainer()` throws `ContainerAlreadyInstalledError` when called twice with THROW mode
+- `initTestContainer()` allows override when mode is OVERRIDE
+- `initTestContainer()` allows stacking when mode is STACK (default)
 - Verify global `inject()` and `register()` work with installed test container
 - After `initTestContainer()`, calling `uninstall()` removes container
 - After `uninstall()`, module `injector` variable is still set (not cleared)
@@ -389,6 +449,63 @@ Add JSDoc `@deprecated` tags with migration guidance:
   - Custom options example with `newInjector()`
 - `README.md` - Update testing section to recommend `tinytsdi/tc` over deprecated global functions
 - `README.md` - Add migration note for users upgrading from v3.2 or earlier
+
+### v3.3.1. Migrate global test methods to use test container
+
+#### Step 1: Implement helper to check if current container is test container
+
+**Files to modify:** `src/tc.ts`
+
+- Add internal function to check identity:
+  - `export function isTestContainer(container: Container | null): boolean`
+  - Return `container?.getInjector === getInjector` (compare function references)
+
+#### Step 2: Update global test methods to delegate to test container
+
+**Files to modify:** `src/global.ts`
+
+- Import `isTestContainer`, `initTestContainer` from `'./tc'`
+- Import `getContainer` from `'./container'`
+- Import test container functions: `newInjector as tcNewInjector`, `setInjector as tcSetInjector`, `removeInjector as tcRemoveInjector`
+- Update `newTestInjector(options?: InjectorOptions)`:
+  - Call `checkTestInjectorAllowed()` (existing behavior)
+  - If `!isTestContainer(getContainer())`, call `initTestContainer(InstallMode.STACK)`
+  - Return `tcNewInjector(options)`
+- Update `setTestInjector(injector: Injector)`:
+  - Call `checkTestInjectorAllowed()` (existing behavior)
+  - If `!isTestContainer(getContainer())`, call `initTestContainer(InstallMode.STACK)`
+  - Return `tcSetInjector(injector)`
+- Update `removeTestInjector()`:
+  - If `isTestContainer(getContainer())`, call `uninstall()` from `'./container'`
+  - Call `tcRemoveInjector()`
+
+#### Step 3: Remove special testInjector handling in getInjector/deleteInjector
+
+**Files to modify:** `src/global.ts`
+
+- Update `getInjector()`:
+  - Remove testInjector check (now handled by container)
+  - Order becomes: container → default injector
+- Update `deleteInjector()`:
+  - Remove testInjector special handling
+  - Order becomes: container → default injector
+
+**Note:** This should be done carefully - the container check now covers test injector cases
+
+#### Step 4: Verify existing tests pass
+
+**Tests to verify:**
+
+- All existing tests in `src/test/global.test.ts` should pass without modification
+- All existing tests using global test methods should continue to work
+- Test isolation should still work correctly
+
+#### Step 5: Documentation updates
+
+**Files to modify:**
+
+- `CHANGELOG.md` - Document internal refactoring in v3.3.1 (user-facing behavior unchanged)
+- Note that deprecated methods now delegate to test container internally
 
 ### v3.4. Create default container
 
