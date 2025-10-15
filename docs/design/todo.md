@@ -22,14 +22,14 @@ Implementation:
 
 - Add `container.ts` with `install()` and `uninstall()` methods and associated types (`Container`,
   `InstallMode`).
-  - also `getContianer(): Container | null` that will be used by the `global`.
+  - also `getContainer(): Container | null` that will be used by the `global`.
   - Also `uninstallAll()` that clears the stack.
 - Container stack is stored in a module local `stack: Container[]` variable.
 - `global.ts`:
-  - `getInjector()`, `deleteInjector()` - first check if `getContainer()` reutrn a container,
+  - `getInjector()`, `deleteInjector()` - first check if `getContainer()` return a container,
     - if so, pass the call through to the currently installed container.
     - if not, install the default container, then call `getContainer()`. If the second
-      `getContainer()` dosen't return a container, throw `ThisShouldNeverHappenTMError`.
+      `getContainer()` does not return a container, throw `ThisShouldNeverHappenTMError`.
     - `getOrCreateContainer()` local function does this and guarantees to return a `Container`.
 
 Implementation phases:
@@ -44,7 +44,7 @@ Implementation phases:
   tests and e2e tests.
 - v3.3.1: convert current test global methods to install / uninstall and use the test container. all
   existing tests should pass unmodified.
-- v3.4: `containers/default.ts` (default container) implementation (not available from anywhwere).
+- v3.4: `containers/default.ts` (default container) implementation (not available from anywhere).
   write tests.
 - v 3.4.1: convert existing global container to use the default one under the hood
   (`getOrCreateContainer()` described above). mark `init` as deprecated in favor of something that
@@ -466,7 +466,8 @@ Add JSDoc `@deprecated` tags with migration guidance:
 
 - Import `isTestContainer`, `initTestContainer` from `'./tc'`
 - Import `getContainer` from `'./container'`
-- Import test container functions: `newInjector as tcNewInjector`, `setInjector as tcSetInjector`, `removeInjector as tcRemoveInjector`
+- Import test container functions: `newInjector as tcNewInjector`, `setInjector as tcSetInjector`,
+  `removeInjector as tcRemoveInjector`
 - Update `newTestInjector(options?: InjectorOptions)`:
   - Call `checkTestInjectorAllowed()` (existing behavior)
   - If `!isTestContainer(getContainer())`, call `initTestContainer(InstallMode.STACK)`
