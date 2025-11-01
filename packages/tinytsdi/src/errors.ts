@@ -60,6 +60,16 @@ export class NoMatchingTagError extends Error {
   }
 }
 
+/** Error thrown when attempting to install a container when one is already installed (THROW mode) */
+export class ContainerAlreadyInstalledError extends Error {
+  constructor() {
+    super(
+      'A container is already installed. Use InstallMode.OVERRIDE or InstallMode.STACK, or uninstall the current container first.'
+    );
+    this.name = 'ContainerAlreadyInstalledError';
+  }
+}
+
 function formatInjectionId(id: GenericInjectionId): string {
   if (id instanceof Token) {
     return id.toString();

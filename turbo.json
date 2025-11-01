@@ -13,10 +13,15 @@
       "with": ["typecheck:watch", "test"]
     },
     "fix": {
+      "cache": false,
       "dependsOn": ["fix:prettier", "fix:eslint"]
     },
-    "fix:eslint": {},
-    "fix:prettier": {},
+    "fix:eslint": {
+      "cache": false
+    },
+    "fix:prettier": {
+      "cache": false
+    },
     "fox": {
       "cache": false,
       "dependsOn": ["fix", "check"]

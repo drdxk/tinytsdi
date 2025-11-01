@@ -1,6 +1,7 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 
 import {TAG_SINK} from '../constants.js';
+import {install, uninstall} from '../container.js';
 import {AlreadyInitializedError, TestInjectorNotAllowedError} from '../errors.js';
 import {
   deleteInjector,
@@ -320,6 +321,170 @@ describe('Global API', () => {
 
       const testInjector = newTestInjector();
       expect(testInjector).toBeInstanceOf(Injector);
+    });
+  });
+
+  describe('container integration', () => {
+    function createMockContainer() {
+      const injector = new Injector();
+      const calls = {
+        getInjector: 0,
+        deleteInjector: 0,
+      };
+
+      return {
+        container: {
+          getInjector: () => {
+            calls.getInjector++;
+            return injector;
+          },
+          deleteInjector: () => {
+            calls.deleteInjector++;
+          },
+        },
+        injector,
+        calls,
+      };
+    }
+
+    beforeEach(() => {
+      // Clean up any installed containers
+      uninstall(/* all= */ true);
+    });
+
+    describe('getInjector()', () => {
+      it('returns container injector', () => {
+        const {container, injector, calls} = createMockContainer();
+        install(container);
+
+        const result = getInjector();
+        expect(result).toBe(injector);
+        expect(calls.getInjector).toBe(1);
+
+        getInjector();
+        expect(calls.getInjector).toBe(2);
+      });
+
+      it('container takes precedence over test injector', () => {
+        const token = new Token<string>('test');
+
+        // Set up test injector
+        const testInjector = newTestInjector();
+        testInjector.register({provide: token, useValue: 'test-value'});
+
+        // Install container
+        const {container, injector: containerInjector} = createMockContainer();
+        containerInjector.register({provide: token, useValue: 'container-value'});
+        install(container);
+
+        // Container should take precedence
+        expect(getInjector()).toBe(containerInjector);
+        expect(inject(token)).toBe('container-value');
+      });
+
+      it('container takes precedence over default global injector', () => {
+        const token = new Token<string>('test');
+
+        // Set up default global injector
+        register({provide: token, useValue: 'global-value'});
+        expect(inject(token)).toBe('global-value');
+
+        // Install container
+        const {container, injector: containerInjector} = createMockContainer();
+        containerInjector.register({provide: token, useValue: 'container-value'});
+        install(container);
+
+        // Container should take precedence
+        expect(getInjector()).toBe(containerInjector);
+        expect(inject(token)).toBe('container-value');
+      });
+
+      it('falls back to test injector after container uninstall', () => {
+        const token = new Token<string>('test');
+
+        // Set up test injector
+        const testInjector = newTestInjector();
+        testInjector.register({provide: token, useValue: 'test-value'});
+
+        // Install and then uninstall container
+        const {container, injector: containerInjector} = createMockContainer();
+        containerInjector.register({provide: token, useValue: 'container-value'});
+        install(container);
+        expect(inject(token)).toBe('container-value');
+
+        uninstall();
+
+        // Should fall back to test injector
+        expect(getInjector()).toBe(testInjector);
+        expect(inject(token)).toBe('test-value');
+      });
+
+      it('falls back to global injector after container uninstall (no test injector)', () => {
+        const token = new Token<string>('test');
+
+        // Set up global injector
+        register({provide: token, useValue: 'global-value'});
+        const globalInjector = getInjector();
+
+        // Install and then uninstall container
+        const {container, injector: containerInjector} = createMockContainer();
+        containerInjector.register({provide: token, useValue: 'container-value'});
+        install(container);
+        expect(inject(token)).toBe('container-value');
+
+        uninstall();
+
+        // Should fall back to global injector
+        expect(getInjector()).toBe(globalInjector);
+        expect(inject(token)).toBe('global-value');
+      });
+    });
+
+    describe('deleteInjector()', () => {
+      it('delegates to container.deleteInjector() when container is installed', () => {
+        const {container, calls} = createMockContainer();
+        install(container);
+
+        deleteInjector();
+
+        expect(calls.deleteInjector).toBe(1);
+      });
+
+      it('does not delete global injector when container is installed', () => {
+        const token = new Token<string>('test');
+
+        // Set up global injector
+        register({provide: token, useValue: 'global-value'});
+        const globalInjector = getInjector();
+
+        // Install container
+        const {container} = createMockContainer();
+        install(container);
+
+        // Call deleteInjector - should delegate to container, not delete global
+        deleteInjector();
+
+        // Uninstall container
+        uninstall();
+
+        // Global injector should still exist
+        expect(getInjector()).toBe(globalInjector);
+        expect(inject(token)).toBe('global-value');
+      });
+    });
+
+    describe('register() and inject()', () => {
+      it('use container injector', () => {
+        const token = new Token<string>('test');
+
+        const {container, injector: containerInjector} = createMockContainer();
+        install(container);
+
+        register({provide: token, useValue: 'value'});
+
+        // Should be registered in container's injector
+        expect(containerInjector.inject(token)).toBe('value');
+      });
     });
   });
 });

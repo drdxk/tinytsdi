@@ -2,6 +2,7 @@
 
 // Re-export all public types and classes
 export * from './constants.js';
+export * from './container.js';
 export * from './errors.js';
 export * from './injector.js';
 export * from './providers.js';

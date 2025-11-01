@@ -1,6 +1,7 @@
 /** Global API functions for dependency injection using a module-level singleton injector. */
 
 import {TAG_SINK} from './constants.js';
+import {getContainer} from './container.js';
 import {AlreadyInitializedError, TestInjectorNotAllowedError} from './errors.js';
 import {Injector} from './injector.js';
 
@@ -44,19 +45,31 @@ export function init(options: Partial<ContainerConfig> = {}): void {
 }
 
 /**
- * Returns the current injector instance (test injector if set, otherwise global injector).
+ * Returns the current injector instance.
  *
- * The injector is created with settings from init() if called, otherwise defaults. Multiple calls
- * return the same instance unless deleteInjector() has been called.
+ * Precedence order:
+ *
+ * 1. Container's injector (if a container is installed)
+ * 2. Test injector (if set via setTestInjector or newTestInjector)
+ * 3. Default global injector (created lazily with settings from init())
+ *
+ * Multiple calls return the same instance unless deleteInjector() has been called.
  *
  * @returns The current injector instance.
  */
 export function getInjector(): Injector {
+  // Check if a container is installed first
+  const container = getContainer();
+  if (container) {
+    return container.getInjector();
+  }
+
   // Return test injector if one is set
   if (testInjector) {
     return testInjector;
   }
 
+  // Create or return the default global injector
   if (!injector) {
     const defaultAllowOverrides = config?.defaultAllowOverrides ?? false;
     injector = new Injector({defaultAllowOverrides});
@@ -65,7 +78,10 @@ export function getInjector(): Injector {
 }
 
 /**
- * Deletes the current global injector instance.
+ * Deletes the current injector instance.
+ *
+ * If a container is installed, delegates to the container's deleteInjector() method. Otherwise,
+ * deletes the current global injector instance.
  *
  * The next call to getInjector(), register(), or inject() will create a new injector. This is
  * primarily useful for testing to reset the global state between tests.
@@ -80,6 +96,14 @@ export function getInjector(): Injector {
  * ```
  */
 export function deleteInjector(): void {
+  // Delegate to container if one is installed
+  const container = getContainer();
+  if (container) {
+    container.deleteInjector();
+    return;
+  }
+
+  // Otherwise, delete the default global injector
   injector = undefined;
 }
 

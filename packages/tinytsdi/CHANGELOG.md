@@ -1,5 +1,30 @@
 # Changelog
 
+## [3.2.0] - 2025.11.01
+
+### Added
+
+**Custom Containers**
+
+- `Container` interface for implementing custom DI containers
+  - `getInjector(): Injector` - Returns the current injector managed by the container
+  - `deleteInjector(): void` - Deletes/cleans up the injector managed by the container
+- `InstallMode` type for controlling container installation behavior
+  - `'throw'` - Throw error if container already installed (default mode)
+  - `'override'` - Replace the currently installed container
+  - `'stack'` - Stack the new container on top of existing containers (useful for testing)
+- `install(container: Container, mode?: InstallMode)` - Install a container to handle global
+  inject() and register() calls
+- `uninstall(all?: boolean)` - Uninstall the currently active container
+  - `all: false` (default) - Remove only the top container from the stack
+  - `all: true` - Clear the entire container stack
+- `getContainer(): Container | null` - Get the currently active container
+- Global API integration with containers
+  - `getInjector()` now checks for installed containers first (precedence: container → testInjector
+    → default)
+  - `deleteInjector()` now delegates to container's `deleteInjector()` when a container is installed
+  - `register()` and `inject()` work through the container's injector when installed
+
 ## [3.1.0] - 2025.10.05
 
 ### Added

@@ -4,7 +4,9 @@ Minimalistic (yet _useful_ and _elegant_) TypeScript Dependency Injection librar
 runtime reflection or complex terminology - just a simple, type-safe dependency management with a
 default global container.
 
-✅ **v3.1.0:** now with targeted providers!
+✅ **v3.2.0:** now with custom containers!
+
+✅ **v3.1.0:** added targeted providers
 
 ## Quick Start
 
@@ -215,6 +217,12 @@ See JSDoc comments in the source code for detailed API documentation! Generated 
 - **`setTestInjector(injector)`** - Set a custom injector as the test injector
 - **`removeTestInjector()`** - Restore previous non-test global injector
 
+#### Container Functions
+
+- **`install(container: Container, mode?: InstallMode)`** - Install a custom container
+- **`uninstall(all?: boolean)`** - Uninstall the active container (or all if `all: true`)
+- **`getContainer(): Container | null`** - Get the currently installed container
+
 ### Provider Types
 
 #### Value Provider
@@ -305,6 +313,8 @@ injector.fork({                     // Create child injector with ForkOptions
 type Token<T>           // Type-safe injection ID
 type InjectionId<T>     // Token<T> | Constructor<T>
 type InjectFn           // typeof inject
+interface Container     // Custom container interface
+type InstallMode        // 'throw' | 'override' | 'stack'
 ```
 
 ### Errors
@@ -317,6 +327,7 @@ The library throws specific errors (see JSDoc of any method):
 - **`UnknownProviderError`** - Unsupported provider type
 - **`AlreadyInitializedError`** - Multiple `init()` calls
 - **`TestInjectorNotAllowedError`** - Test functions disabled via config
+- **`ContainerAlreadyInstalledError`** - Container already installed (when mode is 'throw')
 
 ## Additional Features
 
@@ -395,6 +406,85 @@ When a provider has `at: 'app'`, registration walks up the hierarchy to the firs
 - `TAG_SINK` (`=== Symbol.for('sink')`) - Injectors tagged as sinks ignore provider targeting. This
   tag is meant to be used for testing environment injectors.
 
+### Custom Containers
+
+When a container is installed, global functions (`inject()`, `register()`, `getInjector()`,
+`deleteInjector()`) delegate to the installed container's injector. Containers generally expose
+other methods to be used directly, such as for hierarchy management (adding and removing injectors).
+
+#### Container Interface
+
+```typescript
+interface Container {
+  getInjector(): Injector; // Called by global API to get the injector
+  deleteInjector(): void; // Called when deleteInjector() is invoked
+}
+```
+
+#### Creating Custom Containers
+
+```typescript
+import {Injector, type Container} from 'tinytsdi';
+
+const injector = new Injector();
+injector.register({provide: CONFIG, useValue: {env: 'custom'}});
+
+const container: Container = {
+  getInjector: () => injector,
+  deleteInjector: () => {
+    // Optional cleanup logic
+  },
+};
+```
+
+#### Installing Containers
+
+```typescript
+import {install, uninstall, getContainer} from 'tinytsdi';
+
+// Install container
+install(container);
+
+// Global API now uses container's injector
+inject(CONFIG); // Delegates to container.getInjector().inject(CONFIG)
+
+// Check active container
+getContainer(); // Returns installed container
+
+// Uninstall
+uninstall();
+```
+
+**Install Modes:**
+
+```typescript
+install(container); // 'throw' (default) - Error if already installed
+install(container, 'override'); // Replace current container
+install(container, 'stack'); // Stack on top (for temporary overrides)
+
+uninstall(); // Remove top container
+uninstall(true); // Clear entire stack
+```
+
+**Example: Test Container**
+
+```typescript
+beforeEach(() => {
+  const testInjector = new Injector({defaultAllowOverrides: true});
+  testInjector.register({provide: CONFIG, useValue: testConfig});
+
+  install(
+    {
+      getInjector: () => testInjector,
+      deleteInjector: () => {},
+    },
+    'stack'
+  );
+});
+
+afterEach(() => uninstall());
+```
+
 ### Async
 
 ```typescript
@@ -431,7 +521,6 @@ aka "this is by design" of _minimialistic_ DI
 
 ## Coming Up Next
 
-- Custom containers support
 - Separate default testing container
 - Hierarchical containers (`node` (`ALS`), `fastify`, `express`, `react`, in that order of
   likelihood)
