@@ -110,9 +110,7 @@ export function deleteInjector(): void {
 /**
  * Registers one or more providers with the global injector.
  *
- * @example
- *
- * Providers:
+ * @example Providers:
  *
  * ```typescript
  * // Value provider

@@ -30,7 +30,9 @@
       "dependsOn": ["lint:eslint", "lint:prettier"],
       "cache": false
     },
-    "lint:eslint": {},
+    "lint:eslint": {
+      "dependsOn": ["^build"]
+    },
     "lint:prettier": {},
     "pub": {
       "cache": false,
@@ -41,8 +43,11 @@
       "persistent": true
     },
     "test:run": {},
-    "typecheck": {},
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
     "typecheck:watch": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
