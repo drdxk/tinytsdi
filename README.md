@@ -5,6 +5,8 @@ using Turborepo and pnpm workspaces.
 
 [→ `tinytsdi` documentation](./packages/tinytsdi/README.md)
 
+![full check checks](https://github.com/drdxk/tinytsdi/actions/workflows/full_check.yml/badge.svg?branch=main&event=push)
+
 ## Structure
 
 ```
