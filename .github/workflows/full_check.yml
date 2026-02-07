@@ -1,0 +1,18 @@
+name: Full Check
+
+on: push
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: "package.json"
+          check-latest: true
+          cache: "pnpm"
+      - run: pnpm install
+      - run: pnpm run check
+      - run: pnpm run root:check
