@@ -1,5 +1,6 @@
+import {createTypeScriptImportResolver} from 'eslint-import-resolver-typescript';
 import globals from 'globals';
-import importPlugin from 'eslint-plugin-import';
+import importPlugin from 'eslint-plugin-import-x';
 import js from '@eslint/js';
 import jsdoc from 'eslint-plugin-jsdoc';
 import prettierConfig from 'eslint-config-prettier';
@@ -32,7 +33,7 @@ export function createEslintConfig(basePath = 'src') {
         '@typescript-eslint': tseslint,
         jsdoc: jsdoc,
         tsdoc: tsdoc,
-        import: importPlugin,
+        'import-x': importPlugin,
       },
       rules: {
         ...js.configs.recommended.rules,
@@ -67,8 +68,8 @@ export function createEslintConfig(basePath = 'src') {
         'tsdoc/syntax': 'error',
 
         // Import order
-        'import/no-unresolved': 'error',
-        'import/order': [
+        'import-x/no-unresolved': 'error',
+        'import-x/order': [
           'error',
           {
             groups: [
@@ -91,17 +92,22 @@ export function createEslintConfig(basePath = 'src') {
           },
         ],
 
-        'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
+        'import-x/consistent-type-specifier-style': ['error', 'prefer-top-level'],
       },
       settings: {
         // Add JSDoc settings here for this config object
         jsdoc: {
           mode: 'typescript', // Essential for eslint-plugin-jsdoc to understand TS JSDoc
         },
-        'import/resolver': {
-          typescript: true,
-          node: true,
-        },
+        'import-x/resolver-next': [createTypeScriptImportResolver()],
+      },
+    },
+    {
+      basePath,
+      files: ['**/*.ct.ts'],
+      rules: {
+        // Compile-test files intentionally reassign variables for type verification
+        'no-useless-assignment': 'off',
       },
     },
     prettierConfig,

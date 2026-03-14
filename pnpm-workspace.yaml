@@ -6,11 +6,16 @@ catalogs:
     vite: 7.3.1
     vite-plugin-dts: 4.5.4
   dev:
-    eslint: 9.39.3
+    eslint: 10.0.3
     prettier: 3.8.1
     typescript: 5.9.3
     vitest: 4.0.18
   types:
     '@types/node': 25.4.0
+
+overrides:
+  # eslint-plugin-import-x is being used instead of eslint-plugin-import;
+  # prevent the old plugin from resolving as an optional peer of eslint-import-resolver-typescript
+  eslint-plugin-import: '-'
 
 minimumReleaseAge: 4320
