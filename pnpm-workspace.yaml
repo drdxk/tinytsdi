@@ -13,4 +13,9 @@ catalogs:
   types:
     '@types/node': 25.4.0
 
+overrides:
+  # eslint-import-resolver-typescript has eslint-plugin-import as an optional peer;
+  # we use eslint-plugin-import-x instead, so prevent the old plugin from resolving
+  eslint-plugin-import: '-'
+
 minimumReleaseAge: 4320

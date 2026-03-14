@@ -1,3 +1,4 @@
+import {createTypeScriptImportResolver} from 'eslint-import-resolver-typescript';
 import globals from 'globals';
 import importPlugin from 'eslint-plugin-import-x';
 import js from '@eslint/js';
@@ -98,10 +99,7 @@ export function createEslintConfig(basePath = 'src') {
         jsdoc: {
           mode: 'typescript', // Essential for eslint-plugin-jsdoc to understand TS JSDoc
         },
-        'import-x/resolver': {
-          typescript: true,
-          node: true,
-        },
+        'import-x/resolver-next': [createTypeScriptImportResolver()],
       },
     },
     {
