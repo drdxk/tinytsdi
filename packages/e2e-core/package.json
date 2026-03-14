@@ -4,9 +4,6 @@
   "description": "End-to-end tests for tinytsdi library",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": ">=24.0.0"
-  },
   "scripts": {
     "e2e:test:run": "vitest run",
     "e2e:test": "vitest",
