@@ -11,6 +11,6 @@ catalogs:
     typescript: 5.9.3
     vitest: 4.0.18
   types:
-    '@types/node': 25.3.0
+    '@types/node': 25.4.0
 
 minimumReleaseAge: 4320
